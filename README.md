@@ -55,8 +55,21 @@ WIkilympics merupakan sebuah aplikasi mobile yang dirancang untuk menyediakan in
     Admin dapat menambahkan, mengedit, dan menghapus pertanyaan polling terkait olahraga Olimpiade.
 
 ## Peran Pengguna Aplikasi
+- Pengguna (User)
+    - Menjelajahi informasi seputar olahraga, atlet, berita, dan event Olimpiade melalui halaman list, pencarian, dan detail.
+    - *[Khusus pengguna terautentikasi]* Memberikan ulasan serta berinteraksi dalam forum komunitas melalui fitur *reply*.
+- Admin
+    - Mengelola seluruh informasi dalam aplikasi—mulai dari olahraga, atlet, berita, event, hingga forum diskusi—dengan menambahkan, mengedit, dan menghapus data agar tetap akurat dan terbarui.
 
 ## Alur pengintegrasian dengan *web service* untuk terhubung dengan aplikasi web yang sudah dibuat saat Proyek Tengah Semester
+
+Integrasi dimulai dengan **menambahkan dependensi `http` pada proyek Flutter**. Dependensi ini memungkinkan Flutter melakukan http request ke web service Django.
+
+Setelah itu, **dibuat model sesuai dengan respons dari data yang berasal dari web service tersebut**. Model ini memerlukan method `fromJson` dan `toJson` agar data dari Django dapat dikonversi dengan mudah ke objek Dart dan sebaliknya.
+
+Kemudian **dilakukan http request ke web service menggunakan dependensi `http`**. Objek yang diterima dari web service kemudian **dikonversi ke model yang telah dibuat sebelumnya** menggunakan `Model.fromJson()`.
+
+Tahap akhir adalah **menampilkan data yang sudah dikonversi melalui widget seperti `FutureBuilder`**. Widget ini memastikan antarmuka menyesuaikan keadaan data, seperti menampilkan indikator loading saat permintaan sedang diproses, menampilkan error bila terjadi kegagalan, atau menyajikan daftar dan halaman detail ketika data berhasil diambil.
 
 [Link Figma](https://www.figma.com/design/8s9shJvl1GytVinYODj2Mw/Untitled?node-id=2-11&t=RTs0siFokXQJyazt-1)
 Untuk Design terdapat pada page 2
