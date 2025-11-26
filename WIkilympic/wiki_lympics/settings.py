@@ -32,6 +32,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "razan-muhammad-wikilympics.pbp.cs.ui.ac.id"]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id"
+]
+
 
 # Application definition
 
@@ -42,11 +46,18 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'main',
+    'article',
+    'sports',
+    'landingpoll',
+    'upcoming_event',
     'forum_section',
+    'athletes',
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -61,7 +72,9 @@ ROOT_URLCONF = "wiki_lympics.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        'DIRS': [BASE_DIR / 'templates'],
+        "DIRS": [BASE_DIR / "templates",
+                 BASE_DIR / "forum_section" / "templates",],
+        
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -78,6 +91,7 @@ WSGI_APPLICATION = "wiki_lympics.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+
 
 # Database configuration
 if PRODUCTION:
