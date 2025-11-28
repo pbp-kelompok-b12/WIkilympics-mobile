@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wikilympics/screens/menu.dart';
+import 'package:wikilympics/screens/landingpoll/menu.dart';
 import 'package:wikilympics/screens/register.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
                 secondary: const Color(0xFFD9E3E4),
             ),
         ),
-        home: const RegisterPage(),
+        home: const MyHomePage(),
       ),
     );
   }
