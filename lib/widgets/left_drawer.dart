@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wikilympics/Razan/Screens/forum_main.dart';
 import 'package:wikilympics/screens/landingpoll/menu.dart';
 import 'package:wikilympics/screens/login.dart';
 
@@ -109,7 +110,7 @@ class LeftDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MyHomePage(),
+                    builder: (context) => ForumListPage(),
                   ));
             },
           ),
