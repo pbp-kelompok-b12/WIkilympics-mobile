@@ -132,20 +132,6 @@ class _ArticleListPageState extends State<ArticleListPage> {
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text(
-      //     "WIKILYMPICS", 
-      //     style: TextStyle(
-      //       color: Colors.white, 
-      //       fontWeight: FontWeight.w900,
-      //       letterSpacing: 2.0,
-      //     )
-      //   ),
-      //   backgroundColor: kPrimaryNavy,
-      //   iconTheme: const IconThemeData(color: Colors.white),
-      //   elevation: 0,
-      // ),
-
       appBar: AppBar(
         title: Image.asset(
           'assets/wikilympics_banner.png', 
@@ -177,7 +163,7 @@ class _ArticleListPageState extends State<ArticleListPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       
-      // --- Body List Artikel ---
+      // Body List Artikel
       body: FutureBuilder(
         future: fetchArticles(request),
         builder: (context, AsyncSnapshot snapshot) {
