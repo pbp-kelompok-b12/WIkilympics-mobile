@@ -1,51 +1,90 @@
 import 'package:flutter/material.dart';
 import 'package:wikilympics/widgets/left_drawer.dart';
 import 'package:wikilympics/screens/login.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart'; // Tambah ini
+import 'package:provider/provider.dart'; // Tambah ini
 
 class MyHomePage extends StatelessWidget {
-    const MyHomePage({super.key});
+  const MyHomePage({super.key});
 
-    @override
-    Widget build(BuildContext context) {
-        // Scaffold menyediakan struktur dasar halaman dengan AppBar dan body.
-        return Scaffold(
-            // AppBar adalah bagian atas halaman yang menampilkan judul.
-            appBar: AppBar(
-                // Judul aplikasi "Football News" dengan teks putih dan tebal.
-                title: const Text(
-                    'Football News',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                    ),
-                ),
-                // Warna latar belakang AppBar diambil dari skema warna tema aplikasi.
-                backgroundColor: Theme
-                    .of(context)
-                    .colorScheme
-                    .primary,
+  @override
+  Widget build(BuildContext context) {
+    // 1. Ambil state request. Gunakan 'watch' agar UI refresh saat status login berubah
+    final request = context.watch<CookieRequest>();
 
-                // 👉 Tambahan tombol di pojok kanan
-                actions: [
-                    TextButton(
-                        onPressed: () {
-                            // TODO: arahkan ke halaman login
-                            Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginPage()));
-                        },
-                        child: const Text(
-                            'Sign In',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                            ),
-                        ),
-                    ),
-                ],
-
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Football News',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        
+        // 2. Logika Tampilan Tombol
+        actions: [
+          // Jika User SUDAH Login
+          if (request.loggedIn) ...[
+            Center(
+              child: Text(
+                "Hi, ${request.jsonData['username'] ?? 'User'}", // Menampilkan nama user (opsional)
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
             ),
-
-
-            drawer: const LeftDrawer(),
-        );
-    }
+            IconButton(
+              icon: const Icon(Icons.logout, color: Colors.white),
+              onPressed: () async {
+                // Logika Logout
+                final response = await request.logout(
+                  "http://localhost:8000/auth/logout/" // Sesuaikan URL logout Django kamu
+                );
+                
+                String message = response["message"];
+                if (context.mounted) {
+                  if (response['status']) {
+                    String uname = response["username"];
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text("$message Sampai jumpa, $uname."),
+                    ));
+                    // Tidak perlu navigasi, karena UI akan auto-refresh (tombol jadi Sign In lagi)
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(message),
+                    ));
+                  }
+                }
+              },
+              tooltip: "Logout",
+            )
+          ]
+          // Jika User BELUM Login
+          else ...[
+            TextButton(
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const LoginPage()));
+              },
+              child: const Text(
+                'Sign In',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+      drawer: const LeftDrawer(),
+      body: Center(
+        child: Text(
+          request.loggedIn 
+              ? "Kamu sudah login!" 
+              : "Silakan login untuk akses fitur.",
+        ),
+      ),
+    );
+  }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wikilympics/screens/landingpoll/menu.dart';
-import 'package:wikilympics/screens/login.dart';
+import 'package:wikilympics/screens/article/article_list.dart';
 
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -16,7 +16,7 @@ class LeftDrawer extends StatelessWidget {
         children: [
           const DrawerHeader(
             decoration: BoxDecoration(
-              color: Colors.blue,
+              color: Color(0xFF0A203D),
             ),
             child: Column(
               children: [
@@ -90,14 +90,14 @@ class LeftDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.home_outlined),
+            leading: const Icon(Icons.article),
             title: const Text('Articles'),
             // Bagian redirection ke MyHomePage
             onTap: () {
               Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MyHomePage(),
+                    builder: (context) => ArticleListPage(),
                   ));
             },
           ),
@@ -137,7 +137,7 @@ class LeftDrawer extends StatelessWidget {
 
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                    MaterialPageRoute(builder: (context) => const MyHomePage()),
                   );
 
                 } else {
