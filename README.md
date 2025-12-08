@@ -73,3 +73,6 @@ Tahap akhir adalah **menampilkan data yang sudah dikonversi melalui widget seper
 
 [Link Figma](https://www.figma.com/design/8s9shJvl1GytVinYODj2Mw/Untitled?node-id=2-11&t=RTs0siFokXQJyazt-1)
 Untuk Design terdapat pada page 2
+
+
+
