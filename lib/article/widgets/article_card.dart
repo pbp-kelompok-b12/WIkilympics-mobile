@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:wikilympics/models/article/article_entry.dart';
+import 'package:wikilympics/article/models/article_entry.dart';
 
 class ArticleCard extends StatelessWidget {
   final ArticleEntry article;
