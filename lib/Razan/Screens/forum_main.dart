@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:wikilympics/Razan/Screens/discussion_entry_card.dart';
 import 'package:wikilympics/Razan/models/forum_entry.dart';
 import 'package:wikilympics/Razan/Screens/forum_entry_card.dart';
 
@@ -52,6 +53,8 @@ class _ForumListPageState extends State<ForumListPage> {
                 return ForumEntryCard(
                   forum: forum,
                   onTap: () {
+                    Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const DiscussionEntryCard()));
                    
                     print("Tapped on forum: ${forum.fields.topic}");
                   },
