@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:wikilympics/Razan/models/discussion_entry.dart';
+import 'package:wikilympics/Razan/models/discussion_entry.dart'; // Make sure path is correct
 
 class DiscussionEntryCard extends StatelessWidget {
   final DiscussionEntry discussion;
+
   const DiscussionEntryCard({
     super.key,
     required this.discussion,
