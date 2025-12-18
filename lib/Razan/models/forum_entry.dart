@@ -8,6 +8,7 @@ List<ForumEntry> forumEntryFromJson(String str) => List<ForumEntry>.from(json.de
 
 String forumEntryToJson(List<ForumEntry> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
+
 class ForumEntry {
     String model;
     int pk;

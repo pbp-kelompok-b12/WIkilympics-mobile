@@ -28,7 +28,7 @@ class DiscussionEntryCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  "User #${discussion.fields.username}", 
+                  discussion.fields.username, 
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,

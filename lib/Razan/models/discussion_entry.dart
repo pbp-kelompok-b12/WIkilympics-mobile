@@ -1,6 +1,4 @@
-// To parse this JSON data, do
-//
-//     final discussionEntry = discussionEntryFromJson(jsonString);
+
 
 import 'dart:convert';
 
@@ -33,20 +31,23 @@ class DiscussionEntry {
 }
 
 class Fields {
-    int username;
+    String username;  // Changed from int to String
+    int username_id;  // Keep the ID separately if needed
     int forum;
     String discuss;
     DateTime dateCreated;
 
     Fields({
         required this.username,
+        required this.username_id,
         required this.forum,
         required this.discuss,
         required this.dateCreated,
     });
 
     factory Fields.fromJson(Map<String, dynamic> json) => Fields(
-        username: json["username"],
+        username: json["username"] is int ? "User #${json["username"]}" : json["username"].toString(),
+        username_id: json["username_id"] ?? (json["username"] is int ? json["username"] : 0),
         forum: json["forum"],
         discuss: json["discuss"],
         dateCreated: DateTime.parse(json["date_created"]),
@@ -54,6 +55,7 @@ class Fields {
 
     Map<String, dynamic> toJson() => {
         "username": username,
+        "username_id": username_id,
         "forum": forum,
         "discuss": discuss,
         "date_created": dateCreated.toIso8601String(),

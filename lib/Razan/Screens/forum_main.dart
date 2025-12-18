@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:wikilympics/Razan/Screens/discussion_entry_card.dart';
 import 'package:wikilympics/Razan/models/forum_entry.dart';
 import 'package:wikilympics/Razan/Screens/forum_entry_card.dart';
-
-import 'package:wikilympics/Razan/models/discussion_entry.dart';
+import 'package:wikilympics/Razan/Screens/forum_detail.dart';
+import 'package:wikilympics/Razan/models/forum_entry.dart';
 
 class ForumListPage extends StatefulWidget {
   const ForumListPage({super.key});
@@ -53,10 +53,12 @@ class _ForumListPageState extends State<ForumListPage> {
                 return ForumEntryCard(
                   forum: forum,
                   onTap: () {
-                    Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const DiscussionEntryCard()));
-                   
-                    print("Tapped on forum: ${forum.fields.topic}");
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ForumDetailPage(forum: forum),
+                      ),
+                    );
                   },
                 );
               },

@@ -4,7 +4,6 @@ import 'package:wikilympics/Razan/models/forum_entry.dart';
 class ForumEntryCard extends StatelessWidget {
   final ForumEntry forum;
   final VoidCallback onTap;
-
   const ForumEntryCard({
     super.key,
     required this.forum,
