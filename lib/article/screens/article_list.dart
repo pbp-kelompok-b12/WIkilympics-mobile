@@ -393,9 +393,6 @@ class _ArticleListPageState extends State<ArticleListPage> {
   }
 
   void _handleNavigation(CookieRequest request, ArticleEntry article) async{
-    if (!request.loggedIn) {
-      _showLoginDialog(context);
-    } else {
       // Navigator.push(context, MaterialPageRoute(builder: (context) => ArticleDetailPage(article: article)));
       await Navigator.push(
         context, 
@@ -408,7 +405,6 @@ class _ArticleListPageState extends State<ArticleListPage> {
           // Ini akan memicu FutureBuilder untuk memanggil fetchArticles lagi
         });
       }
-    }
   }
 
   Widget _buildChip(String label) {
@@ -431,21 +427,5 @@ class _ArticleListPageState extends State<ArticleListPage> {
     );
   }
 
-  void _showLoginDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Login Required'),
-        content: const Text('You need to be logged in to view the details.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          TextButton(onPressed: () { 
-            Navigator.pop(context); 
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage())); 
-          }, child: const Text('Login')),
-        ],
-      ),
-    );
-  }
   
 }
