@@ -17,10 +17,45 @@ class EventsListScreen extends StatefulWidget {
 class _EventsListScreenState extends State<EventsListScreen> {
   String _searchQuery = "";
 
+  Future<List<EventEntry>> fetchEvents(CookieRequest request) async {
+    final response = await request.get('http://127.0.0.1:8000/upcoming_event/json/');
+    List<EventEntry> events = [];
+    for (var item in response) {
+      events.add(EventEntry.fromJson(item));
+    }
+    return events;
+  }
+
+  void _deleteEvent(CookieRequest request, int id) async {
+    final response = await request.post(
+      'http://127.0.0.1:8000/upcoming_event/delete-flutter/$id/',
+      {},
+    );
+
+    if (mounted) {
+      if (response['status'] == 'success' || response['success'] == true) {
+        setState(() {});
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Event deleted successfully!", style: GoogleFonts.poppins()),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Failed to delete event: ${response['message']}", style: GoogleFonts.poppins()),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
-    bool isAdmin = true; // Hardcoded true untuk testing
+    bool isAdmin = request.jsonData['is_superuser'] ?? false;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -34,15 +69,14 @@ class _EventsListScreenState extends State<EventsListScreen> {
             letterSpacing: 1.5,
           ),
         ),
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        leading: const Icon(Icons.menu, color: Colors.black),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Search Bar
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Center(
@@ -70,8 +104,6 @@ class _EventsListScreenState extends State<EventsListScreen> {
               ),
             ),
           ),
-
-          // Judul Section
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
             child: Text(
@@ -83,7 +115,6 @@ class _EventsListScreenState extends State<EventsListScreen> {
               ),
             ),
           ),
-
           Expanded(
             child: FutureBuilder<List<EventEntry>>(
               future: fetchEvents(request),
@@ -91,12 +122,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(
-                    child: Text(
-                      'No Upcoming Events found.',
-                      style: GoogleFonts.poppins(),
-                    ),
-                  );
+                  return Center(child: Text('No Upcoming Events found.', style: GoogleFonts.poppins()));
                 } else {
                   var filteredData = snapshot.data!.where((event) =>
                   event.name.toLowerCase().contains(_searchQuery) ||
@@ -118,57 +144,21 @@ class _EventsListScreenState extends State<EventsListScreen> {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(
-                              builder: (context) => EventDetailScreen(event: event),
-                            ),
+                            MaterialPageRoute(builder: (context) => EventDetailScreen(event: event)),
                           );
                         },
-                        onEdit: () async {
+                        onEdit: isAdmin
+                            ? () async {
                           final refresh = await Navigator.push(
                             context,
-                            MaterialPageRoute(
-                              builder: (context) => EditEventScreen(event: event),
-                            ),
+                            MaterialPageRoute(builder: (context) => EditEventScreen(event: event)),
                           );
                           if (refresh == true) setState(() {});
-                        },
-                        onDelete: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: Text(
-                                "Delete Event",
-                                style: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.bold,
-                                  color: const Color(0xFF03045E),
-                                ),
-                              ),
-                              content: Text(
-                                "Are you sure you want to delete ${event.name}?",
-                                style: GoogleFonts.poppins(),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: Text(
-                                    "Cancel",
-                                    style: GoogleFonts.poppins(color: Colors.grey),
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    _deleteEvent(request, event.id);
-                                  },
-                                  child: Text(
-                                    "Delete",
-                                    style: GoogleFonts.poppins(color: Colors.red, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
+                        }
+                            : null,
+                        onDelete: isAdmin
+                            ? () => _showDeleteDialog(request, event)
+                            : null,
                       );
                     },
                   );
@@ -180,10 +170,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
       ),
       floatingActionButton: isAdmin ? FloatingActionButton(
         onPressed: () async {
-          final refresh = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddEventScreen()),
-          );
+          final refresh = await Navigator.push(context, MaterialPageRoute(builder: (context) => const AddEventScreen()));
           if (refresh == true) setState(() {});
         },
         backgroundColor: const Color(0xFF03045E),
@@ -192,27 +179,23 @@ class _EventsListScreenState extends State<EventsListScreen> {
     );
   }
 
-  Future<List<EventEntry>> fetchEvents(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/upcoming_event/json/');
-    List<EventEntry> events = [];
-    for (var item in response) {
-      events.add(EventEntry.fromJson(item));
-    }
-    return events;
-  }
-
-  void _deleteEvent(CookieRequest request, int id) async {
-    final response = await request.post(
-      'http://127.0.0.1:8000/upcoming_event/delete-event/$id/',
-      {},
+  void _showDeleteDialog(CookieRequest request, EventEntry event) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Delete Event", style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: const Color(0xFF03045E))),
+        content: Text("Are you sure you want to delete ${event.name}?", style: GoogleFonts.poppins()),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: Text("Cancel", style: GoogleFonts.poppins(color: Colors.grey))),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _deleteEvent(request, event.id);
+            },
+            child: Text("Delete", style: GoogleFonts.poppins(color: Colors.red, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
     );
-    if (response['success'] == true) {
-      setState(() {});
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Event deleted!", style: GoogleFonts.poppins())),
-        );
-      }
-    }
   }
 }
