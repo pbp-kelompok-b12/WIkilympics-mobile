@@ -612,57 +612,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           // ===== LATEST ARTICLES =====
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Latest Articles",
-                  style: GoogleFonts.poppins(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF155F90),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                FutureBuilder<List<ArticleEntry>>(
-                  future: fetchArticles(request),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Text("No articles available");
-                    }
-                    final articles = snapshot.data!.take(2).toList();
-                    return Column(
-                      children: articles.map((article) {
-                        return LatestArticleCard(
-                          imageUrl: article.thumbnail.isNotEmpty
-                              ? article.thumbnail
-                              : "https://picsum.photos/600",
-                          title: article.title,
-                          author: article.category,
-                          date: "${article.created.day.toString().padLeft(2, '0')} "
-                              "${article.created.month.toString().padLeft(2, '0')} "
-                              "${article.created.year}",
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => ArticleDetailPage(article: article),
-                              ),
-                            );
-                          },
-                        );
-                      }).toList(),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
 
           // ===== FORUM & REVIEWS =====
           Padding(
@@ -915,19 +864,8 @@ Future<List<SportEntry>> fetchSports(CookieRequest request) async {
   return listSports;
 }
 
-Future<List<ArticleEntry>> fetchArticles(CookieRequest request) async {
-  final response = await request.get('http://127.0.0.1:8000/article/json/');
-  List<ArticleEntry> listArticles = [];
-  for (var d in response) {
-    if (d != null) {
-      listArticles.add(ArticleEntry.fromJson(d));
-    }
-  }
-  return listArticles;
-}
-
 Future<List<EventEntry>> fetchEvents(CookieRequest request) async {
-  final response = await request.get('http://127.0.0.1:8000/upcoming_events/json/');
+  final response = await request.get('http://127.0.0.1:8000/upcoming_event/json/');
   List<EventEntry> listEvents = [];
   for (var d in response) {
     if (d != null) {

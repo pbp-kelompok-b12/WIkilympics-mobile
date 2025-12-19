@@ -22,17 +22,16 @@ class UpcomingEventCard extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        // Beri jarak antar item
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 1. IMAGE (Diperbesar sedikit agar sesuai Figma)
+            // 1. IMAGE (Tetap sesuai kode kamu)
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: SizedBox(
-                width: 110, // Lebar diperbesar
-                height: 75, // Tinggi disesuaikan rasio
+                width: 110,
+                height: 75,
                 child: FittedBox(
                   fit: BoxFit.cover,
                   child: image,
@@ -54,28 +53,37 @@ class UpcomingEventCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.poppins(
                       fontSize: 15,
-                      fontWeight: FontWeight.w700, // Lebih tebal (Bold)
+                      fontWeight: FontWeight.w700,
                       color: const Color(0xFF01203F),
-                      height: 1.2, // Spasi antar baris judul
+                      height: 1.2,
                     ),
                   ),
                   const SizedBox(height: 8),
 
-                  // Author & Date
+                  // Author & Date (INI BAGIAN YANG DIPERBAIKI)
                   Row(
                     children: [
-                      Text(
-                        "By $author",
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w500,
+                      // Bungkus Author dengan Flexible agar tidak nabrak kanan
+                      Flexible(
+                        child: Text(
+                          "By $author",
+                          maxLines: 1, // Batasi 1 baris
+                          overflow: TextOverflow.ellipsis, // Kalo panjang jadi "..."
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
+
+                      // Separator (Icon)
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 6),
                         child: Icon(Icons.circle, size: 4, color: Colors.grey),
                       ),
+
+                      // Date (Tidak perlu Flexible, karena kita mau tanggal selalu terlihat)
                       Text(
                         date,
                         style: GoogleFonts.poppins(
