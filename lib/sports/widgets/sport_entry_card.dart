@@ -29,12 +29,11 @@ class SportEntryCard extends StatelessWidget {
 
     String structureDesc;
     if (rawStructure == 'BOTH') {
-      structureDesc = 'INDIVIDUAL & TEAM'; // Memperjelas makna BOTH
+      structureDesc = 'INDIVIDUAL & TEAM';
     } else {
-      structureDesc = rawStructure; // TEAM atau INDIVIDUAL
+      structureDesc = rawStructure;
     }
 
-    // 3. Gabungkan dengan format: CATEGORY | STRUCTURE
     return '$category | $structureDesc';
   }
 
@@ -67,20 +66,13 @@ class SportEntryCard extends StatelessWidget {
               /// ================= 1. TOP SECTION (IMAGE) =================
               Container(
                 height: 200,
-                color: Colors.white,
+                color: Colors.grey[200],
                 child: Image.network(
                   'http://localhost:8000/sports/proxy-image/?url=${Uri.encodeComponent(sport.fields.sportImg)}',
                   fit: BoxFit.cover,
                   alignment: Alignment.topCenter,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    color: Colors.grey[200],
-                    child: const Center(
-                      child: Icon(
-                        Icons.sports,
-                        size: 50,
-                        color: Colors.grey,
-                      ),
-                    ),
+                  errorBuilder: (context, error, stackTrace) => const Center(
+                    child: Icon(Icons.broken_image, size: 50, color: Colors.grey),
                   ),
                 ),
               ),
@@ -125,14 +117,13 @@ class SportEntryCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
 
-                          // --- UPDATE PANGGILAN FUNGSI DI SINI ---
-                          // Tampilkan: CATEGORY | STRUCTURE
+                          // Info Category | Structure
                           Text(
                             _formatSportInfo(sport.fields),
                             style: TextStyle(
                               color: Colors.blueGrey[200],
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
@@ -143,10 +134,7 @@ class SportEntryCard extends StatelessWidget {
                     Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(4),
-                        border: Border.all(
-                          color: Colors.white24,
-                          width: 1,
-                        ),
+                        border: Border.all(color: Colors.white24, width: 1),
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(4),
@@ -156,11 +144,7 @@ class SportEntryCard extends StatelessWidget {
                           height: 22,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) =>
-                              const Icon(
-                            Icons.flag,
-                            color: Colors.white,
-                            size: 20,
-                          ),
+                              const Icon(Icons.flag, color: Colors.white, size: 20),
                         ),
                       ),
                     ),
