@@ -1,35 +1,35 @@
-import 'package:pbp_django_auth/pbp_django_auth.dart';
-import 'package:provider/provider.dart';
-
-import 'package:wikilympics/article/models/article_entry.dart';
-import 'package:wikilympics/article/widgets/article_card.dart';
-import 'package:wikilympics/article/screens/article_detail.dart';
-
-import 'dart:math';
 import 'package:flutter/material.dart';
+import 'dart:math';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
-// polling
-import '../models/poll_model.dart';
-import '../widgets/poll_service.dart';
-
-// drawer
+// --- IMPORTS MODUL LAIN ---
+import 'package:wikilympics/sports/models/sport_entry.dart';
+import 'package:wikilympics/sports/screens/sport_entry_list.dart';
+import 'package:wikilympics/article/models/article_entry.dart';
+import 'package:wikilympics/article/widgets/article_card.dart';
+import 'package:wikilympics/article/screens/article_detail.dart';
+import 'package:wikilympics/screens/login.dart';
 import '../../widgets/left_drawer.dart';
 
-// login
-import 'package:wikilympics/screens/login.dart';
+// --- IMPORTS LANDING & POLLING ---
+import '../models/poll_model.dart';
+import '../widgets/poll_service.dart';
+// Import halaman List Admin
+import 'package:wikilympics/landingpoll/screens/poll_list_page.dart';
 
-// navbar pages
-import 'forum_page.dart';
-import 'profile_page.dart';
-
-// modul punya temen temen
+// --- IMPORTS WIDGETS TEMAN ---
 import '../widgets/popular_sport_card.dart';
 import '../widgets/athlete_highlight_card.dart';
 import '../widgets/upcoming_event_card.dart';
 import '../widgets/latest_article_card.dart';
+import '../widgets/forum_review_card.dart';
+
+// --- IMPORTS NAVBAR PAGES ---
+import 'forum_page.dart';
+import 'profile_page.dart';
+
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -44,24 +44,55 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _hasVoted = false;
   bool _alreadyLoad = false;
 
+  // 1. TAMBAHKAN VARIABEL ADMIN
+  bool _isAdmin = false;
+
   int _selectedIndex = 0;
 
   final List<Widget> _navbarPages = const [
-    Placeholder(), // home landing
+    Placeholder(), // home landing (index 0 ditangani khusus di build)
     ForumPage(),
-    Placeholder(), // ini tidak dipakai karena menu buka bottom sheet
+    Placeholder(), // menu (index 2 membuka bottom sheet)
     ProfilePage(),
   ];
 
   // ======================================================
-  // LOAD POLL
+  // INIT STATE (Load Admin & Poll)
   // ======================================================
+  @override
+  void initState() {
+    super.initState();
+    // 2. CEK STATUS ADMIN SAAT MEMBUKA HALAMAN
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAdminStatus();
+    });
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_alreadyLoad) {
       _alreadyLoad = true;
       _loadPoll();
+    }
+  }
+
+  // 3. FUNGSI CEK ADMIN KE DJANGO
+  Future<void> _checkAdminStatus() async {
+    final request = context.read<CookieRequest>();
+    if (request.loggedIn) {
+      try {
+        // Pastikan endpoint ini benar di Django kamu
+        final response = await request.get("http://127.0.0.1:8000/auth/status/");
+        setState(() {
+          _isAdmin = response['is_superuser'] ?? false;
+        });
+      } catch (e) {
+        // Jika error, anggap bukan admin
+        setState(() => _isAdmin = false);
+      }
+    } else {
+      setState(() => _isAdmin = false);
     }
   }
 
@@ -92,22 +123,20 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-// ======================================================
-  // BOTTOM SHEET MENU (FIXED OVERFLOW)
+  // ======================================================
+  // BOTTOM SHEET MENU (FIXED)
   // ======================================================
   void _openMenuSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // Tambahkan ini agar sheet menyesuaikan konten
+      isScrollControlled: true,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
       ),
       builder: (_) {
-        // WRAP DENGAN SingleChildScrollView AGAR BISA SCROLL
         return SingleChildScrollView(
           child: Padding(
-            // Tambahkan padding bottom menyesuaikan viewInsets (opsional, untuk safety)
             padding: EdgeInsets.fromLTRB(20, 18, 20, MediaQuery.of(context).viewInsets.bottom + 30),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -136,16 +165,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 const SizedBox(height: 15),
 
-                // ============================================
-                //  DAFTAR ITEM
-                // ============================================
+                // --- LIST MENU ITEMS ---
 
                 _menuItem(
                   icon: Icons.sports_basketball_outlined,
                   label: "Sports",
                   onTap: () {
                     Navigator.pop(context);
-                    // Navigator.push(context, MaterialPageRoute(builder: (_) => SportsPage()));
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const SportEntryListPage()));
                   },
                 ),
 
@@ -154,7 +181,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   label: "Article",
                   onTap: () {
                     Navigator.pop(context);
-                    // Navigator.push(context, MaterialPageRoute(builder: (_) => ArticlePage()));
+                    // Navigator.push(context, MaterialPageRoute(builder: (_) => const ArticlePage()));
                   },
                 ),
 
@@ -173,6 +200,24 @@ class _MyHomePageState extends State<MyHomePage> {
                     Navigator.pop(context);
                   },
                 ),
+
+                // 4. BAGIAN TOMBOL POLLING MANAGEMENT (HANYA ADMIN)
+                if (_isAdmin) ...[
+                  const SizedBox(height: 10),
+                  Divider(color: Colors.grey[300]),
+                  _menuItem(
+                    icon: Icons.how_to_vote,
+                    label: "Polling",
+                    onTap: () {
+                      Navigator.pop(context); // Tutup sheet
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const PollListPage()),
+                      );
+                    },
+                  ),
+                ],
+                // ========================================
 
                 const SizedBox(height: 14),
               ],
@@ -221,7 +266,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
     final username = request.jsonData['username'];
-
     final greeting = username == null ? "Hello" : "Hello, $username";
 
     return Scaffold(
@@ -243,13 +287,12 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
 
-      // custom navbar
       bottomNavigationBar: _buildCustomBottomNavbar(),
     );
   }
 
   // ======================================================
-  // HOME LANDING
+  // HOME LANDING CONTENT
   // ======================================================
   Widget _buildLandingContent(CookieRequest request) {
     final username = request.jsonData['username'];
@@ -272,13 +315,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     );
                   },
                 ),
-
                 Expanded(
                   child: Center(
                     child: Image.asset("assets/wikilympics_banner.png", height: 40),
                   ),
                 ),
-
                 username == null
                     ? ElevatedButton(
                   onPressed: () {
@@ -292,8 +333,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 18, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                   ),
                   child: const Text(
                     "SIGN IN",
@@ -320,7 +360,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
           const SizedBox(height: 16),
 
-          // ===== POPULAR SPORTS SECTION =====
+          // ===== POPULAR SPORTS =====
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
@@ -334,42 +374,46 @@ class _MyHomePageState extends State<MyHomePage> {
                     color: const Color(0xFF01203F),
                   ),
                 ),
-
                 const SizedBox(height: 12),
+                FutureBuilder<List<SportEntry>>(
+                  future: fetchSports(request),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Text("Error loading sports: ${snapshot.error}");
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Text("No sports data available");
+                    }
 
-                PopularSportCard(
-                  rank: 1,
-                  sportName: "Basketball",
-                  firstYear: "1896",
-                  imageUrl: "https://via.placeholder.com/150",
+                    final topSports = snapshot.data!.take(3).toList();
+                    return Column(
+                      children: topSports.asMap().entries.map((entry) {
+                        int index = entry.key;
+                        SportEntry sport = entry.value;
+                        return PopularSportCard(
+                          rank: index + 1,
+                          sportName: sport.fields.sportName,
+                          firstYear: sport.fields.firstYearPlayed.toString(),
+                          imageUrl: sport.fields.sportImg,
+                          description: sport.fields.sportDescription,
+                          origin: sport.fields.countryOfOrigin,
+                          type: sport.fields.sportType.toString(),
+                        );
+                      }).toList(),
+                    );
+                  },
                 ),
-
-                PopularSportCard(
-                  rank: 2,
-                  sportName: "Football",
-                  firstYear: "1863",
-                  imageUrl: "https://via.placeholder.com/150",
-                ),
-
-                PopularSportCard(
-                  rank: 3,
-                  sportName: "Tennis",
-                  firstYear: "1873",
-                  imageUrl: "https://via.placeholder.com/150",
-                ),
-
                 const SizedBox(height: 8),
-
-                // GANTI DENGAN INI
                 Container(
-                  width: double.infinity, // Agar lebarnya memenuhi layar
+                  width: double.infinity,
                   margin: const EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
-                    color: Colors.white, // Background putih
-                    borderRadius: BorderRadius.circular(20), // Radius membulat
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05), // Bayangan tipis
+                        color: Colors.black.withOpacity(0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -380,7 +424,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: InkWell(
                       borderRadius: BorderRadius.circular(20),
                       onTap: () {
-                        // Tambahkan aksi di sini nanti
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const SportEntryListPage()),
+                        );
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 18),
@@ -392,14 +439,13 @@ class _MyHomePageState extends State<MyHomePage> {
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
-                                // Sesuaikan kode warna ini dengan warna hijau/kuning di Figma kamu
                                 color: Color(0xFFC8DB2C),
                               ),
                             ),
                             SizedBox(width: 4),
                             Icon(
-                              Icons.keyboard_arrow_down_rounded, // Pakai yang rounded biar lebih halus
-                              color: Color(0xFFC8DB2C), // Samakan warnanya
+                              Icons.keyboard_arrow_down_rounded,
+                              color: Color(0xFFC8DB2C),
                               size: 20,
                             ),
                           ],
@@ -412,7 +458,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
 
-// ===== ATHLETES HIGHLIGHT =====
+          // ===== ATHLETES HIGHLIGHT =====
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
@@ -427,34 +473,26 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 const SizedBox(height: 12),
-
                 AthleteHighlightCard(
                   rank: 1,
                   athleteName: "Verstappen",
                   sportName: "Handball",
                   country: "Netherlands",
-                  onTap: () {
-                    // nanti sambung ke modul athlete detail
-                  },
+                  onTap: () {},
                 ),
-
                 AthleteHighlightCard(
                   rank: 2,
                   athleteName: "Verstappen",
                   sportName: "Archery",
                   country: "Netherlands",
                 ),
-
                 AthleteHighlightCard(
                   rank: 3,
                   athleteName: "Verstappen",
                   sportName: "Basketball",
                   country: "Netherlands",
                 ),
-
                 const SizedBox(height: 8),
-
-                // SEE ALL ATHLETES
                 Container(
                   width: double.infinity,
                   margin: const EdgeInsets.symmetric(vertical: 10),
@@ -471,9 +509,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(20),
-                    onTap: () {
-                      // NAVIGATE KE MODUL ATHLETES TEMAN
-                    },
+                    onTap: () {},
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 18),
                       child: Row(
@@ -500,26 +536,23 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
           ),
+
           // ===== UPCOMING EVENTS =====
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // HEADER JUDUL (Disesuaikan Style Figma yang besar & biru)
                 Text(
                   "Upcoming Events",
                   style: GoogleFonts.poppins(
-                    fontSize: 22, // Diperbesar
-                    fontWeight: FontWeight.w700, // Sangat tebal
-                    color: const Color(0xFF155F90), // Biru agak terang sesuai header Figma
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF155F90),
                   ),
                 ),
                 const SizedBox(height: 16),
-
-                // CARD 1 (Contoh Data Real)
                 UpcomingEventCard(
-                  // Gunakan Image.network untuk test, atau asset jika ada
                   image: Image.network(
                     "https://upload.wikimedia.org/wikipedia/en/thumb/1/13/Minnesota_Wild.svg/1200px-Minnesota_Wild.svg.png",
                     errorBuilder: (context, error, stackTrace) => Container(color: Colors.grey),
@@ -527,15 +560,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   title: "Titans Post Elite PFF Tackling in 2019",
                   author: "Bob Dylan",
                   date: "Mar. 05, 2020",
-                  onTap: () {
-                    // nanti sambung ke modul event temen
-                  },
+                  onTap: () {},
                 ),
-
-                // GARIS PEMBATAS TIPIS (Optional, biar rapi)
                 Divider(color: Colors.grey[300], height: 20),
-
-                // CARD 2 (Duplikasi biar terlihat list)
                 UpcomingEventCard(
                   image: Image.network(
                     "https://upload.wikimedia.org/wikipedia/en/thumb/1/13/Minnesota_Wild.svg/1200px-Minnesota_Wild.svg.png",
@@ -565,37 +592,27 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
                 FutureBuilder<List<ArticleEntry>>(
                   future: fetchArticles(request),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     }
-
                     if (!snapshot.hasData || snapshot.data!.isEmpty) {
                       return const Text("No articles available");
                     }
-
                     final articles = snapshot.data!.take(2).toList();
-
                     return Column(
                       children: articles.map((article) {
                         return LatestArticleCard(
                           imageUrl: article.thumbnail.isNotEmpty
                               ? article.thumbnail
                               : "https://picsum.photos/600",
-
                           title: article.title,
-
-                          // Karena model TIDAK punya author → aman pakai placeholder
                           author: article.category,
-
-                          // created = DateTime → HARUS diubah ke String
                           date: "${article.created.day.toString().padLeft(2, '0')} "
                               "${article.created.month.toString().padLeft(2, '0')} "
                               "${article.created.year}",
-
                           onTap: () {
                             Navigator.push(
                               context,
@@ -613,30 +630,96 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
 
-          _section("Forum & Reviews"),
-
+          // ===== FORUM & REVIEWS =====
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Forum & Reviews",
+                  style: GoogleFonts.poppins(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF155F90),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ForumReviewCard(
+                  username: "Tassy Omah",
+                  profileImage: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
+                  timeAgo: "6h ago",
+                  title: "The Raptors Don't Need Leonard To be in that game! They really don't!",
+                  contentImage: "https://images.unsplash.com/photo-1546519638-68e109498ee2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                  likeCount: 334,
+                  commentCount: 23440,
+                  onTap: () {},
+                ),
+                ForumReviewCard(
+                  username: "Jhon Doe",
+                  profileImage: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
+                  timeAgo: "2h ago",
+                  title: "Why Swimming is the best cardio workout you can do right now.",
+                  contentImage: "https://images.unsplash.com/photo-1530549387789-4c1017266635?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                  likeCount: 120,
+                  commentCount: 45,
+                  onTap: () {},
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const ForumPage())
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Text(
+                              "SEE ALL FORUMS",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFFC8DB2C),
+                              ),
+                            ),
+                            SizedBox(width: 4),
+                            Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              color: Color(0xFFC8DB2C),
+                              size: 20,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: 100),
         ],
-      ),
-    );
-  }
-
-  Widget _section(String title) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(18),
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Text(
-        title,
-        style: GoogleFonts.poppins(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: const Color(0xFF01203F),
-        ),
       ),
     );
   }
@@ -646,7 +729,6 @@ class _MyHomePageState extends State<MyHomePage> {
   // ======================================================
   Widget _buildPopup(String greeting) {
     final poll = _poll!;
-
     return Positioned.fill(
       child: Container(
         color: Colors.black45,
@@ -668,7 +750,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   onPressed: () => setState(() => _showPopup = false),
                 ),
               ),
-
               Text(
                 greeting,
                 style: GoogleFonts.poppins(
@@ -677,7 +758,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               const SizedBox(height: 6),
-
               Text(
                 poll.questionText,
                 textAlign: TextAlign.center,
@@ -688,7 +768,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               const SizedBox(height: 14),
-
               ...poll.options.map(
                     (o) => Padding(
                   padding: const EdgeInsets.only(bottom: 8),
@@ -704,7 +783,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ),
-
               if (_hasVoted)
                 Text(
                   "Terima kasih sudah memilih!",
@@ -716,15 +794,15 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+
   // ======================================================
-  // CUSTOM NAVBAR (SESUAI FIGMA)
+  // CUSTOM NAVBAR
   // ======================================================
   Widget _buildCustomBottomNavbar() {
     return Container(
       height: 64,
       decoration: BoxDecoration(
         color: Colors.white,
-        // Membuat sudut atas kiri & kanan melengkung (Rounded)
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: [
           BoxShadow(
@@ -739,7 +817,7 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           _buildNavItem(0, Icons.home_filled, "HOME"),
           _buildNavItem(1, Icons.forum, "FORUM & REVIEW"),
-          _buildNavItem(2, Icons.assignment, "MENU"), // Icon papan jalan
+          _buildNavItem(2, Icons.assignment, "MENU"),
           _buildNavItem(3, Icons.person, "PROFIL"),
         ],
       ),
@@ -748,40 +826,30 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildNavItem(int index, IconData icon, String label) {
     final bool isSelected = _selectedIndex == index;
-
     return GestureDetector(
       onTap: () => _onNavTap(index),
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
-        width: 68, // Area sentuh
+        width: 68,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            // 1. GARIS INDIKATOR (Garis Lime di atas)
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               width: 32,
               height: 3,
               decoration: BoxDecoration(
-                // Warna garis lime saat aktif, transparan saat tidak aktif
                 color: isSelected ? const Color(0xFFC8DB2C) : Colors.transparent,
                 borderRadius: const BorderRadius.vertical(bottom: Radius.circular(4)),
               ),
             ),
-
             const Spacer(),
-
-            // 2. ICON
             Icon(
               icon,
               size: 22,
-              // Warna ikon tetap Navy gelap (sesuai gambar)
               color: const Color(0xFF01203F),
             ),
-
             const SizedBox(height: 4),
-
-            // 3. TEXT LABEL
             Text(
               label,
               textAlign: TextAlign.center,
@@ -791,7 +859,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 color: const Color(0xFF01203F),
               ),
             ),
-
             const Spacer(),
           ],
         ),
@@ -800,9 +867,22 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+// --- HELPER FUNCTIONS ---
+
+Future<List<SportEntry>> fetchSports(CookieRequest request) async {
+  // Ganti URL jika perlu
+  final response = await request.get('http://127.0.0.1:8000/sports/json/');
+  List<SportEntry> listSports = [];
+  for (var d in response) {
+    if (d != null) {
+      listSports.add(SportEntry.fromJson(d));
+    }
+  }
+  return listSports;
+}
+
 Future<List<ArticleEntry>> fetchArticles(CookieRequest request) async {
   final response = await request.get('http://127.0.0.1:8000/article/json/');
-
   List<ArticleEntry> listArticles = [];
   for (var d in response) {
     if (d != null) {
@@ -811,4 +891,3 @@ Future<List<ArticleEntry>> fetchArticles(CookieRequest request) async {
   }
   return listArticles;
 }
-
