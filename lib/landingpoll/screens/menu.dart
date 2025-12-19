@@ -12,6 +12,10 @@ import 'package:wikilympics/article/widgets/article_card.dart';
 import 'package:wikilympics/article/screens/article_detail.dart';
 import 'package:wikilympics/screens/login.dart';
 import '../../widgets/left_drawer.dart';
+// Import Model Events
+import 'package:wikilympics/upcomingevents/models/events_entry.dart';
+// Import Halaman Detail Events (Sesuai import di file list screen temanmu)
+import 'package:wikilympics/upcomingevents/screens/events_detail_screen.dart';
 
 // --- IMPORTS LANDING & POLLING ---
 import '../models/poll_model.dart';
@@ -537,7 +541,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
 
-          // ===== UPCOMING EVENTS =====
+// ===== UPCOMING EVENTS =====
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
@@ -552,31 +556,61 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                UpcomingEventCard(
-                  image: Image.network(
-                    "https://upload.wikimedia.org/wikipedia/en/thumb/1/13/Minnesota_Wild.svg/1200px-Minnesota_Wild.svg.png",
-                    errorBuilder: (context, error, stackTrace) => Container(color: Colors.grey),
-                  ),
-                  title: "Titans Post Elite PFF Tackling in 2019",
-                  author: "Bob Dylan",
-                  date: "Mar. 05, 2020",
-                  onTap: () {},
-                ),
-                Divider(color: Colors.grey[300], height: 20),
-                UpcomingEventCard(
-                  image: Image.network(
-                    "https://upload.wikimedia.org/wikipedia/en/thumb/1/13/Minnesota_Wild.svg/1200px-Minnesota_Wild.svg.png",
-                    errorBuilder: (context, error, stackTrace) => Container(color: Colors.grey),
-                  ),
-                  title: "Wild post Elite PFF Tackling in 2024",
-                  author: "Bob Dylan",
-                  date: "Mar. 10, 2024",
-                  onTap: () {},
+
+                FutureBuilder<List<EventEntry>>(
+                  future: fetchEvents(request),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Text("Error loading events: ${snapshot.error}");
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Text("No upcoming events.");
+                    }
+
+                    // Ambil 2 event teratas saja
+                    final events = snapshot.data!.take(2).toList();
+
+                    return Column(
+                      children: events.map((event) {
+                        // Format Tanggal Sederhana (YYYY-MM-DD)
+                        String formattedDate = "${event.date.year}-${event.date.month.toString().padLeft(2,'0')}-${event.date.day.toString().padLeft(2,'0')}";
+
+                        return Column(
+                          children: [
+                            UpcomingEventCard(
+                              // Konversi URL string ke Widget Image
+                              image: Image.network(
+                                event.imageUrl,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Container(color: Colors.grey, child: const Icon(Icons.broken_image)),
+                              ),
+                              title: event.name,
+                              author: event.organizer, // Kita pakai organizer sebagai 'author'
+                              date: formattedDate,
+                              onTap: () {
+                                // Navigasi ke Detail Event Teman
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => EventDetailScreen(event: event),
+                                  ),
+                                );
+                              },
+                            ),
+                            // Tambahkan Divider pembatas (kecuali untuk item terakhir)
+                            if (event != events.last)
+                              Divider(color: Colors.grey[300], height: 20),
+                          ],
+                        );
+                      }).toList(),
+                    );
+                  },
                 ),
               ],
             ),
           ),
-
           // ===== LATEST ARTICLES =====
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -890,4 +924,15 @@ Future<List<ArticleEntry>> fetchArticles(CookieRequest request) async {
     }
   }
   return listArticles;
+}
+
+Future<List<EventEntry>> fetchEvents(CookieRequest request) async {
+  final response = await request.get('http://127.0.0.1:8000/upcoming_events/json/');
+  List<EventEntry> listEvents = [];
+  for (var d in response) {
+    if (d != null) {
+      listEvents.add(EventEntry.fromJson(d));
+    }
+  }
+  return listEvents;
 }
