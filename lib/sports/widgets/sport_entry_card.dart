@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:wikilympics/sports/models/sport_entry.dart';
 
 class SportEntryCard extends StatelessWidget {
@@ -12,7 +13,6 @@ class SportEntryCard extends StatelessWidget {
   });
 
   String _formatSportInfo(Fields fields) {
-    // 1. Ambil Kategori (SportType)
     String category = fields.sportType
         .toString()
         .split('.')
@@ -20,7 +20,6 @@ class SportEntryCard extends StatelessWidget {
         .replaceAll('_', ' ')
         .toUpperCase();
 
-    // 2. Ambil Struktur (ParticipationStructure)
     String rawStructure = fields.participationStructure
         .toString()
         .split('.')
@@ -106,7 +105,7 @@ class SportEntryCard extends StatelessWidget {
                           // Sport Name
                           Text(
                             sport.fields.sportName.toUpperCase(),
-                            style: const TextStyle(
+                            style: GoogleFonts.poppins(
                               color: Colors.white,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -120,7 +119,7 @@ class SportEntryCard extends StatelessWidget {
                           // Info Category | Structure
                           Text(
                             _formatSportInfo(sport.fields),
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               color: Colors.blueGrey[200],
                               fontSize: 12,
                               fontWeight: FontWeight.w600,

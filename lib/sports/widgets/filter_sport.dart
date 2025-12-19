@@ -25,9 +25,8 @@ class _FilterSportSheetState extends State<FilterSportSheet> {
   late List<String> _tempTypes;
   late List<String> _tempParts;
 
-  // === COLOR PALETTE ===
   final Color kPrimaryNavy = const Color(0xFF03045E);
-  final Color kAccentLime = const Color(0xFFD9E74C); // Warna Aksen
+  final Color kAccentLime = const Color(0xFFD9E74C);
   final Color kSoftGrey = const Color(0xFFF0F0F0);
 
   @override
@@ -37,40 +36,25 @@ class _FilterSportSheetState extends State<FilterSportSheet> {
     _tempParts = List.from(widget.initialParts);
   }
 
-  // --- LOGIC PEMILIHAN IKON ---
   IconData _getIconForLabel(String label) {
     switch (label.toLowerCase()) {
-      // Sport Types
-      case 'ball':
-        return Icons.sports_soccer;
-      case 'target':
-        return Icons.ads_click; // Simbol target/akuras
-      case 'water':
-        return Icons.waves; // Simbol air
-      case 'combat':
-        return Icons.sports_martial_arts;
-      case 'athletics':
-        return Icons.directions_run;
-      case 'gymnastics':
-        return Icons.accessibility_new;
-
-      // Participation
-      case 'team':
-        return Icons.groups;
-      case 'individual':
-        return Icons.person;
-      case 'both':
-        return Icons.compare_arrows;
-
-      default:
-        return Icons.sports;
+      case 'ball': return Icons.sports_soccer;
+      case 'target': return Icons.ads_click;
+      case 'water': return Icons.waves;
+      case 'combat': return Icons.sports_martial_arts;
+      case 'athletics': return Icons.directions_run;
+      case 'gymnastics': return Icons.accessibility_new;
+      case 'team': return Icons.groups;
+      case 'individual': return Icons.person;
+      case 'both': return Icons.compare_arrows;
+      default: return Icons.sports;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.75, // Sedikit lebih tinggi
+      height: MediaQuery.of(context).size.height * 0.75,
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -87,9 +71,9 @@ class _FilterSportSheetState extends State<FilterSportSheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Filter Sports",
-                    style: GoogleFonts.inter(
+                    style: GoogleFonts.poppins(
                         fontSize: 20,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w700,
                         color: kPrimaryNavy)),
                 IconButton(
                   icon: const Icon(Icons.close),
@@ -107,8 +91,6 @@ class _FilterSportSheetState extends State<FilterSportSheet> {
               children: [
                 _buildSectionTitle("Sport Category"),
                 const SizedBox(height: 10),
-                // Menggunakan Grid/Wrap agar tampilan tidak hanya list ke bawah biasa
-                // Tapi untuk filter yang jelas, List Vertical dengan Icon lebih rapi
                 ...widget.typeOptions.map((opt) => _buildCustomCheckbox(opt, _tempTypes)),
 
                 const SizedBox(height: 30),
@@ -147,7 +129,10 @@ class _FilterSportSheetState extends State<FilterSportSheet> {
                           borderRadius: BorderRadius.circular(16)),
                     ),
                     child: Text("Reset",
-                        style: TextStyle(color: kPrimaryNavy, fontWeight: FontWeight.w600)),
+                        style: GoogleFonts.poppins(
+                            color: kPrimaryNavy,
+                            fontWeight: FontWeight.w600
+                        )),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -164,8 +149,8 @@ class _FilterSportSheetState extends State<FilterSportSheet> {
                           borderRadius: BorderRadius.circular(16)),
                       elevation: 0,
                     ),
-                    child: const Text("Apply Filters",
-                        style: TextStyle(
+                    child: Text("Apply Filters",
+                        style: GoogleFonts.poppins(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 16)),
@@ -182,7 +167,7 @@ class _FilterSportSheetState extends State<FilterSportSheet> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title.toUpperCase(),
-      style: GoogleFonts.inter(
+      style: GoogleFonts.poppins(
         fontSize: 12,
         fontWeight: FontWeight.w700,
         color: Colors.grey[500],
@@ -191,7 +176,6 @@ class _FilterSportSheetState extends State<FilterSportSheet> {
     );
   }
 
-  // --- CUSTOM ROW ITEM DENGAN ICON ---
   Widget _buildCustomCheckbox(String label, List<String> currentList) {
     final isSelected = currentList.contains(label);
     final iconData = _getIconForLabel(label);
@@ -209,9 +193,7 @@ class _FilterSportSheetState extends State<FilterSportSheet> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          // Jika dipilih, background putih dengan border Navy tebal atau Lime halus
-          // Di sini saya buat style "Card" bersih
-          color: isSelected ? Colors.white : Colors.white,
+          color: Colors.white,
           border: Border.all(
             color: isSelected ? kPrimaryNavy : Colors.grey.shade200,
             width: isSelected ? 2 : 1,
@@ -223,11 +205,10 @@ class _FilterSportSheetState extends State<FilterSportSheet> {
         ),
         child: Row(
           children: [
-            // 1. Icon Container
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: isSelected ? kAccentLime : kSoftGrey, // Ikon jadi Lime saat dipilih
+                color: isSelected ? kAccentLime : kSoftGrey,
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -236,10 +217,7 @@ class _FilterSportSheetState extends State<FilterSportSheet> {
                 color: kPrimaryNavy,
               ),
             ),
-
             const SizedBox(width: 16),
-
-            // 2. Text Label
             Expanded(
               child: Text(
                 label,
@@ -250,8 +228,6 @@ class _FilterSportSheetState extends State<FilterSportSheet> {
                 ),
               ),
             ),
-
-            // 3. Custom Checkmark
             if (isSelected)
               Container(
                 decoration: BoxDecoration(
