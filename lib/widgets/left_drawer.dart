@@ -30,7 +30,7 @@ class LeftDrawer extends StatelessWidget {
                   ),
                 ),
                 Padding(padding: EdgeInsets.all(10)),
-                Text("Seluruh berita olahraga terkini di sini!",
+                Text("Seluruh berita olahraga terkini di sini",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 15,
@@ -119,8 +119,23 @@ class LeftDrawer extends StatelessWidget {
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),
             onTap: () async {
+              if(!request.loggedIn) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Anda belum login, tidak bisa logout."),
+                  ),
+                );
+
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const MyHomePage()),
+                  );
+
+                return;
+              }
               final response = await request.logout(
                   "http://127.0.0.1:8000/auth/logout/");
+                  // "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id/auth/logout/");
               String message = response["message"];
               if (context.mounted) {
                 if (response['status']) {
@@ -128,12 +143,6 @@ class LeftDrawer extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text("$message See you again, $uname."),
                   ));
-
-                  // Navigator.pushAndRemoveUntil(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => const LoginPage()),
-                  //       (Route<dynamic> route) => false,
-                  // );
 
                   Navigator.pushReplacement(
                     context,
