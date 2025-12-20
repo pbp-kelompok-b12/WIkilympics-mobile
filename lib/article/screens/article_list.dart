@@ -426,6 +426,9 @@ class _ArticleListPageState extends State<ArticleListPage> {
       ),
     );
   }
+<<<<<<< HEAD
 
+=======
+>>>>>>> c3394bbb7cb8b118826c5c8471a5675b30c30ff6
   
 }
