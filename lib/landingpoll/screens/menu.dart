@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 // --- IMPORTS MODUL SPORTS ---
 import 'package:wikilympics/sports/models/sport_entry.dart';
 import 'package:wikilympics/sports/screens/sport_entry_list.dart';
+import 'package:wikilympics/sports/screens/sport_entry_detail.dart';
 
 // --- IMPORTS MODUL ARTICLE (PUNYA TEMANMU) ---
 import 'package:wikilympics/article/models/article_entry.dart';
@@ -398,6 +399,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: const Color(0xFF01203F)),
                 ),
                 const SizedBox(height: 12),
+                // Di dalam menu.dart
                 FutureBuilder<List<SportEntry>>(
                   future: fetchSports(request),
                   builder: (context, snapshot) {
@@ -408,25 +410,37 @@ class _MyHomePageState extends State<MyHomePage> {
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                       return const Text("No sports data available");
                     }
+
                     final topSports = snapshot.data!.take(3).toList();
                     return Column(
                       children: topSports.asMap().entries.map((entry) {
                         int index = entry.key;
                         SportEntry sport = entry.value;
+
                         return PopularSportCard(
                           rank: index + 1,
                           sportName: sport.fields.sportName,
                           firstYear: sport.fields.firstYearPlayed.toString(),
-                          imageUrl: sport.fields.sportImg,
+                          imageUrl: fixImageUrl(sport.fields.sportImg),
+                          flagUrl: fixImageUrl(sport.fields.countryFlagImg),
                           description: sport.fields.sportDescription,
                           origin: sport.fields.countryOfOrigin,
-                          type: sport.fields.sportType.toString(),
+                          type: sport.fields.sportType.toString().split('.').last.replaceAll('_', ' '),
+                          onDetailTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SportDetailPage(sport: sport),
+                              ),
+                            );
+                          },
                         );
                       }).toList(),
                     );
                   },
                 ),
                 const SizedBox(height: 8),
+
                 Container(
                   width: double.infinity,
                   margin: const EdgeInsets.symmetric(vertical: 10),
@@ -830,24 +844,41 @@ class _MyHomePageState extends State<MyHomePage> {
 // HELPER FUNCTIONS & URL FIXER (SOLUSI GAMBAR)
 // =========================================================================
 
+// =========================================================================
+// HELPER FUNCTIONS & URL FIXER (SOLUSI GAMBAR & KONEKSI)
+// =========================================================================
+
 String fixImageUrl(String rawUrl) {
   if (rawUrl.isEmpty) {
     return "https://cdn.pixabay.com/photo/2016/05/01/17/56/rio-1365366_1280.jpg";
   }
+
+  // Deteksi lingkungan: Gunakan 10.0.2.2 untuk Android Emulator
   if (!kIsWeb && (rawUrl.contains("127.0.0.1") || rawUrl.contains("localhost"))) {
     rawUrl = rawUrl.replaceAll("127.0.0.1", "10.0.2.2").replaceAll("localhost", "10.0.2.2");
   }
+
+  // Membersihkan URL dari pinimg atau proxy jika ada masalah di Django
   if (rawUrl.contains("pinimg.com")) {
     return "https://cdn.pixabay.com/photo/2016/05/01/17/56/rio-1365366_1280.jpg";
   }
+
+  // Jika URL menggunakan path relatif dari Django
   if (rawUrl.startsWith("/")) {
-    return "http://10.0.2.2:8000$rawUrl";
+    String base = kIsWeb ? "http://127.0.0.1:8000" : "http://10.0.2.2:8000";
+    return "$base$rawUrl";
   }
+
   return rawUrl;
 }
 
 Future<List<SportEntry>> fetchSports(CookieRequest request) async {
-  final response = await request.get('http://127.0.0.1:8000/sports/json/');
+  // Cek apakah web atau mobile untuk menentukan IP server
+  final String baseUrl = kIsWeb ? "http://127.0.0.1:8000" : "http://10.0.2.2:8000";
+
+  // Gunakan endpoint milik modul sports temanmu
+  final response = await request.get('$baseUrl/sports/json/');
+
   List<SportEntry> listSports = [];
   for (var d in response) {
     if (d != null) {
