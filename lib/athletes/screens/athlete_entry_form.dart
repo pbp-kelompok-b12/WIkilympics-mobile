@@ -1,14 +1,11 @@
-// lib/athletes/screens/athlete_entry_form.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'dart:convert';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:wikilympics/athletes/models/athlete_entry.dart';
 
 class AthleteEntryFormPage extends StatefulWidget {
   final AthleteEntry? athleteEntry;
-
   const AthleteEntryFormPage({super.key, this.athleteEntry});
 
   @override
@@ -17,23 +14,17 @@ class AthleteEntryFormPage extends StatefulWidget {
 
 class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
   final _formKey = GlobalKey<FormState>();
-
-  // === FORM FIELDS (SESUAI DJANGO) ===
   String _athleteName = "";
   String _country = "";
   String _sport = "";
   String _biography = "";
   String _athletePhoto = "";
-
-  // === COLOR PALETTE ===
-  final Color kPrimaryNavy = const Color(0xFF03045E);
-  final Color kAccentLime = const Color(0xFFD9E74C);
-  final Color kBgGrey = const Color(0xFFF9F9F9);
-
-  // === DYNAMIC OPTIONS ===
   List<String> _sportOptions = [];
   List<String> _countryOptions = [];
   bool _loadingOptions = true;
+  final Color kPrimaryNavy = const Color(0xFF03045E);
+  final Color kAccentLime = const Color(0xFFD9E74C);
+  final Color kBgGrey = const Color(0xFFF9F9F9);
 
   @override
   void initState() {
@@ -55,25 +46,19 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
       final response = await request.get(
         'http://127.0.0.1:8000/athletes/json/',
       );
-
       Set<String> sportSet = {};
       Set<String> countrySet = {};
 
       for (var d in response) {
         if (d != null) {
           final athlete = AthleteEntry.fromJson(d);
-
-          if (athlete.fields.sport.isNotEmpty) {
+          if (athlete.fields.sport.isNotEmpty)
             sportSet.add(athlete.fields.sport);
-          }
-
-          if (athlete.fields.country.isNotEmpty) {
+          if (athlete.fields.country.isNotEmpty)
             countrySet.add(athlete.fields.country);
-          }
         }
       }
 
-      // Tambahkan data dari athlete yang sedang diedit
       if (widget.athleteEntry != null) {
         final f = widget.athleteEntry!.fields;
         sportSet.add(f.sport);
@@ -88,7 +73,6 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
         });
       }
     } catch (e) {
-      print("Error fetching options: $e");
       if (mounted) {
         setState(() {
           _loadingOptions = false;
@@ -97,19 +81,13 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
     }
   }
 
-  // === VALIDATOR HELPER ===
   String? _validateUrl(String? value) {
-    if (value == null || value.isEmpty) {
-      return "URL cannot be empty!";
-    }
+    if (value == null || value.isEmpty) return null;
     final uri = Uri.tryParse(value);
-    if (uri == null || !uri.hasAbsolutePath) {
-      return "URL is not valid!";
-    }
+    if (uri == null || !uri.hasAbsolutePath) return "URL is not valid!";
     return null;
   }
 
-  // === STYLE HELPER ===
   InputDecoration _buildInputDecoration(String hint, IconData icon) {
     return InputDecoration(
       hintText: hint,
@@ -170,15 +148,17 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
                     ),
                   ),
                   isExpanded: true,
-                  items: options.map((String option) {
-                    return DropdownMenuItem<String>(
-                      value: option,
-                      child: Text(
-                        option,
-                        style: GoogleFonts.poppins(fontSize: 14),
-                      ),
-                    );
-                  }).toList(),
+                  items: options
+                      .map(
+                        (option) => DropdownMenuItem<String>(
+                          value: option,
+                          child: Text(
+                            option,
+                            style: GoogleFonts.poppins(fontSize: 14),
+                          ),
+                        ),
+                      )
+                      .toList(),
                   onChanged: isLoading ? null : onChanged,
                 ),
               ),
@@ -189,9 +169,70 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
     );
   }
 
+  Map<String, dynamic> _createFormData() {
+    return {
+      "athlete_name": _athleteName,
+      "country": _country,
+      "sport": _sport,
+      "biography": _biography,
+      "athlete_photo": _athletePhoto,
+    };
+  }
+
+  Future<void> _submitForm(BuildContext context, bool isEdit) async {
+    final request = context.read<CookieRequest>();
+    try {
+      Map<String, dynamic> response;
+      if (isEdit) {
+        response = await request.postJson(
+          'http://localhost:8000/athletes/edit-athlete-ajax/${widget.athleteEntry!.pk}/',
+          _createFormData(),
+        );
+      } else {
+        response = await request.postJson(
+          'http://localhost:8000/athletes/create-athlete-ajax/',
+          _createFormData(),
+        );
+      }
+
+      if (context.mounted) {
+        if (response['status'] == 'success') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(isEdit ? "Athlete updated!" : "Athlete added!"),
+              backgroundColor: kAccentLime,
+              behavior: SnackBarBehavior.floating,
+              action: SnackBarAction(
+                label: 'OK',
+                textColor: kPrimaryNavy,
+                onPressed: () {},
+              ),
+            ),
+          );
+          Navigator.pop(context);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(response['message'] ?? "Failed to save athlete."),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error: ${e.toString()}"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final request = context.watch<CookieRequest>();
     final isEdit = widget.athleteEntry != null;
 
     return Scaffold(
@@ -226,7 +267,6 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // === HEADER ===
                   Padding(
                     padding: const EdgeInsets.only(left: 10),
                     child: Text(
@@ -239,8 +279,6 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
                     ),
                   ),
                   const SizedBox(height: 25),
-
-                  // 1. Athlete Name
                   TextFormField(
                     initialValue: _athleteName,
                     decoration: _buildInputDecoration(
@@ -254,8 +292,6 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
                         : null,
                   ),
                   const SizedBox(height: 16),
-
-                  // 2. Country Dropdown
                   _buildDropdownFormField(
                     hint: "Select Country",
                     icon: Icons.flag,
@@ -267,8 +303,6 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
                         value == null ? "Please select country!" : null,
                   ),
                   const SizedBox(height: 16),
-
-                  // 3. Sport Dropdown
                   _buildDropdownFormField(
                     hint: "Select Sport",
                     icon: Icons.sports,
@@ -280,8 +314,6 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
                         value == null ? "Please select sport!" : null,
                   ),
                   const SizedBox(height: 16),
-
-                  // 4. Biography
                   TextFormField(
                     initialValue: _biography,
                     maxLines: 5,
@@ -305,12 +337,10 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
                         : null,
                   ),
                   const SizedBox(height: 16),
-
-                  // 5. Athlete Photo URL
                   TextFormField(
                     initialValue: _athletePhoto,
                     decoration: _buildInputDecoration(
-                      "Athlete Photo URL",
+                      "Athlete Photo URL (Optional)",
                       Icons.image,
                     ),
                     style: GoogleFonts.poppins(color: kPrimaryNavy),
@@ -318,8 +348,6 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
                     validator: _validateUrl,
                   ),
                   const SizedBox(height: 32),
-
-                  // === SUBMIT BUTTON ===
                   Align(
                     alignment: Alignment.centerRight,
                     child: SizedBox(
@@ -337,57 +365,7 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
                         ),
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            // TENTUKAN URL BERDASARKAN MODE
-                            String url;
-                            if (isEdit) {
-                              // EDIT URL
-                              url =
-                                  "http://localhost:8000/athletes/edit-flutter/${widget.athleteEntry!.pk}/";
-                            } else {
-                              // CREATE URL
-                              url =
-                                  "http://localhost:8000/athletes/create-flutter/";
-                            }
-
-                            final response = await request.postJson(
-                              url,
-                              jsonEncode({
-                                "athlete_name": _athleteName, // SESUAI DJANGO
-                                "country": _country, // SESUAI DJANGO
-                                "sport": _sport, // SESUAI DJANGO
-                                "biography": _biography, // SESUAI DJANGO
-                                "athlete_photo": _athletePhoto, // SESUAI DJANGO
-                              }),
-                            );
-
-                            if (context.mounted) {
-                              if (response['status'] == 'success') {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      isEdit
-                                          ? "Athlete updated!"
-                                          : "Athlete added!",
-                                    ),
-                                    backgroundColor: kAccentLime,
-                                    behavior: SnackBarBehavior.floating,
-                                    action: SnackBarAction(
-                                      label: 'OK',
-                                      textColor: kPrimaryNavy,
-                                      onPressed: () {},
-                                    ),
-                                  ),
-                                );
-                                Navigator.pop(context);
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text("Failed to save athlete."),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                              }
-                            }
+                            await _submitForm(context, isEdit);
                           }
                         },
                         child: Row(

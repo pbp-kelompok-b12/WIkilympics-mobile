@@ -1,4 +1,3 @@
-// lib/athletes/screens/athletes_entry_list.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -19,20 +18,14 @@ class AthleteEntryListPage extends StatefulWidget {
 }
 
 class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
-  // === COLOR PALETTE ===
-  final Color kPrimaryNavy = const Color(0xFF03045E); // Dark Blue
+  final Color kPrimaryNavy = const Color(0xFF03045E);
   final Color kBgGrey = const Color(0xFFF9F9F9);
-  final Color kAccentLime = const Color(0xFFD9E74C); // Yellow
+  final Color kAccentLime = const Color(0xFFD9E74C);
 
-  // === ADMIN STATE ===
   bool _isAdmin = false;
-
-  // === FILTER STATE ===
   String _searchQuery = "";
   List<String> _selectedSports = [];
   List<String> _selectedCountries = [];
-
-  // === DYNAMIC OPTIONS ===
   List<String> _sportOptions = [];
   List<String> _countryOptions = [];
 
@@ -70,19 +63,16 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
         final athlete = AthleteEntry.fromJson(d);
         listAthletes.add(athlete);
 
-        // Collect unique sports
         if (athlete.fields.sport.isNotEmpty) {
           sportSet.add(athlete.fields.sport);
         }
 
-        // Collect unique countries
         if (athlete.fields.country.isNotEmpty) {
           countrySet.add(athlete.fields.country);
         }
       }
     }
 
-    // Update filter options
     if (mounted) {
       setState(() {
         _sportOptions = sportSet.toList()..sort();
@@ -97,7 +87,6 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
     setState(() {});
   }
 
-  // === FILTER LOGIC ===
   List<AthleteEntry> _applyFilters(List<AthleteEntry> allAthletes) {
     return allAthletes.where((athlete) {
       final name = athlete.fields.athleteName.toLowerCase();
@@ -123,7 +112,6 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
     }).toList();
   }
 
-  // === SHOW FILTER MODAL ===
   void _showFilterModal() {
     showModalBottomSheet(
       context: context,
@@ -168,7 +156,6 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
         elevation: 0,
       ),
       drawer: const LeftDrawer(),
-
       floatingActionButton: _isAdmin
           ? FloatingActionButton.extended(
               onPressed: () async {
@@ -194,11 +181,9 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
               ),
             )
           : null,
-
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // === HEADER SECTION ===
           Container(
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(30, 10, 30, 7),
@@ -214,7 +199,6 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
               children: [
                 Row(
                   children: [
-                    // Search Bar
                     Expanded(
                       child: Container(
                         height: 40,
@@ -249,8 +233,6 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
                       ),
                     ),
                     const SizedBox(width: 10),
-
-                    // Filter Button
                     GestureDetector(
                       onTap: _showFilterModal,
                       child: Container(
@@ -289,9 +271,7 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 13),
-
                 Padding(
                   padding: const EdgeInsets.only(left: 15.0),
                   child: Text(
@@ -304,7 +284,6 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
                     ),
                   ),
                 ),
-
                 if (_selectedSports.isNotEmpty || _selectedCountries.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: 10, left: 15),
@@ -342,8 +321,6 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
               ],
             ),
           ),
-
-          // === LIST CONTENT ===
           Expanded(
             child: FutureBuilder<List<AthleteEntry>>(
               future: fetchAthletes(request),
@@ -382,7 +359,6 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
                   );
                 } else {
                   final filteredList = _applyFilters(snapshot.data!);
-
                   if (filteredList.isEmpty) {
                     return Center(
                       child: Column(
@@ -402,7 +378,6 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
                       ),
                     );
                   }
-
                   return ListView.builder(
                     padding: const EdgeInsets.only(
                       top: 0,

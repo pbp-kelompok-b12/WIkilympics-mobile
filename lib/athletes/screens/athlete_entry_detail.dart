@@ -1,4 +1,3 @@
-// lib/athletes/screens/athlete_entry_detail.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -9,7 +8,6 @@ import 'package:wikilympics/athletes/screens/athlete_entry_form.dart';
 
 class AthleteDetailPage extends StatefulWidget {
   final AthleteEntry athlete;
-
   const AthleteDetailPage({super.key, required this.athlete});
 
   @override
@@ -17,14 +15,11 @@ class AthleteDetailPage extends StatefulWidget {
 }
 
 class _AthleteDetailPageState extends State<AthleteDetailPage> {
-  // === COLOR PALETTE (Sesuai Django) ===
-  static const Color kNavyColor = Color(0xFF0F1929); // Dark Blue
-  static const Color kLimeColor = Color(0xFFD2F665); // Yellow/Lime
+  static const Color kNavyColor = Color(0xFF0F1929);
+  static const Color kLimeColor = Color(0xFFD2F665);
   static const Color kDarkBlue = Color(0xFF162235);
   static const Color kRedAlert = Color(0xFFFF4C4C);
-  static const Color kYellow = Color(0xFFFFFF00); // Bright Yellow
-
-  // === STATE VARIABLES ===
+  static const Color kYellow = Color(0xFFFFFF00);
   bool _isAdmin = false;
   late AthleteEntry _athlete;
 
@@ -42,7 +37,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
     if (request.loggedIn) {
       try {
         final response = await request.get(
-          "http://127.0.0.1:8000/auth/status/",
+          "http://127.0.0.1:8000/authentication/status/",
         );
         if (mounted) {
           setState(() {
@@ -59,7 +54,6 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
       final response = await request.get(
         'http://127.0.0.1:8000/athletes/json/',
       );
-
       var updatedItemData;
       for (var item in response) {
         if (item['pk'] == _athlete.pk) {
@@ -84,9 +78,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
           ),
         );
       }
-    } catch (e) {
-      print("Error refreshing data: $e");
-    }
+    } catch (e) {}
   }
 
   Future<void> _handleDelete(
@@ -133,7 +125,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
 
     if (confirm == true) {
       final response = await request.postJson(
-        'http://127.0.0.1:8000/athletes/delete-flutter/${_athlete.pk}/',
+        'http://127.0.0.1:8000/athletes/delete-athlete-ajax/${_athlete.pk}/',
         {},
       );
 
@@ -153,7 +145,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                "Failed to delete athlete.",
+                response['message'] ?? "Failed to delete athlete.",
                 style: GoogleFonts.poppins(),
               ),
               backgroundColor: kRedAlert,
@@ -171,7 +163,6 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
 
     return Scaffold(
       backgroundColor: kNavyColor,
-
       floatingActionButton: _isAdmin
           ? FloatingActionButton.extended(
               onPressed: () async {
@@ -195,7 +186,6 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
               ),
             )
           : null,
-
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -240,7 +230,9 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
                 fit: StackFit.expand,
                 children: [
                   Image.network(
-                    f.athletePhoto,
+                    f.athletePhoto.isNotEmpty
+                        ? f.athletePhoto
+                        : 'https://via.placeholder.com/400x400?text=No+Image',
                     fit: BoxFit.cover,
                     errorBuilder: (ctx, err, stack) =>
                         Container(color: kDarkBlue),
@@ -282,7 +274,6 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
                         const SizedBox(height: 10),
                         Row(
                           children: [
-                            // Sport Badge (seperti Django)
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 12,
@@ -318,13 +309,11 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
               ),
             ),
           ),
-
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
               child: Column(
                 children: [
-                  // === PERSONAL INFORMATION CARD ===
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
@@ -358,10 +347,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 20),
-
-                  // === BIOGRAPHY CARD ===
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
@@ -401,7 +387,6 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 100),
                 ],
               ),
