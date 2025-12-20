@@ -3,9 +3,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:wikilympics/sports/models/sport_entry.dart';
 
 class SportEntryFormPage extends StatefulWidget {
-  const SportEntryFormPage({super.key});
+  final SportEntry? sportEntry;
+
+  const SportEntryFormPage({super.key, this.sportEntry});
 
   @override
   State<SportEntryFormPage> createState() => _SportEntryFormPageState();
@@ -40,18 +43,44 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
     'both', 'individual', 'team'
   ];
 
-  // === VALIDATOR HELPER (UPDATED) ===
-  // Menggunakan logika Uri.tryParse sesuai request
+  // === INIT STATE  ===
+  @override
+  void initState() {
+    super.initState();
+    if (widget.sportEntry != null) {
+      final f = widget.sportEntry!.fields;
+      _sportName = f.sportName;
+      _countryOfOrigin = f.countryOfOrigin;
+      _firstYearPlayed = f.firstYearPlayed.toString();
+      _equipment = f.equipment;
+      _sportImg = f.sportImg;
+      _countryFlagImg = f.countryFlagImg;
+      _sportDescription = f.sportDescription;
+      _historyDescription = f.historyDescription;
+
+      String typeRaw = f.sportType.toString().split('.').last.toLowerCase();
+      if (_sportTypes.contains(typeRaw)) {
+        _sportType = typeRaw;
+      } else if (_sportTypes.contains("${typeRaw}_sport")) {
+         _sportType = "${typeRaw}_sport";
+      }
+
+      String partRaw = f.participationStructure.toString().split('.').last.toLowerCase();
+      if (_participations.contains(partRaw)) {
+        _participation = partRaw;
+      }
+    }
+  }
+
+  // === VALIDATOR HELPER ===
   String? _validateUrl(String? value) {
     if (value == null || value.isEmpty) {
       return "URL cannot be empty!";
     }
-
     final uri = Uri.tryParse(value);
-    if (uri == null || !uri.hasAbsolutePath || !(uri.isScheme("http") || uri.isScheme("https"))) {
+    if (uri == null || !uri.hasAbsolutePath) {
       return "URL is not valid!";
     }
-
     return null;
   }
 
@@ -59,7 +88,7 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
   InputDecoration _buildInputDecoration(String hint, IconData icon) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
+      hintStyle: GoogleFonts.poppins(color: Colors.grey[500], fontSize: 14),
       prefixIcon: Icon(icon, color: kPrimaryNavy),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       fillColor: Colors.white,
@@ -101,6 +130,7 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
+    final isEdit = widget.sportEntry != null;
 
     return Scaffold(
       backgroundColor: kBgGrey,
@@ -109,11 +139,6 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-//         title: const Text(
-//           "Back",
-//           style: TextStyle(color: Colors.black, fontSize: 16),
-//         ),
-//         titleSpacing: 0,
         backgroundColor: kBgGrey,
         elevation: 0,
       ),
@@ -144,7 +169,7 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
                   Padding(
                     padding: const EdgeInsets.only(left: 10),
                     child: Text(
-                      "Add New Sport",
+                      isEdit ? "Edit Sport" : "Add New Sport",
                       style: GoogleFonts.poppins(
                         fontSize: 26,
                         fontWeight: FontWeight.w700,
@@ -156,8 +181,9 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
 
                   // 1. Sport Name
                   TextFormField(
+                    initialValue: _sportName,
                     decoration: _buildInputDecoration("Sport Name", Icons.sports_soccer),
-                    style: TextStyle(color: kPrimaryNavy),
+                    style: GoogleFonts.poppins(color: kPrimaryNavy),
                     onChanged: (value) => _sportName = value,
                     validator: (value) => (value == null || value.isEmpty)
                         ? "Name cannot be empty!" : null,
@@ -178,7 +204,7 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
                             child: Text(
                               t.replaceAll("_", " ").toUpperCase(),
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 12),
+                              style: GoogleFonts.poppins(fontSize: 12),
                             ),
                           )).toList(),
                           onChanged: (val) => setState(() => _sportType = val!),
@@ -195,7 +221,7 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
                             value: p,
                             child: Text(
                               p.toUpperCase(),
-                              style: const TextStyle(fontSize: 12),
+                              style: GoogleFonts.poppins(fontSize: 12),
                             ),
                           )).toList(),
                           onChanged: (val) => setState(() => _participation = val!),
@@ -207,31 +233,27 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
 
                   // 3. Country of Origin
                   TextFormField(
+                    initialValue: _countryOfOrigin,
                     decoration: _buildInputDecoration("Country of Origin", Icons.public),
-                    style: TextStyle(color: kPrimaryNavy),
+                    style: GoogleFonts.poppins(color: kPrimaryNavy),
                     onChanged: (value) => _countryOfOrigin = value,
                     validator: (value) => (value == null || value.isEmpty)
                         ? "Country cannot be empty!" : null,
                   ),
                   const SizedBox(height: 16),
 
-                  // 4. First Year Played (Number) - UPDATED VALIDATION
+                  // 4. First Year Played
                   TextFormField(
+                    initialValue: _firstYearPlayed,
                     decoration: _buildInputDecoration("First Year Played (e.g., 1890)", Icons.calendar_month),
                     keyboardType: TextInputType.number,
-                    style: TextStyle(color: kPrimaryNavy),
+                    style: GoogleFonts.poppins(color: kPrimaryNavy),
                     onChanged: (value) => _firstYearPlayed = value,
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Year cannot be empty!";
-                      }
+                      if (value == null || value.isEmpty) return "Year cannot be empty!";
                       final parsed = int.tryParse(value);
-                      if (parsed == null) {
-                        return "Year must be a valid number!";
-                      }
-                      if (parsed <= 0) { // Validasi tidak boleh 0 atau negatif
-                        return "Year must be greater than 0!";
-                      }
+                      if (parsed == null) return "Year must be a valid number!";
+                      if (parsed <= 0) return "Year must be > 0!";
                       return null;
                     },
                   ),
@@ -239,53 +261,58 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
 
                    // 5. Equipment
                   TextFormField(
+                    initialValue: _equipment,
                     decoration: _buildInputDecoration("Equipment", Icons.fitness_center),
-                    style: TextStyle(color: kPrimaryNavy),
+                    style: GoogleFonts.poppins(color: kPrimaryNavy),
                     onChanged: (value) => _equipment = value,
                     validator: (value) => (value == null || value.isEmpty)
                         ? "Equipment cannot be empty!" : null,
                   ),
                   const SizedBox(height: 16),
 
-                  // 6. Image URLs (Row) - UPDATED WITH URI VALIDATION
+                  // 6. Image URLs
                   Row(
                     children: [
                       Expanded(
                         child: TextFormField(
+                          initialValue: _sportImg,
                           decoration: _buildInputDecoration("Sport Img URL", Icons.image),
-                          style: TextStyle(color: kPrimaryNavy),
+                          style: GoogleFonts.poppins(color: kPrimaryNavy),
                           onChanged: (value) => _sportImg = value,
-                          validator: _validateUrl, // Panggil fungsi helper baru
+                          validator: _validateUrl,
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: TextFormField(
+                          initialValue: _countryFlagImg,
                           decoration: _buildInputDecoration("Flag Img URL", Icons.flag),
-                          style: TextStyle(color: kPrimaryNavy),
+                          style: GoogleFonts.poppins(color: kPrimaryNavy),
                           onChanged: (value) => _countryFlagImg = value,
-                          validator: _validateUrl, // Panggil fungsi helper baru
+                          validator: _validateUrl,
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
 
-                  // 7. Sport Description (Multiline)
+                  // 7. Sport Description
                   TextFormField(
+                    initialValue: _sportDescription,
                     maxLines: 4,
                     decoration: _buildMultilineDecoration("Sport Description", Icons.description),
-                    style: TextStyle(color: kPrimaryNavy),
+                    style: GoogleFonts.poppins(color: kPrimaryNavy),
                     onChanged: (value) => _sportDescription = value,
                     validator: (value) => (value == null || value.isEmpty) ? "Description cannot be empty!" : null,
                   ),
                   const SizedBox(height: 16),
 
-                  // 8. History Description (Multiline)
+                  // 8. History Description
                   TextFormField(
+                    initialValue: _historyDescription,
                     maxLines: 4,
                     decoration: _buildMultilineDecoration("History Description", Icons.history_edu),
-                    style: TextStyle(color: kPrimaryNavy),
+                    style: GoogleFonts.poppins(color: kPrimaryNavy),
                     onChanged: (value) => _historyDescription = value,
                     validator: (value) => (value == null || value.isEmpty) ? "History cannot be empty!" : null,
                   ),
@@ -309,9 +336,19 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
                         ),
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            // Kirim ke Django
+
+                            // TENTUKAN URL BERDASARKAN MODE
+                            String url;
+                            if (isEdit) {
+                              // EDIT URL
+                              url = "http://localhost:8000/sports/edit-flutter/${widget.sportEntry!.pk}/";
+                            } else {
+                              // CREATE URL
+                              url = "http://localhost:8000/sports/create-flutter/";
+                            }
+
                             final response = await request.postJson(
-                              "http://127.0.0.1:8000/sports/create-flutter/",
+                              url,
                               jsonEncode({
                                 "sport_name": _sportName,
                                 "sport_img": _sportImg,
@@ -330,7 +367,7 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
                                 if (response['status'] == 'success') {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: const Text("Sport added successfully!"),
+                                      content: Text(isEdit ? "Data updated!" : "Sport added!"),
                                       backgroundColor: kAccentLime,
                                       behavior: SnackBarBehavior.floating,
                                       action: SnackBarAction(
@@ -354,13 +391,13 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
                         },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
+                          children: [
                              Text(
-                              "SAVE",
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                              isEdit ? "UPDATE" : "SAVE",
+                              style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 14),
                             ),
-                            SizedBox(width: 5),
-                            Icon(Icons.check_circle_outline, size: 18)
+                            const SizedBox(width: 5),
+                            const Icon(Icons.check_circle_outline, size: 18)
                           ],
                         ),
                       ),
