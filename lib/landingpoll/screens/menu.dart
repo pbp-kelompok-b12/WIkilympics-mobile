@@ -1,29 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:math';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
-// --- IMPORTS MODUL LAIN ---
+// --- IMPORTS MODUL SPORTS ---
 import 'package:wikilympics/sports/models/sport_entry.dart';
 import 'package:wikilympics/sports/screens/sport_entry_list.dart';
+
+// --- IMPORTS MODUL ARTICLE (PUNYA TEMANMU) ---
 import 'package:wikilympics/article/models/article_entry.dart';
-import 'package:wikilympics/article/widgets/article_card.dart';
 import 'package:wikilympics/article/screens/article_detail.dart';
+import 'package:wikilympics/article/screens/article_list.dart'; // <--- IMPORT LIST ARTIKEL
+
+// --- IMPORTS MODUL UPCOMING EVENTS (PUNYA TEMANMU) ---
+import 'package:wikilympics/upcomingevents/models/events_entry.dart';
+import 'package:wikilympics/upcomingevents/screens/events_detail_screen.dart';
+import 'package:wikilympics/upcomingevents/screens/events_list_screen.dart'; // <--- IMPORT LIST EVENTS
+
+// --- IMPORTS AUTH & DRAWER ---
 import 'package:wikilympics/screens/login.dart';
 import '../../widgets/left_drawer.dart';
-// Import Model Events
-import 'package:wikilympics/upcomingevents/models/events_entry.dart';
-// Import Halaman Detail Events (Sesuai import di file list screen temanmu)
-import 'package:wikilympics/upcomingevents/screens/events_detail_screen.dart';
 
 // --- IMPORTS LANDING & POLLING ---
 import '../models/poll_model.dart';
 import '../widgets/poll_service.dart';
-// Import halaman List Admin
 import 'package:wikilympics/landingpoll/screens/poll_list_page.dart';
 
-// --- IMPORTS WIDGETS TEMAN ---
+// --- IMPORTS WIDGETS UI ---
 import '../widgets/popular_sport_card.dart';
 import '../widgets/athlete_highlight_card.dart';
 import '../widgets/upcoming_event_card.dart';
@@ -47,26 +52,19 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _showPopup = false;
   bool _hasVoted = false;
   bool _alreadyLoad = false;
-
-  // 1. TAMBAHKAN VARIABEL ADMIN
   bool _isAdmin = false;
-
   int _selectedIndex = 0;
 
   final List<Widget> _navbarPages = const [
-    Placeholder(), // home landing (index 0 ditangani khusus di build)
-    ForumPage(),
-    Placeholder(), // menu (index 2 membuka bottom sheet)
-    ProfilePage(),
+    Placeholder(), // Landing (index 0)
+    ForumPage(),   // Forum (index 1)
+    Placeholder(), // Menu Sheet (index 2)
+    ProfilePage(), // Profil (index 3)
   ];
 
-  // ======================================================
-  // INIT STATE (Load Admin & Poll)
-  // ======================================================
   @override
   void initState() {
     super.initState();
-    // 2. CEK STATUS ADMIN SAAT MEMBUKA HALAMAN
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkAdminStatus();
     });
@@ -81,18 +79,15 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  // 3. FUNGSI CEK ADMIN KE DJANGO
   Future<void> _checkAdminStatus() async {
     final request = context.read<CookieRequest>();
     if (request.loggedIn) {
       try {
-        // Pastikan endpoint ini benar di Django kamu
         final response = await request.get("http://127.0.0.1:8000/auth/status/");
         setState(() {
           _isAdmin = response['is_superuser'] ?? false;
         });
       } catch (e) {
-        // Jika error, anggap bukan admin
         setState(() => _isAdmin = false);
       }
     } else {
@@ -116,19 +111,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _vote(int optionId) async {
     if (_hasVoted) return;
-
     final request = context.read<CookieRequest>();
     setState(() => _hasVoted = true);
-
     await PollService.vote(request, optionId);
-
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) setState(() => _showPopup = false);
     });
   }
 
   // ======================================================
-  // BOTTOM SHEET MENU (FIXED)
+  // BOTTOM SHEET MENU
   // ======================================================
   void _openMenuSheet(BuildContext context) {
     showModalBottomSheet(
@@ -146,7 +138,6 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Drag handle
                 Center(
                   child: Container(
                     width: 40,
@@ -158,7 +149,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-
                 Text(
                   "Menu",
                   style: GoogleFonts.poppins(
@@ -169,8 +159,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 const SizedBox(height: 15),
 
-                // --- LIST MENU ITEMS ---
-
                 _menuItem(
                   icon: Icons.sports_basketball_outlined,
                   label: "Sports",
@@ -180,20 +168,23 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                 ),
 
+                // --- UPDATE: ARTICLE ---
                 _menuItem(
                   icon: Icons.article_outlined,
                   label: "Article",
                   onTap: () {
                     Navigator.pop(context);
-                    // Navigator.push(context, MaterialPageRoute(builder: (_) => const ArticlePage()));
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const ArticleListPage()));
                   },
                 ),
 
+                // --- UPDATE: OLYMPIC EVENTS ---
                 _menuItem(
                   icon: Icons.event_outlined,
                   label: "Olympic Events",
                   onTap: () {
                     Navigator.pop(context);
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const EventsListScreen()));
                   },
                 ),
 
@@ -205,15 +196,14 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                 ),
 
-                // 4. BAGIAN TOMBOL POLLING MANAGEMENT (HANYA ADMIN)
                 if (_isAdmin) ...[
                   const SizedBox(height: 10),
                   Divider(color: Colors.grey[300]),
                   _menuItem(
                     icon: Icons.how_to_vote,
-                    label: "Polling",
+                    label: "Polling Management",
                     onTap: () {
-                      Navigator.pop(context); // Tutup sheet
+                      Navigator.pop(context);
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (_) => const PollListPage()),
@@ -221,8 +211,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     },
                   ),
                 ],
-                // ========================================
-
                 const SizedBox(height: 14),
               ],
             ),
@@ -232,11 +220,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _menuItem({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
+  Widget _menuItem({required IconData icon, required String label, required VoidCallback onTap}) {
     return ListTile(
       leading: Icon(icon, color: const Color(0xFF01203F), size: 26),
       title: Text(
@@ -252,9 +236,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  // ======================================================
-  // NAVBAR HANDLER
-  // ======================================================
   void _onNavTap(int index) {
     if (index == 2) {
       _openMenuSheet(context);
@@ -280,17 +261,14 @@ class _MyHomePageState extends State<MyHomePage> {
         child: AppBar(backgroundColor: Colors.white, elevation: 0),
       ),
       drawer: const LeftDrawer(),
-
       body: Stack(
         children: [
           _selectedIndex == 0
               ? _buildLandingContent(request)
               : _navbarPages[_selectedIndex],
-
           if (_showPopup && _poll != null) _buildPopup(greeting),
         ],
       ),
-
       bottomNavigationBar: _buildCustomBottomNavbar(),
     );
   }
@@ -327,30 +305,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 username == null
                     ? ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const LoginPage()),
-                    );
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginPage()));
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF01203F),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                     padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                   ),
-                  child: const Text(
-                    "SIGN IN",
-                    style: TextStyle(color: Colors.white, fontSize: 12),
-                  ),
+                  child: const Text("SIGN IN", style: TextStyle(color: Colors.white, fontSize: 12)),
                 )
                     : Text(
                   username,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF01203F),
-                  ),
+                  style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF01203F)),
                 ),
               ],
             ),
@@ -361,8 +327,41 @@ class _MyHomePageState extends State<MyHomePage> {
             width: double.infinity,
             child: Image.asset("assets/hero_wikilympics.jpg", fit: BoxFit.cover),
           ),
-
           const SizedBox(height: 16),
+
+          // ===== ADMIN DASHBOARD SECTION =====
+          if (_isAdmin)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFC8DB2C), width: 2),
+                  boxShadow: [
+                    BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+                  ],
+                ),
+                child: ListTile(
+                  leading: const Icon(Icons.admin_panel_settings, color: Color(0xFF01203F), size: 32),
+                  title: Text(
+                    "Admin Dashboard",
+                    style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  subtitle: const Text("Manage Polls & Users"),
+                  trailing: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF01203F),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => const PollListPage()));
+                    },
+                    child: const Text("Manage", style: TextStyle(color: Colors.white)),
+                  ),
+                ),
+              ),
+            ),
 
           // ===== POPULAR SPORTS =====
           Padding(
@@ -372,11 +371,7 @@ class _MyHomePageState extends State<MyHomePage> {
               children: [
                 Text(
                   "Popular Sports",
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF01203F),
-                  ),
+                  style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: const Color(0xFF01203F)),
                 ),
                 const SizedBox(height: 12),
                 FutureBuilder<List<SportEntry>>(
@@ -389,7 +384,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                       return const Text("No sports data available");
                     }
-
                     final topSports = snapshot.data!.take(3).toList();
                     return Column(
                       children: topSports.asMap().entries.map((entry) {
@@ -416,11 +410,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
+                      BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
                     ],
                   ),
                   child: Material(
@@ -428,10 +418,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: InkWell(
                       borderRadius: BorderRadius.circular(20),
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const SportEntryListPage()),
-                        );
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const SportEntryListPage()));
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 18),
@@ -440,18 +427,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           children: const [
                             Text(
                               "SEE ALL SPORTS",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFFC8DB2C),
-                              ),
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFFC8DB2C)),
                             ),
                             SizedBox(width: 4),
-                            Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: Color(0xFFC8DB2C),
-                              size: 20,
-                            ),
+                            Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFFC8DB2C), size: 20),
                           ],
                         ),
                       ),
@@ -470,11 +449,7 @@ class _MyHomePageState extends State<MyHomePage> {
               children: [
                 Text(
                   "Athletes Highlight",
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF01203F),
-                  ),
+                  style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: const Color(0xFF01203F)),
                 ),
                 const SizedBox(height: 12),
                 AthleteHighlightCard(
@@ -504,11 +479,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
+                      BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
                     ],
                   ),
                   child: InkWell(
@@ -521,17 +492,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: const [
                           Text(
                             "SEE ALL ATHLETES",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFFC8DB2C),
-                            ),
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFFC8DB2C)),
                           ),
                           SizedBox(width: 4),
-                          Icon(
-                            Icons.keyboard_arrow_down_rounded,
-                            color: Color(0xFFC8DB2C),
-                          ),
+                          Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFFC8DB2C)),
                         ],
                       ),
                     ),
@@ -541,7 +505,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
 
-// ===== UPCOMING EVENTS =====
+          // ===== UPCOMING EVENTS (DATA TEMANMU) =====
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
@@ -549,59 +513,43 @@ class _MyHomePageState extends State<MyHomePage> {
               children: [
                 Text(
                   "Upcoming Events",
-                  style: GoogleFonts.poppins(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF155F90),
-                  ),
+                  style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.w700, color: const Color(0xFF155F90)),
                 ),
                 const SizedBox(height: 16),
-
                 FutureBuilder<List<EventEntry>>(
                   future: fetchEvents(request),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     } else if (snapshot.hasError) {
-                      return Text("Error loading events: ${snapshot.error}");
+                      return Text("Error: ${snapshot.error}", style: const TextStyle(color: Colors.red));
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Text("No upcoming events.");
+                      return const Text("No upcoming events available.");
                     }
-
-                    // Ambil 2 event teratas saja
-                    final events = snapshot.data!.take(2).toList();
-
+                    final events = snapshot.data!.take(3).toList();
                     return Column(
                       children: events.map((event) {
-                        // Format Tanggal Sederhana (YYYY-MM-DD)
-                        String formattedDate = "${event.date.year}-${event.date.month.toString().padLeft(2,'0')}-${event.date.day.toString().padLeft(2,'0')}";
-
                         return Column(
                           children: [
                             UpcomingEventCard(
-                              // Konversi URL string ke Widget Image
+                              // --- GUNAKAN FIX IMAGE URL DI SINI JUGA ---
                               image: Image.network(
-                                event.imageUrl,
+                                fixImageUrl(event.imageUrl),
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) =>
-                                    Container(color: Colors.grey, child: const Icon(Icons.broken_image)),
+                                    Container(color: Colors.grey[300], child: const Icon(Icons.broken_image)),
                               ),
                               title: event.name,
-                              author: event.organizer, // Kita pakai organizer sebagai 'author'
-                              date: formattedDate,
+                              author: event.organizer,
+                              date: "${event.date.day.toString().padLeft(2, '0')}-${event.date.month.toString().padLeft(2, '0')}-${event.date.year}",
                               onTap: () {
-                                // Navigasi ke Detail Event Teman
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
-                                    builder: (context) => EventDetailScreen(event: event),
-                                  ),
+                                  MaterialPageRoute(builder: (context) => EventDetailScreen(event: event)),
                                 );
                               },
                             ),
-                            // Tambahkan Divider pembatas (kecuali untuk item terakhir)
-                            if (event != events.last)
-                              Divider(color: Colors.grey[300], height: 20),
+                            Divider(color: Colors.grey[300], height: 20),
                           ],
                         );
                       }).toList(),
@@ -611,7 +559,63 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
           ),
-          // ===== LATEST ARTICLES =====
+
+          // ===== LATEST ARTICLES (DATA TEMANMU) =====
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Latest Articles",
+                  style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.w700, color: const Color(0xFF155F90)),
+                ),
+                const SizedBox(height: 16),
+                FutureBuilder<List<ArticleEntry>>(
+                  future: fetchArticles(request),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Text("Error: ${snapshot.error}");
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Text("No articles available");
+                    }
+
+                    final articles = snapshot.data!.take(2).toList();
+                    return Column(
+                      children: articles.map((article) {
+
+                        // --- FUNGSI PEMBERSIH GAMBAR ---
+                        if (article.thumbnail.contains("pinimg.com") || article.thumbnail.isEmpty) {
+                          article.thumbnail = "https://cdn.pixabay.com/photo/2016/05/01/17/56/rio-1365366_1280.jpg";
+                        }
+
+                        String categoryFormatted = article.category.toUpperCase().replaceAll('_', ' ');
+
+                        return LatestArticleCard(
+                          imageUrl: article.thumbnail,
+                          title: article.title,
+                          author: categoryFormatted,
+                          date: "${article.created.day.toString().padLeft(2, '0')} "
+                              "${article.created.month.toString().padLeft(2, '0')} "
+                              "${article.created.year}",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ArticleDetailPage(article: article),
+                              ),
+                            );
+                          },
+                        );
+                      }).toList(),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
 
           // ===== FORUM & REVIEWS =====
           Padding(
@@ -621,11 +625,7 @@ class _MyHomePageState extends State<MyHomePage> {
               children: [
                 Text(
                   "Forum & Reviews",
-                  style: GoogleFonts.poppins(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF155F90),
-                  ),
+                  style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.w700, color: const Color(0xFF155F90)),
                 ),
                 const SizedBox(height: 16),
                 ForumReviewCard(
@@ -656,11 +656,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
+                      BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
                     ],
                   ),
                   child: Material(
@@ -668,10 +664,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: InkWell(
                       borderRadius: BorderRadius.circular(20),
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const ForumPage())
-                        );
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const ForumPage()));
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 18),
@@ -680,18 +673,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           children: const [
                             Text(
                               "SEE ALL FORUMS",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFFC8DB2C),
-                              ),
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFFC8DB2C)),
                             ),
                             SizedBox(width: 4),
-                            Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: Color(0xFFC8DB2C),
-                              size: 20,
-                            ),
+                            Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFFC8DB2C), size: 20),
                           ],
                         ),
                       ),
@@ -707,9 +692,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  // ======================================================
-  // POLLING POPUP
-  // ======================================================
   Widget _buildPopup(String greeting) {
     final poll = _poll!;
     return Positioned.fill(
@@ -719,10 +701,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Container(
           width: 300,
           padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(22),
-          ),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(22)),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -733,22 +712,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   onPressed: () => setState(() => _showPopup = false),
                 ),
               ),
-              Text(
-                greeting,
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFF01203F),
-                ),
-              ),
+              Text(greeting, style: GoogleFonts.poppins(fontWeight: FontWeight.w500, color: const Color(0xFF01203F))),
               const SizedBox(height: 6),
               Text(
                 poll.questionText,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: const Color(0xFF155F90),
-                ),
+                style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16, color: const Color(0xFF155F90)),
               ),
               const SizedBox(height: 14),
               ...poll.options.map(
@@ -757,9 +726,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF01203F),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     ),
                     onPressed: _hasVoted ? null : () => _vote(o.id),
                     child: Text(o.optionText),
@@ -767,10 +734,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               if (_hasVoted)
-                Text(
-                  "Terima kasih sudah memilih!",
-                  style: GoogleFonts.poppins(color: Colors.green),
-                )
+                Text("Terima kasih sudah memilih!", style: GoogleFonts.poppins(color: Colors.green)),
             ],
           ),
         ),
@@ -778,9 +742,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  // ======================================================
-  // CUSTOM NAVBAR
-  // ======================================================
   Widget _buildCustomBottomNavbar() {
     return Container(
       height: 64,
@@ -788,11 +749,7 @@ class _MyHomePageState extends State<MyHomePage> {
         color: Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 15,
-            offset: const Offset(0, -2),
-          ),
+          BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 15, offset: const Offset(0, -2)),
         ],
       ),
       child: Row(
@@ -827,20 +784,12 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             const Spacer(),
-            Icon(
-              icon,
-              size: 22,
-              color: const Color(0xFF01203F),
-            ),
+            Icon(icon, size: 22, color: const Color(0xFF01203F)),
             const SizedBox(height: 4),
             Text(
               label,
               textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
-                fontSize: 9,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF01203F),
-              ),
+              style: GoogleFonts.poppins(fontSize: 9, fontWeight: FontWeight.w600, color: const Color(0xFF01203F)),
             ),
             const Spacer(),
           ],
@@ -850,10 +799,27 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-// --- HELPER FUNCTIONS ---
+// =========================================================================
+// HELPER FUNCTIONS & URL FIXER (SOLUSI GAMBAR)
+// =========================================================================
+
+String fixImageUrl(String rawUrl) {
+  if (rawUrl.isEmpty) {
+    return "https://cdn.pixabay.com/photo/2016/05/01/17/56/rio-1365366_1280.jpg";
+  }
+  if (!kIsWeb && (rawUrl.contains("127.0.0.1") || rawUrl.contains("localhost"))) {
+    rawUrl = rawUrl.replaceAll("127.0.0.1", "10.0.2.2").replaceAll("localhost", "10.0.2.2");
+  }
+  if (rawUrl.contains("pinimg.com")) {
+    return "https://cdn.pixabay.com/photo/2016/05/01/17/56/rio-1365366_1280.jpg";
+  }
+  if (rawUrl.startsWith("/")) {
+    return "http://10.0.2.2:8000$rawUrl";
+  }
+  return rawUrl;
+}
 
 Future<List<SportEntry>> fetchSports(CookieRequest request) async {
-  // Ganti URL jika perlu
   final response = await request.get('http://127.0.0.1:8000/sports/json/');
   List<SportEntry> listSports = [];
   for (var d in response) {
@@ -862,6 +828,17 @@ Future<List<SportEntry>> fetchSports(CookieRequest request) async {
     }
   }
   return listSports;
+}
+
+Future<List<ArticleEntry>> fetchArticles(CookieRequest request) async {
+  final response = await request.get('http://127.0.0.1:8000/article/json/');
+  List<ArticleEntry> listArticles = [];
+  for (var d in response) {
+    if (d != null) {
+      listArticles.add(ArticleEntry.fromJson(d));
+    }
+  }
+  return listArticles;
 }
 
 Future<List<EventEntry>> fetchEvents(CookieRequest request) async {
