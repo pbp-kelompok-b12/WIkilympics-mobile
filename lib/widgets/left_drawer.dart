@@ -6,6 +6,9 @@ import 'package:wikilympics/sports/screens/sport_entry_list.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 
+// IMPORT ATHLETES YANG DIPERLUKAN
+import 'package:wikilympics/athletes/screens/athletes_entry_list.dart'; // INI HARUS ADA
+
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
 
@@ -160,7 +163,6 @@ class LeftDrawer extends StatelessWidget {
               }
             },
           ),
-
         ],
       ),
     );
