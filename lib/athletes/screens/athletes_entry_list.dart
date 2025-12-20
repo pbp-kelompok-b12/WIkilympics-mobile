@@ -52,7 +52,9 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
   }
 
   Future<List<AthleteEntry>> fetchAthletes(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/athletes/json/');
+    final response = await request.get(
+      'http://127.0.0.1:8000/athletes/flutter/',
+    );
     List<AthleteEntry> listAthletes = [];
 
     Set<String> sportSet = {};

@@ -37,7 +37,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
     if (request.loggedIn) {
       try {
         final response = await request.get(
-          "http://127.0.0.1:8000/authentication/status/",
+          "http://127.0.0.1:8000/auth/status/",
         );
         if (mounted) {
           setState(() {
@@ -52,7 +52,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
     final request = context.read<CookieRequest>();
     try {
       final response = await request.get(
-        'http://127.0.0.1:8000/athletes/json/',
+        'http://127.0.0.1:8000/athletes/flutter/',
       );
       var updatedItemData;
       for (var item in response) {
@@ -125,7 +125,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
 
     if (confirm == true) {
       final response = await request.postJson(
-        'http://127.0.0.1:8000/athletes/delete-athlete-ajax/${_athlete.pk}/',
+        'http://127.0.0.1:8000/athletes/flutter/${_athlete.pk}/delete/',
         {},
       );
 

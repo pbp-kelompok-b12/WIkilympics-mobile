@@ -44,7 +44,7 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
     final request = context.read<CookieRequest>();
     try {
       final response = await request.get(
-        'http://127.0.0.1:8000/athletes/json/',
+        'http://127.0.0.1:8000/athletes/flutter/',
       );
       Set<String> sportSet = {};
       Set<String> countrySet = {};
@@ -185,12 +185,12 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
       Map<String, dynamic> response;
       if (isEdit) {
         response = await request.postJson(
-          'http://localhost:8000/athletes/edit-athlete-ajax/${widget.athleteEntry!.pk}/',
+          'http://127.0.0.1:8000/athletes/flutter/${widget.athleteEntry!.pk}/edit/',
           _createFormData(),
         );
       } else {
         response = await request.postJson(
-          'http://localhost:8000/athletes/create-athlete-ajax/',
+          'http://127.0.0.1:8000/athletes/flutter/create/',
           _createFormData(),
         );
       }
