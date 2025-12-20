@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wikilympics/landingpoll/screens/menu.dart';
 import 'package:wikilympics/article/screens/article_list.dart';
+import 'package:wikilympics/sports/screens/sport_entry_list.dart';
 
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -58,10 +59,10 @@ class LeftDrawer extends StatelessWidget {
             title: const Text('Sports'),
             // Bagian redirection ke MyHomePage
             onTap: () {
-              Navigator.pushReplacement(
+              Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MyHomePage(),
+                    builder: (context) => SportEntryListPage(),
                   ));
             },
           ),
