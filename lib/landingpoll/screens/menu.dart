@@ -54,6 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _alreadyLoad = false;
   bool _isAdmin = false;
   int _selectedIndex = 0;
+  Widget? _selectedPage;
 
   final List<Widget> _navbarPages = const [
     Placeholder(), // Landing (index 0)
@@ -119,6 +120,15 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  // TAMBAHKAN FUNGSI INI:
+  void _selectMenuPage(Widget page) {
+    Navigator.pop(context); // Menutup Bottom Sheet (Menu yang muncul dari bawah)
+    setState(() {
+      _selectedPage = page;   // Mengisi body dengan halaman tujuan
+      _selectedIndex = 2;     // Memindah highlight navbar ke icon 'Menu'
+    });
+  }
+
   // ======================================================
   // BOTTOM SHEET MENU
   // ======================================================
@@ -162,38 +172,34 @@ class _MyHomePageState extends State<MyHomePage> {
                 _menuItem(
                   icon: Icons.sports_basketball_outlined,
                   label: "Sports",
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => const SportEntryListPage()));
-                  },
+                  onTap: () => _selectMenuPage(const SportEntryListPage()), // GANTI JADI INI
                 ),
 
                 // --- UPDATE: ARTICLE ---
                 _menuItem(
                   icon: Icons.article_outlined,
                   label: "Article",
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => const ArticleListPage()));
-                  },
+                  onTap: () => _selectMenuPage(const ArticleListPage()), // GANTI JADI INI
                 ),
 
                 // --- UPDATE: OLYMPIC EVENTS ---
                 _menuItem(
                   icon: Icons.event_outlined,
                   label: "Olympic Events",
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => const EventsListScreen()));
-                  },
+                  onTap: () => _selectMenuPage(const EventsListScreen()), // GANTI JADI INI
                 ),
 
                 _menuItem(
                   icon: Icons.person_search_outlined,
                   label: "Athletes",
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
+                  onTap: () => _selectMenuPage(
+                    Scaffold(
+                      backgroundColor: Colors.white,
+                      body: Center(
+                        child: Text("Halaman Athletes Segera Hadir!"),
+                      ),
+                    ),
+                  ),
                 ),
 
                 if (_isAdmin) ...[
@@ -202,13 +208,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   _menuItem(
                     icon: Icons.how_to_vote,
                     label: "Polling Management",
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const PollListPage()),
-                      );
-                    },
+                    onTap: () => _selectMenuPage(const PollListPage()),
                   ),
                 ],
                 const SizedBox(height: 14),
@@ -241,7 +241,10 @@ class _MyHomePageState extends State<MyHomePage> {
       _openMenuSheet(context);
       return;
     }
-    setState(() => _selectedIndex = index);
+    setState(() {
+      _selectedIndex = index;
+      _selectedPage = null; // TAMBAHKAN BARIS INI (Reset halaman menu saat ganti tab)
+    });
   }
 
   // ======================================================
@@ -263,9 +266,30 @@ class _MyHomePageState extends State<MyHomePage> {
       drawer: const LeftDrawer(),
       body: Stack(
         children: [
-          _selectedIndex == 0
-              ? _buildLandingContent(request)
-              : _navbarPages[_selectedIndex],
+          // LOGIKA BARU:
+
+          // 1. Jika halaman dari Menu (Manage Polls, Sports, Article, dll)
+          // KITA TAMBAH PADDING BIAR GAK KETUTUP NAVBAR
+          if (_selectedIndex == 2 && _selectedPage != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 80), // Geser konten ke atas 80px
+              child: _selectedPage!,
+            )
+
+          // 2. Jika Tab Home (0)
+          // BIARKAN TANPA PADDING (Supaya gambar banner tetap full sampai bawah navbar)
+          else if (_selectedIndex == 0)
+            _buildLandingContent(request)
+
+          // 3. Jika Tab lain (Forum/Profil)
+          // TAMBAH PADDING JUGA
+          else
+            Padding(
+              padding: const EdgeInsets.only(bottom: 80), // Geser konten ke atas 80px
+              child: _navbarPages[_selectedIndex],
+            ),
+
+          // POPUP POLLING (Muncul paling atas)
           if (_showPopup && _poll != null) _buildPopup(greeting),
         ],
       ),
@@ -418,7 +442,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: InkWell(
                       borderRadius: BorderRadius.circular(20),
                       onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const SportEntryListPage()));
+                        setState(() {
+                          _selectedPage = const SportEntryListPage(); // Set halaman
+                          _selectedIndex = 2; // Pindah highlight ke Menu
+                        });
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 18),
