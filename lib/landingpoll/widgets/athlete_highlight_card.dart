@@ -77,7 +77,7 @@ class AthleteHighlightCard extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 6),
-)
+
                             Row(
                               children: [
                                 const Icon(

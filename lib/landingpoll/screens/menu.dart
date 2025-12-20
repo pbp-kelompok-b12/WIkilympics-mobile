@@ -164,8 +164,8 @@ class _MyHomePageState extends State<MyHomePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     //if (!_alreadyLoad) {
-      //_alreadyLoad = true;
-      //_loadPoll();
+    //_alreadyLoad = true;
+    //_loadPoll();
     //}
   }
 
