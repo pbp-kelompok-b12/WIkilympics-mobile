@@ -121,6 +121,20 @@ class _LoginPageState extends State<LoginPage> {
                             final prefs = await SharedPreferences.getInstance();
                             await prefs.setString('username', username);
                             
+                            try {
+                              final userInfoResponse = await request.get(
+                                'http://localhost:8000/forum_section/get-user-info/'
+                              );
+                              
+                              if (userInfoResponse is Map) {
+                                final userId = userInfoResponse['user_id'] ?? 0;
+                                final isSuperuser = userInfoResponse['is_superuser'] ?? false;
+                                await prefs.setInt('user_id', userId);
+                                await prefs.setBool('is_superuser', isSuperuser);
+                              }
+                            } catch (e) {
+                            }
+                            
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Login successful!'),
@@ -180,8 +194,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
 
                   const SizedBox(height: 20),
-
-                  // ===== SIGN UP LINK =====
                   Center(
                     child: GestureDetector(
                       onTap: () {
@@ -223,7 +235,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // ===== INPUT FIELD (SAMA PERSIS REGISTER) =====
   Widget _buildInputField({
     required TextEditingController controller,
     required String hint,

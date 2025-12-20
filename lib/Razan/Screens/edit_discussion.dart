@@ -2,20 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wikilympics/Razan/models/forum_entry.dart';
+import 'package:wikilympics/Razan/models/discussion_entry.dart';
 import 'package:wikilympics/widgets/left_drawer.dart';
 
-class AddDiscussionPage extends StatefulWidget {
-  final ForumEntry forum;
-  const AddDiscussionPage({super.key, required this.forum});
+class EditDiscussionPage extends StatefulWidget {
+  final DiscussionEntry discussion;
+  const EditDiscussionPage({super.key, required this.discussion});
 
   @override
-  State<AddDiscussionPage> createState() => _AddDiscussionPageState();
+  State<EditDiscussionPage> createState() => _EditDiscussionPageState();
 }
 
-class _AddDiscussionPageState extends State<AddDiscussionPage> {
+class _EditDiscussionPageState extends State<EditDiscussionPage> {
   final TextEditingController _discussionController = TextEditingController();
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _discussionController.text = widget.discussion.fields.discuss;
+  }
+
   @override
   void dispose() {
     _discussionController.dispose();
@@ -33,18 +40,19 @@ class _AddDiscussionPageState extends State<AddDiscussionPage> {
     setState(() => _isLoading = true);
 
     try {
-      // Get username from SharedPreferences stored during login
+      // Get user_id from SharedPreferences
       final prefs = await SharedPreferences.getInstance();
-      final username = prefs.getString('username');
+      final userId = prefs.getInt('user_id');
+      final isSuperuser = prefs.getBool('is_superuser') ?? false;
       
-      if (username == null || username.isEmpty) {
+      if (userId == null) {
         if (context.mounted) {
           setState(() => _isLoading = false);
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
               title: const Text("Not Authenticated"),
-              content: const Text("You must be logged in to post discussions."),
+              content: const Text("You must be logged in to edit discussions."),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
@@ -58,11 +66,11 @@ class _AddDiscussionPageState extends State<AddDiscussionPage> {
       }
 
       final response = await request.post(
-        'http://127.0.0.1:8000/forum_section/forum/add-discussion/',
+        'http://127.0.0.1:8000/forum_section/discussion/${widget.discussion.pk}/edit/',
         {
-          'forum': widget.forum.pk.toString(),
           'discuss': _discussionController.text,
-          'username': username,
+          'user_id': userId.toString(),
+          'is_superuser': isSuperuser.toString(),
         },
       );
 
@@ -72,15 +80,15 @@ class _AddDiscussionPageState extends State<AddDiscussionPage> {
         if (response is Map) {
           if (response['status'] == 'success') {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Discussion added successfully!")),
+              const SnackBar(content: Text("Discussion updated successfully!")),
             );
-            Navigator.pop(context, true); // Return true to refresh
+            Navigator.pop(context, true);
           } else {
             showDialog(
               context: context,
               builder: (context) => AlertDialog(
                 title: const Text("Error"),
-                content: Text("Status: ${response['status']}\nMessage: ${response['message']}"),
+                content: Text(response['message'] ?? 'Unknown error'),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
@@ -108,7 +116,6 @@ class _AddDiscussionPageState extends State<AddDiscussionPage> {
       }
       
     } catch (e) {
-      print("Exception: $e");
       if (context.mounted) {
         setState(() => _isLoading = false);
         showDialog(
@@ -134,7 +141,7 @@ class _AddDiscussionPageState extends State<AddDiscussionPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Add Discussion"),
+        title: const Text("Edit Discussion"),
         backgroundColor: const Color(0xFF3f5f90),
         titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
       ),
@@ -147,7 +154,7 @@ class _AddDiscussionPageState extends State<AddDiscussionPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Forum: ${widget.forum.fields.topic}",
+              "Editing Discussion",
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
@@ -155,7 +162,7 @@ class _AddDiscussionPageState extends State<AddDiscussionPage> {
               controller: _discussionController,
               maxLines: 5,
               decoration: InputDecoration(
-                hintText: "Share your thoughts...",
+                labelText: "Discussion Content",
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -171,12 +178,8 @@ class _AddDiscussionPageState extends State<AddDiscussionPage> {
                 ),
                 onPressed: _isLoading ? null : () => _submitDiscussion(request),
                 child: _isLoading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text("Post Discussion"),
+                    ? const CircularProgressIndicator()
+                    : const Text("Update Discussion"),
               ),
             ),
           ],

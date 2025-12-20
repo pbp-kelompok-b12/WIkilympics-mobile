@@ -31,8 +31,8 @@ class DiscussionEntry {
 }
 
 class Fields {
-    String username;  // Changed from int to String
-    int username_id;  // Keep the ID separately if needed
+    String username;  
+    int username_id;  
     int forum;
     String discuss;
     DateTime dateCreated;

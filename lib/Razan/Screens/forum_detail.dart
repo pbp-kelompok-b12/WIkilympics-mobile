@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wikilympics/Razan/models/forum_entry.dart';
 import 'package:wikilympics/Razan/models/discussion_entry.dart';
 import 'package:wikilympics/Razan/Screens/discussion_entry_card.dart';
 import 'package:wikilympics/Razan/Screens/add_discussion.dart';
+import 'package:wikilympics/widgets/left_drawer.dart';
+import 'package:wikilympics/Razan/Screens/add_forum.dart';
 
 
 class ForumDetailPage extends StatefulWidget {
@@ -15,6 +18,36 @@ class ForumDetailPage extends StatefulWidget {
 }
 
 class _ForumDetailPageState extends State<ForumDetailPage> {
+  bool _canEdit = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkEditPermission();
+  }
+
+  Future<void> _checkEditPermission() async {
+    final prefs = await SharedPreferences.getInstance();
+    final currentUserId = prefs.getInt('user_id');
+    final isSuperuser = prefs.getBool('is_superuser') ?? false;
+    
+    setState(() {
+      _canEdit = (currentUserId == widget.forum.fields.name) || isSuperuser;
+    });
+  }
+
+  Future<void> _editForum() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddForumPage(forum: widget.forum),
+      ),
+    );
+    if (result == true) {
+      setState(() {});
+    }
+  }
+
   Future<List<DiscussionEntry>> fetchDiscussions(CookieRequest request) async {
     final response = await request.get('http://127.0.0.1:8000/forum_section/forums/json-dis/');
 
@@ -36,8 +69,11 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.forum.fields.topic), 
+        title: Text(widget.forum.fields.topic),
+        backgroundColor: const Color(0xFF3f5f90),
+        titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
       ),
+      drawer: const LeftDrawer(),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,14 +119,17 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
               builder: (context, AsyncSnapshot<List<DiscussionEntry>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
+                }
+               else if (snapshot.hasError) {
                   return Center(child: Text("Error: ${snapshot.error}"));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                }
+               else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return const Padding(
                     padding: EdgeInsets.all(20.0),
                     child: Center(child: Text("No discussions yet. Be the first!")),
                   );
-                } else {
+                }
+                 else {
                   return ListView.builder(
                     shrinkWrap: true, 
                     physics: const NeverScrollableScrollPhysics(),
@@ -98,6 +137,9 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                     itemBuilder: (context, index) {
                       return DiscussionEntryCard(
                         discussion: snapshot.data![index],
+                        onDeleted: () {
+                          setState(() {}); // Refresh the list
+                        },
                       );
                     },
                   );
@@ -108,6 +150,7 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFFE6EC4C),
         onPressed: () async {
           final result = await Navigator.push(
             context,
