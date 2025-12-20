@@ -19,13 +19,12 @@ class LatestArticleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Definisi Warna Tema
     final Color navyColor = const Color(0xFF01203F);
     final Color limeColor = const Color(0xFFC8DB2C);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
-      height: 250, // Tinggi fixed agar gambar terlihat luas
+      height: 250,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
@@ -39,16 +38,15 @@ class LatestArticleCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
         child: Material(
-          color: navyColor, // Fallback color jika gambar gagal load
+          color: navyColor,
           child: InkWell(
             onTap: onTap,
             child: Stack(
               children: [
-                // 1. GAMBAR SEBAGAI BACKGROUND (FULL SIZE)
                 Positioned.fill(
                   child: Image.network(
                     imageUrl,
-                    fit: BoxFit.cover, // Kunci agar gambar full & proporsional
+                    fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) => Container(
                       color: navyColor,
                       child: Icon(Icons.broken_image, color: Colors.white24, size: 50),
@@ -56,7 +54,6 @@ class LatestArticleCard extends StatelessWidget {
                   ),
                 ),
 
-                // 2. GRADASI HALUS (Supaya teks terbaca & transisi mulus)
                 Positioned.fill(
                   child: Container(
                     decoration: BoxDecoration(
@@ -65,23 +62,22 @@ class LatestArticleCard extends StatelessWidget {
                         end: Alignment.bottomCenter,
                         colors: [
                           Colors.transparent,
-                          navyColor.withOpacity(0.4), // Mulai menggelap di tengah
-                          navyColor.withOpacity(0.95), // Gelap pekat di bawah
+                          navyColor.withOpacity(0.4),
+                          navyColor.withOpacity(0.95),
                         ],
-                        stops: const [0.3, 0.65, 1.0], // Mengatur titik gradasi
+                        stops: const [0.3, 0.65, 1.0],
                       ),
                     ),
                   ),
                 ),
 
-                // 3. KONTEN (CATEGORY DI POJOK ATAS)
                 Positioned(
                   top: 16,
                   left: 16,
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                        color: limeColor.withOpacity(0.9), // Sedikit transparan biar menyatu
+                        color: limeColor.withOpacity(0.9),
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
@@ -103,7 +99,6 @@ class LatestArticleCard extends StatelessWidget {
                   ),
                 ),
 
-                // 4. KONTEN (TEXT DI BAWAH)
                 Positioned(
                   bottom: 16,
                   left: 20,
@@ -112,7 +107,6 @@ class LatestArticleCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // TANGGAL
                       Row(
                         children: [
                           Icon(Icons.calendar_today_rounded, size: 12, color: limeColor),
@@ -130,7 +124,6 @@ class LatestArticleCard extends StatelessWidget {
 
                       const SizedBox(height: 8),
 
-                      // JUDUL
                       Text(
                         title,
                         maxLines: 2,
@@ -145,7 +138,6 @@ class LatestArticleCard extends StatelessWidget {
 
                       const SizedBox(height: 12),
 
-                      // TOMBOL "Read More" KECIL
                       Row(
                         children: [
                           Text(

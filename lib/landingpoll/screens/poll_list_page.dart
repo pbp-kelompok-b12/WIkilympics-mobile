@@ -17,7 +17,6 @@ class _PollListPageState extends State<PollListPage> {
   bool _isAdmin = false;
   late Future<List<PollQuestion>> _pollFuture;
 
-  // --- WARNA TEMA WIKILYMPICS ---
   final Color kPrimaryNavy = const Color(0xFF03045E);
   final Color kAccentLime = const Color(0xFFC8DB2C);
   final Color kBgGrey = const Color(0xFFF8F9FA);
@@ -43,7 +42,6 @@ class _PollListPageState extends State<PollListPage> {
           _isAdmin = response['is_superuser'] ?? false;
         });
       } catch (e) {
-        // silent error
       }
     }
   }
@@ -55,7 +53,6 @@ class _PollListPageState extends State<PollListPage> {
     });
   }
 
-  // Helper: Hitung Total Vote untuk Persentase
   int _getTotalVotes(PollQuestion poll) {
     int total = 0;
     for (var opt in poll.options) {
@@ -71,7 +68,6 @@ class _PollListPageState extends State<PollListPage> {
     return Scaffold(
       backgroundColor: kBgGrey,
 
-      // --- APP BAR ---
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -81,7 +77,7 @@ class _PollListPageState extends State<PollListPage> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Image.asset(
-          'assets/wikilympics_banner.png', // Pastikan asset ada
+          'assets/wikilympics_banner.png',
           height: 32,
           fit: BoxFit.contain,
         ),
@@ -91,7 +87,6 @@ class _PollListPageState extends State<PollListPage> {
         ),
       ),
 
-      // Tombol Tambah (FAB)
       floatingActionButton: _isAdmin
           ? FloatingActionButton.extended(
         backgroundColor: kAccentLime,
@@ -118,7 +113,6 @@ class _PollListPageState extends State<PollListPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // --- HEADER TITLE ---
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
             child: Column(
@@ -144,7 +138,6 @@ class _PollListPageState extends State<PollListPage> {
             ),
           ),
 
-          // --- LIST DATA ---
           Expanded(
             child: FutureBuilder<List<PollQuestion>>(
               future: _pollFuture,
@@ -192,7 +185,6 @@ class _PollListPageState extends State<PollListPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // 1. Header Card: Question & Actions
                           Padding(
                             padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
                             child: Row(
@@ -268,15 +260,12 @@ class _PollListPageState extends State<PollListPage> {
                             ),
                           ),
 
-                          // Garis Pemisah Tipis
                           Divider(height: 1, color: Colors.grey[100]),
 
-                          // 2. List Opsi dengan Progress Bar
                           Padding(
                             padding: const EdgeInsets.all(20),
                             child: Column(
                               children: poll.options.map((o) {
-                                // Hitung persentase
                                 double percent = totalVotes == 0 ? 0 : (o.votes / totalVotes);
                                 String percentText = "${(percent * 100).toStringAsFixed(0)}%";
 
@@ -285,7 +274,6 @@ class _PollListPageState extends State<PollListPage> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      // Label Opsi & Persentase
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
@@ -309,14 +297,12 @@ class _PollListPageState extends State<PollListPage> {
                                       ),
                                       const SizedBox(height: 6),
 
-                                      // Bar Visualisasi
                                       ClipRRect(
                                         borderRadius: BorderRadius.circular(6),
                                         child: LinearProgressIndicator(
                                           value: percent,
                                           backgroundColor: kBarGrey,
                                           valueColor: AlwaysStoppedAnimation<Color>(
-                                            // Highlight warna Lime jika vote tertinggi (opsional), atau Navy standar
                                               percent > 0.5 ? kAccentLime : const Color(0xFF4C6EF5)
                                           ),
                                           minHeight: 10,
@@ -341,7 +327,6 @@ class _PollListPageState extends State<PollListPage> {
     );
   }
 
-  // Widget Kecil untuk Tombol Edit/Delete
   Widget _actionButton({
     required IconData icon,
     required Color color,

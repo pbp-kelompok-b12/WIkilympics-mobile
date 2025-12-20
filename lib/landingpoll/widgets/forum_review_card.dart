@@ -3,10 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 
 class ForumReviewCard extends StatelessWidget {
   final String username;
-  final String profileImage; // Bisa URL atau Asset
+  final String profileImage;
   final String timeAgo;
   final String title;
-  final String contentImage; // URL gambar postingan
+  final String contentImage;
   final int likeCount;
   final int commentCount;
   final VoidCallback? onTap;
@@ -44,7 +44,6 @@ class ForumReviewCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // === HEADER: USER INFO ===
             Row(
               children: [
                 CircleAvatar(
@@ -77,7 +76,6 @@ class ForumReviewCard extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            // === TITLE / CAPTION ===
             Text(
               title,
               style: GoogleFonts.poppins(
@@ -91,7 +89,6 @@ class ForumReviewCard extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            // === CONTENT IMAGE ===
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: Image.network(
@@ -109,10 +106,8 @@ class ForumReviewCard extends StatelessWidget {
 
             const SizedBox(height: 14),
 
-            // === FOOTER: ACTIONS (Like, Comment, Bookmark) ===
             Row(
               children: [
-                // LIKE
                 Icon(Icons.favorite, size: 20, color: const Color(0xFF155F90)),
                 const SizedBox(width: 6),
                 Text(
@@ -126,7 +121,6 @@ class ForumReviewCard extends StatelessWidget {
 
                 const SizedBox(width: 20),
 
-                // COMMENT
                 Icon(Icons.chat_bubble_outline, size: 20, color: Colors.grey[400]),
                 const SizedBox(width: 6),
                 Text(
@@ -140,7 +134,6 @@ class ForumReviewCard extends StatelessWidget {
 
                 const Spacer(),
 
-                // BOOKMARK
                 Icon(Icons.bookmark_border, size: 22, color: Colors.grey[400]),
               ],
             )

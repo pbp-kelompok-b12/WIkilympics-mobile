@@ -46,7 +46,6 @@ class ProfilePage extends StatelessWidget {
 
             ElevatedButton(
               onPressed: () async {
-                // FIX: logout perlu 1 argumen
                 await request.logout("/auth/logout/");
 
                 if (context.mounted) {

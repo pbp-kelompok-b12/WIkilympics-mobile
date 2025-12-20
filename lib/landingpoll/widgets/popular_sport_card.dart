@@ -10,7 +10,7 @@ class PopularSportCard extends StatefulWidget {
   final String description;
   final String origin;
   final String type;
-  final VoidCallback onDetailTap; // Parameter untuk navigasi ke modul teman
+  final VoidCallback onDetailTap;
 
   const PopularSportCard({
     super.key,
@@ -109,12 +109,10 @@ class _PopularSportCardState extends State<PopularSportCard> with SingleTickerPr
             ],
           ),
 
-          // DETAIL EXPANDABLE
           AnimatedCrossFade(
             duration: const Duration(milliseconds: 300),
             crossFadeState: _isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
             firstChild: const SizedBox.shrink(),
-            // KITA PANGGIL FUNGSI _buildDetails DI SINI
             secondChild: _buildDetails(),
           ),
 
@@ -150,7 +148,6 @@ class _PopularSportCardState extends State<PopularSportCard> with SingleTickerPr
     );
   }
 
-  // FUNGSI INI SUDAH DIPERBAIKI AGAR TOMBOLNYA MUNCUL DENGAN RAPI
   Widget _buildDetails() {
     return Padding(
       padding: const EdgeInsets.only(top: 20),
@@ -172,7 +169,6 @@ class _PopularSportCardState extends State<PopularSportCard> with SingleTickerPr
           ),
           const SizedBox(height: 20),
 
-          // TOMBOL NAVIGASI KE MODUL TEMAN
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(

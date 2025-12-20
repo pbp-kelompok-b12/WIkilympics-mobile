@@ -2,7 +2,6 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import '../models/poll_model.dart';
 
 class PollService {
-  // Ganti sesuai backend kamu
   static const baseUrl = 'http://127.0.0.1:8000';
 
   static Future<List<PollQuestion>> fetchPolls(CookieRequest request) async {
