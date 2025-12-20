@@ -45,9 +45,9 @@ class EventsCard extends StatelessWidget {
               right: 8,
               child: Row(
                 children: [
-                  if (onEdit != null)
-                  _adminButton(Icons.edit, Colors.blue, onEdit!),
-                  const SizedBox(width: 5),
+                  //if (onEdit != null)
+                  //_adminButton(Icons.edit, Colors.blue, onEdit!),
+                  //const SizedBox(width: 5),
                   if (onDelete != null)
                   _adminButton(Icons.delete, Colors.red, onDelete!),
                 ],
