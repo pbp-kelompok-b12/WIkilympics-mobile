@@ -3,7 +3,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:wikilympics/screens/register.dart';
+<<<<<<< HEAD
 import 'package:wikilympics/landingpoll/screens/menu.dart';
+=======
+import 'package:wikilympics/screens/landingpoll/menu.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+>>>>>>> dcca924f9d6b80ed25e411b36591b460053c2ad0
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -109,7 +114,10 @@ class _LoginPageState extends State<LoginPage> {
 
                         final response = await request.login(
                           "http://127.0.0.1:8000/auth/login/",
+<<<<<<< HEAD
                           // "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id/auth/login/",
+=======
+>>>>>>> dcca924f9d6b80ed25e411b36591b460053c2ad0
                           {
                             "username": username,
                             "password": password,
@@ -118,6 +126,25 @@ class _LoginPageState extends State<LoginPage> {
 
                         if (context.mounted) {
                           if (request.loggedIn) {
+<<<<<<< HEAD
+=======
+                            final prefs = await SharedPreferences.getInstance();
+                                                      await prefs.setString('username', username);
+
+                                                      try {
+                                                        final userInfoResponse = await request.get(
+                                                            'http://127.0.0.1:8000/forum_section/get-user-info/'
+                                                        );
+
+                                                        if (userInfoResponse is Map) {
+                                                          final userId = userInfoResponse['user_id'] ?? 0;
+                                                          final isSuperuser = userInfoResponse['is_superuser'] ?? false;
+                                                          await prefs.setInt('user_id', userId);
+                                                          await prefs.setBool('is_superuser', isSuperuser);
+                                                        }
+                                                      } catch (e) {
+                                                      }
+>>>>>>> dcca924f9d6b80ed25e411b36591b460053c2ad0
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Login successful!'),
@@ -244,7 +271,7 @@ class _LoginPageState extends State<LoginPage> {
           icon,
           color: Colors.grey[500],
         ),
-        suffixIcon: suffix,
+         suffixIcon: suffix,
         filled: true,
         fillColor: Colors.white,
         enabledBorder: OutlineInputBorder(
