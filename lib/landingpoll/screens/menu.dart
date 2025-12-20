@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import 'package:wikilympics/sports/models/sport_entry.dart';
 import 'package:wikilympics/sports/screens/sport_entry_list.dart';
+import 'package:wikilympics/sports/screens/sport_entry_detail.dart';
 
 import 'package:wikilympics/article/models/article_entry.dart';
 import 'package:wikilympics/article/screens/article_detail.dart';
@@ -17,14 +18,10 @@ import 'package:wikilympics/upcomingevents/models/events_entry.dart';
 import 'package:wikilympics/upcomingevents/screens/events_detail_screen.dart';
 import 'package:wikilympics/upcomingevents/screens/events_list_screen.dart';
 
-<<<<<<< HEAD
-// --- IMPORTS AUTH & DRAWER ---
-=======
 import 'package:wikilympics/Razan/models/forum_entry.dart';
 import 'package:wikilympics/Razan/Screens/forum_main.dart';
 import 'package:wikilympics/Razan/Screens/forum_detail.dart';
 
->>>>>>> d0a06c3df570a9d9c7cbf61eb05c3164b7f53676
 import 'package:wikilympics/screens/login.dart';
 import '../../widgets/left_drawer.dart';
 
@@ -144,17 +141,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   final List<Widget> _navbarPages = const [
-<<<<<<< HEAD
-    Placeholder(), // Landing (index 0)
-    ForumPage(),   // Forum (index 1)
-    Placeholder(), // Menu Sheet (index 2)
-    ProfilePage(), // Profil (index 3)
-=======
     Placeholder(),
     ForumListPage(),
     Placeholder(),
     ProfilePage(),
->>>>>>> d0a06c3df570a9d9c7cbf61eb05c3164b7f53676
   ];
 
   @override
@@ -493,25 +483,37 @@ class _MyHomePageState extends State<MyHomePage> {
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                       return const Text("No sports data available");
                     }
+
                     final topSports = snapshot.data!.take(3).toList();
                     return Column(
                       children: topSports.asMap().entries.map((entry) {
                         int index = entry.key;
                         SportEntry sport = entry.value;
+
                         return PopularSportCard(
                           rank: index + 1,
                           sportName: sport.fields.sportName,
                           firstYear: sport.fields.firstYearPlayed.toString(),
-                          imageUrl: sport.fields.sportImg,
+                          imageUrl: fixImageUrl(sport.fields.sportImg),
+                          flagUrl: fixImageUrl(sport.fields.countryFlagImg),
                           description: sport.fields.sportDescription,
                           origin: sport.fields.countryOfOrigin,
-                          type: sport.fields.sportType.toString(),
+                          type: sport.fields.sportType.toString().split('.').last.replaceAll('_', ' '),
+                          onDetailTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SportDetailPage(sport: sport),
+                              ),
+                            );
+                          },
                         );
                       }).toList(),
                     );
                   },
                 ),
                 const SizedBox(height: 8),
+
                 Container(
                   width: double.infinity,
                   margin: const EdgeInsets.symmetric(vertical: 10),
@@ -726,76 +728,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
 
-<<<<<<< HEAD
-          // ===== FORUM & REVIEWS =====
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Forum & Reviews",
-                  style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.w700, color: const Color(0xFF155F90)),
-                ),
-                const SizedBox(height: 16),
-                ForumReviewCard(
-                  username: "Tassy Omah",
-                  profileImage: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
-                  timeAgo: "6h ago",
-                  title: "The Raptors Don't Need Leonard To be in that game! They really don't!",
-                  contentImage: "https://images.unsplash.com/photo-1546519638-68e109498ee2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-                  likeCount: 334,
-                  commentCount: 23440,
-                  onTap: () {},
-                ),
-                ForumReviewCard(
-                  username: "Jhon Doe",
-                  profileImage: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
-                  timeAgo: "2h ago",
-                  title: "Why Swimming is the best cardio workout you can do right now.",
-                  contentImage: "https://images.unsplash.com/photo-1530549387789-4c1017266635?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-                  likeCount: 120,
-                  commentCount: 45,
-                  onTap: () {},
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
-                    ],
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(20),
-                      onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const ForumPage()));
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 18),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Text(
-                              "SEE ALL FORUMS",
-                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFFC8DB2C)),
-                            ),
-                            SizedBox(width: 4),
-                            Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFFC8DB2C), size: 20),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-=======
           // FORUM & REVIEWS
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -842,7 +774,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ],
->>>>>>> d0a06c3df570a9d9c7cbf61eb05c3164b7f53676
           ),
           const SizedBox(height: 100),
         ],
@@ -1068,25 +999,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-<<<<<<< HEAD
-// =========================================================================
-// HELPER FUNCTIONS & URL FIXER (SOLUSI GAMBAR)
-// =========================================================================
-=======
->>>>>>> d0a06c3df570a9d9c7cbf61eb05c3164b7f53676
 
 String fixImageUrl(String rawUrl) {
   if (rawUrl.isEmpty) {
     return "https://cdn.pixabay.com/photo/2016/05/01/17/56/rio-1365366_1280.jpg";
   }
-<<<<<<< HEAD
-  if (!kIsWeb && (rawUrl.contains("127.0.0.1") || rawUrl.contains("localhost"))) {
-    rawUrl = rawUrl.replaceAll("127.0.0.1", "10.0.2.2").replaceAll("localhost", "10.0.2.2");
-  }
-  if (rawUrl.contains("pinimg.com")) {
-    return "https://cdn.pixabay.com/photo/2016/05/01/17/56/rio-1365366_1280.jpg";
-  }
-=======
 
   if (!kIsWeb && (rawUrl.contains("127.0.0.1") || rawUrl.contains("localhost"))) {
     rawUrl = rawUrl.replaceAll("127.0.0.1", "10.0.2.2").replaceAll("localhost", "10.0.2.2");
@@ -1096,22 +1013,19 @@ String fixImageUrl(String rawUrl) {
     return "https://cdn.pixabay.com/photo/2016/05/01/17/56/rio-1365366_1280.jpg";
   }
 
->>>>>>> d0a06c3df570a9d9c7cbf61eb05c3164b7f53676
   if (rawUrl.startsWith("/")) {
-    return "http://10.0.2.2:8000$rawUrl";
+    String base = kIsWeb ? "http://127.0.0.1:8000" : "http://10.0.2.2:8000";
+    return "$base$rawUrl";
   }
+
   return rawUrl;
 }
 
 Future<List<SportEntry>> fetchSports(CookieRequest request) async {
-<<<<<<< HEAD
-  final response = await request.get('http://127.0.0.1:8000/sports/json/');
-=======
   final String baseUrl = kIsWeb ? "http://127.0.0.1:8000" : "http://10.0.2.2:8000";
 
   final response = await request.get('$baseUrl/sports/json/');
 
->>>>>>> d0a06c3df570a9d9c7cbf61eb05c3164b7f53676
   List<SportEntry> listSports = [];
   for (var d in response) {
     if (d != null) {
@@ -1141,8 +1055,6 @@ Future<List<EventEntry>> fetchEvents(CookieRequest request) async {
     }
   }
   return listEvents;
-<<<<<<< HEAD
-=======
 }
 
 Future<List<ForumEntry>> fetchForums(CookieRequest request) async {
@@ -1156,5 +1068,4 @@ Future<List<ForumEntry>> fetchForums(CookieRequest request) async {
     }
   }
   return listForums;
->>>>>>> d0a06c3df570a9d9c7cbf61eb05c3164b7f53676
 }

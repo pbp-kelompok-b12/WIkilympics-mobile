@@ -34,65 +34,15 @@ class _ProfilePageState extends State<ProfilePage> {
         iconTheme: const IconThemeData(color: kNavy),
       ),
       body: Center(
-<<<<<<< HEAD
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 30),
           child: !request.loggedIn 
             ? _buildGuestContent(kNavy) 
             : _buildProfileContent(request, kNavy, kLime),
-=======
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.account_circle,
-                color: const Color(0xFF01203F), size: 90),
-            const SizedBox(height: 10),
-
-            Text(
-              username,
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w600,
-                fontSize: 20,
-                color: const Color(0xFF01203F),
-              ),
-            ),
-
-            const SizedBox(height: 25),
-
-            ElevatedButton(
-              onPressed: () async {
-                await request.logout("/auth/logout/");
-
-                if (context.mounted) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const LoginPage()),
-                  );
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF01203F),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 28, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-              child: Text(
-                "Logout",
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            )
-          ],
->>>>>>> d0a06c3df570a9d9c7cbf61eb05c3164b7f53676
         ),
       ),
     );
   }
-<<<<<<< HEAD
 
   Widget _buildGuestContent(Color navy) {
     return Column(
@@ -254,6 +204,4 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-=======
->>>>>>> d0a06c3df570a9d9c7cbf61eb05c3164b7f53676
 }
