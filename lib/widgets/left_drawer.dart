@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wikilympics/Razan/Screens/forum_main.dart';
-import 'package:wikilympics/screens/landingpoll/menu.dart';
+import 'package:wikilympics/landingpoll/screens/menu.dart';
 import 'package:wikilympics/screens/login.dart';
 
 import 'package:provider/provider.dart';
