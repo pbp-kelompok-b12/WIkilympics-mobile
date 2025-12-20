@@ -1,11 +1,14 @@
+// screens/athlete_entry_form.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'dart:convert';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:wikilympics/athletes/models/athlete_entry.dart';
 
 class AthleteEntryFormPage extends StatefulWidget {
   final AthleteEntry? athleteEntry;
+
   const AthleteEntryFormPage({super.key, this.athleteEntry});
 
   @override
@@ -14,95 +17,47 @@ class AthleteEntryFormPage extends StatefulWidget {
 
 class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
   final _formKey = GlobalKey<FormState>();
+
+  // Form Fields
   String _athleteName = "";
   String _country = "";
   String _sport = "";
   String _biography = "";
   String _athletePhoto = "";
-  List<String> _sportOptions = [];
-  List<String> _countryOptions = [];
-  bool _loadingOptions = true;
-  final Color kPrimaryNavy = const Color(0xFF03045E);
-  final Color kAccentLime = const Color(0xFFD9E74C);
-  final Color kBgGrey = const Color(0xFFF9F9F9);
 
+  // Color Palette
+  final Color kPrimaryBlue = const Color(0xFF1E3CC8);
+  final Color kAccentYellow = const Color(0xFFFFD700);
+  final Color kBgWhite = const Color(0xFFF9F9F9);
+
+  // screens/athlete_entry_form.dart - bagian initState
   @override
   void initState() {
     super.initState();
     if (widget.athleteEntry != null) {
-      final f = widget.athleteEntry!.fields;
-      _athleteName = f.athleteName;
-      _country = f.country;
-      _sport = f.sport;
-      _biography = f.biography;
-      _athletePhoto = f.athletePhoto;
+      _athleteName = widget.athleteEntry!.fields.athleteName;
+      _country = widget.athleteEntry!.fields.country;
+      _sport = widget.athleteEntry!.fields.sport;
+      _biography = widget.athleteEntry!.fields.biography;
+      _athletePhoto = widget.athleteEntry!.fields.athletePhoto;
     }
-    _fetchOptions();
-  }
-
-  Future<void> _fetchOptions() async {
-    final request = context.read<CookieRequest>();
-    try {
-      final response = await request.get(
-        'http://127.0.0.1:8000/athletes/flutter/',
-      );
-      Set<String> sportSet = {};
-      Set<String> countrySet = {};
-
-      for (var d in response) {
-        if (d != null) {
-          final athlete = AthleteEntry.fromJson(d);
-          if (athlete.fields.sport.isNotEmpty)
-            sportSet.add(athlete.fields.sport);
-          if (athlete.fields.country.isNotEmpty)
-            countrySet.add(athlete.fields.country);
-        }
-      }
-
-      if (widget.athleteEntry != null) {
-        final f = widget.athleteEntry!.fields;
-        sportSet.add(f.sport);
-        countrySet.add(f.country);
-      }
-
-      if (mounted) {
-        setState(() {
-          _sportOptions = sportSet.toList()..sort();
-          _countryOptions = countrySet.toList()..sort();
-          _loadingOptions = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _loadingOptions = false;
-        });
-      }
-    }
-  }
-
-  String? _validateUrl(String? value) {
-    if (value == null || value.isEmpty) return null;
-    final uri = Uri.tryParse(value);
-    if (uri == null || !uri.hasAbsolutePath) return "URL is not valid!";
-    return null;
   }
 
   InputDecoration _buildInputDecoration(String hint, IconData icon) {
     return InputDecoration(
       hintText: hint,
       hintStyle: GoogleFonts.poppins(color: Colors.grey[500], fontSize: 14),
-      prefixIcon: Icon(icon, color: kPrimaryNavy),
+      prefixIcon: Icon(icon, color: kPrimaryBlue),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       fillColor: Colors.white,
       filled: true,
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: kPrimaryNavy, width: 1.0),
+        borderSide: BorderSide(color: kPrimaryBlue, width: 1.0),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: kPrimaryNavy, width: 2.0),
+        borderSide: BorderSide(color: kPrimaryBlue, width: 2.0),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
@@ -115,135 +70,36 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
     );
   }
 
-  Widget _buildDropdownFormField({
-    required String hint,
-    required IconData icon,
-    required String? value,
-    required List<String> options,
-    required Function(String?) onChanged,
-    required String? Function(String?) validator,
-    bool isLoading = false,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: kPrimaryNavy, width: 1.0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-        child: Row(
-          children: [
-            Icon(icon, color: kPrimaryNavy),
-            const SizedBox(width: 12),
-            Expanded(
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: value,
-                  hint: Text(
-                    isLoading ? "Loading..." : hint,
-                    style: GoogleFonts.poppins(
-                      color: isLoading ? Colors.grey : Colors.grey[500],
-                      fontSize: 14,
-                    ),
-                  ),
-                  isExpanded: true,
-                  items: options
-                      .map(
-                        (option) => DropdownMenuItem<String>(
-                          value: option,
-                          child: Text(
-                            option,
-                            style: GoogleFonts.poppins(fontSize: 14),
-                          ),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: isLoading ? null : onChanged,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Map<String, dynamic> _createFormData() {
-    return {
-      "athlete_name": _athleteName,
-      "country": _country,
-      "sport": _sport,
-      "biography": _biography,
-      "athlete_photo": _athletePhoto,
-    };
-  }
-
-  Future<void> _submitForm(BuildContext context, bool isEdit) async {
-    final request = context.read<CookieRequest>();
-    try {
-      Map<String, dynamic> response;
-      if (isEdit) {
-        response = await request.postJson(
-          'http://127.0.0.1:8000/athletes/flutter/${widget.athleteEntry!.pk}/edit/',
-          _createFormData(),
-        );
-      } else {
-        response = await request.postJson(
-          'http://127.0.0.1:8000/athletes/flutter/create/',
-          _createFormData(),
-        );
-      }
-
-      if (context.mounted) {
-        if (response['status'] == 'success') {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(isEdit ? "Athlete updated!" : "Athlete added!"),
-              backgroundColor: kAccentLime,
-              behavior: SnackBarBehavior.floating,
-              action: SnackBarAction(
-                label: 'OK',
-                textColor: kPrimaryNavy,
-                onPressed: () {},
-              ),
-            ),
-          );
-          Navigator.pop(context);
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(response['message'] ?? "Failed to save athlete."),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Error: ${e.toString()}"),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+  String? _validateUrl(String? value) {
+    if (value == null || value.isEmpty) return null;
+    final uri = Uri.tryParse(value);
+    if (uri == null || !uri.hasAbsolutePath) {
+      return "URL is not valid!";
     }
+    return null;
   }
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
     final isEdit = widget.athleteEntry != null;
 
     return Scaffold(
-      backgroundColor: kBgGrey,
+      backgroundColor: kBgWhite,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        backgroundColor: kBgGrey,
+        backgroundColor: kBgWhite,
         elevation: 0,
+        title: Text(
+          isEdit ? "Edit Athlete" : "Add New Athlete",
+          style: GoogleFonts.poppins(
+            color: kPrimaryBlue,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -267,6 +123,7 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // Header
                   Padding(
                     padding: const EdgeInsets.only(left: 10),
                     child: Text(
@@ -274,80 +131,119 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
                       style: GoogleFonts.poppins(
                         fontSize: 26,
                         fontWeight: FontWeight.w700,
-                        color: kPrimaryNavy,
+                        color: kPrimaryBlue,
                       ),
                     ),
                   ),
                   const SizedBox(height: 25),
+
+                  // Athlete Name
                   TextFormField(
                     initialValue: _athleteName,
                     decoration: _buildInputDecoration(
                       "Athlete Name",
                       Icons.person,
                     ),
-                    style: GoogleFonts.poppins(color: kPrimaryNavy),
+                    style: GoogleFonts.poppins(color: kPrimaryBlue),
                     onChanged: (value) => _athleteName = value,
                     validator: (value) => (value == null || value.isEmpty)
-                        ? "Athlete name cannot be empty!"
+                        ? "Name cannot be empty!"
                         : null,
                   ),
                   const SizedBox(height: 16),
-                  _buildDropdownFormField(
-                    hint: "Select Country",
-                    icon: Icons.flag,
-                    value: _country.isNotEmpty ? _country : null,
-                    options: _countryOptions,
-                    isLoading: _loadingOptions,
-                    onChanged: (val) => setState(() => _country = val ?? ""),
-                    validator: (value) =>
-                        value == null ? "Please select country!" : null,
+
+                  // Row (Country & Sport)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          initialValue: _country,
+                          decoration: _buildInputDecoration(
+                            "Country",
+                            Icons.flag,
+                          ),
+                          style: GoogleFonts.poppins(color: kPrimaryBlue),
+                          onChanged: (value) => _country = value,
+                          validator: (value) => (value == null || value.isEmpty)
+                              ? "Country cannot be empty!"
+                              : null,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextFormField(
+                          initialValue: _sport,
+                          decoration: _buildInputDecoration(
+                            "Sport",
+                            Icons.sports,
+                          ),
+                          style: GoogleFonts.poppins(color: kPrimaryBlue),
+                          onChanged: (value) => _sport = value,
+                          validator: (value) => (value == null || value.isEmpty)
+                              ? "Sport cannot be empty!"
+                              : null,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 16),
-                  _buildDropdownFormField(
-                    hint: "Select Sport",
-                    icon: Icons.sports,
-                    value: _sport.isNotEmpty ? _sport : null,
-                    options: _sportOptions,
-                    isLoading: _loadingOptions,
-                    onChanged: (val) => setState(() => _sport = val ?? ""),
-                    validator: (value) =>
-                        value == null ? "Please select sport!" : null,
+
+                  // Athlete Photo URL
+                  TextFormField(
+                    initialValue: _athletePhoto,
+                    decoration: _buildInputDecoration(
+                      "Photo URL (optional)",
+                      Icons.image,
+                    ),
+                    style: GoogleFonts.poppins(color: kPrimaryBlue),
+                    onChanged: (value) => _athletePhoto = value,
+                    validator: _validateUrl,
                   ),
                   const SizedBox(height: 16),
+
+                  // Biography
                   TextFormField(
                     initialValue: _biography,
-                    maxLines: 5,
-                    decoration:
-                        _buildInputDecoration(
-                          "Biography",
-                          Icons.description,
-                        ).copyWith(
-                          alignLabelWithHint: true,
-                          prefixIcon: Container(
-                            height: 100,
-                            width: 40,
-                            alignment: Alignment.topCenter,
-                            child: Icon(Icons.description, color: kPrimaryNavy),
-                          ),
+                    maxLines: 6,
+                    decoration: InputDecoration(
+                      hintText: "Biography",
+                      hintStyle: GoogleFonts.poppins(
+                        color: Colors.grey[500],
+                        fontSize: 14,
+                      ),
+                      prefixIcon: Container(
+                        height: 100,
+                        width: 40,
+                        alignment: Alignment.topCenter,
+                        child: Transform.translate(
+                          offset: const Offset(0, 0),
+                          child: Icon(Icons.description, color: kPrimaryBlue),
                         ),
-                    style: GoogleFonts.poppins(color: kPrimaryNavy),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 16,
+                      ),
+                      fillColor: Colors.white,
+                      filled: true,
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(color: kPrimaryBlue, width: 1.0),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(color: kPrimaryBlue, width: 2.0),
+                      ),
+                    ),
+                    style: GoogleFonts.poppins(color: kPrimaryBlue),
                     onChanged: (value) => _biography = value,
                     validator: (value) => (value == null || value.isEmpty)
                         ? "Biography cannot be empty!"
                         : null,
                   ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    initialValue: _athletePhoto,
-                    decoration: _buildInputDecoration(
-                      "Athlete Photo URL (Optional)",
-                      Icons.image,
-                    ),
-                    style: GoogleFonts.poppins(color: kPrimaryNavy),
-                    onChanged: (value) => _athletePhoto = value,
-                    validator: _validateUrl,
-                  ),
                   const SizedBox(height: 32),
+
+                  // Submit Button
                   Align(
                     alignment: Alignment.centerRight,
                     child: SizedBox(
@@ -355,8 +251,8 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
                       height: 45,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: kAccentLime,
-                          foregroundColor: kPrimaryNavy,
+                          backgroundColor: kAccentYellow,
+                          foregroundColor: kPrimaryBlue,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -365,7 +261,57 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
                         ),
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            await _submitForm(context, isEdit);
+                            String url;
+                            if (isEdit) {
+                              url =
+                                  "http://localhost:8000/athletes/flutter/${widget.athleteEntry!.pk}/edit/";
+                            } else {
+                              url =
+                                  "http://localhost:8000/athletes/flutter/create/";
+                            }
+
+                            final response = await request.postJson(
+                              url,
+                              jsonEncode({
+                                "athlete_name": _athleteName,
+                                "country": _country,
+                                "sport": _sport,
+                                "biography": _biography,
+                                "athlete_photo": _athletePhoto,
+                              }),
+                            );
+
+                            if (context.mounted) {
+                              if (response['status'] == 'success') {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      isEdit
+                                          ? "Athlete updated!"
+                                          : "Athlete added!",
+                                    ),
+                                    backgroundColor: kAccentYellow,
+                                    behavior: SnackBarBehavior.floating,
+                                    action: SnackBarAction(
+                                      label: 'OK',
+                                      textColor: kPrimaryBlue,
+                                      onPressed: () {},
+                                    ),
+                                  ),
+                                );
+                                Navigator.pop(context);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      response['message'] ??
+                                          "Failed to save athlete.",
+                                    ),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            }
                           }
                         },
                         child: Row(

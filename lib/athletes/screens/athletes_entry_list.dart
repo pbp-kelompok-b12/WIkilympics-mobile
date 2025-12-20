@@ -1,12 +1,12 @@
+// screens/athlete_entry_list.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:wikilympics/athletes/models/athlete_entry.dart';
 import 'package:wikilympics/widgets/left_drawer.dart';
+import 'package:wikilympics/athletes/models/athlete_entry.dart';
 import 'package:wikilympics/athletes/widgets/athlete_entry_card.dart';
-import 'package:wikilympics/athletes/widgets/filter_athletes.dart';
 import 'package:wikilympics/athletes/screens/athlete_entry_form.dart';
 import 'package:wikilympics/athletes/screens/athlete_entry_detail.dart';
 
@@ -18,14 +18,17 @@ class AthleteEntryListPage extends StatefulWidget {
 }
 
 class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
-  final Color kPrimaryNavy = const Color(0xFF03045E);
-  final Color kBgGrey = const Color(0xFFF9F9F9);
-  final Color kAccentLime = const Color(0xFFD9E74C);
+  // Color Palette
+  final Color kPrimaryBlue = const Color(0xFF1E3CC8);
+  final Color kAccentYellow = const Color(0xFFFFD700);
+  final Color kBgWhite = const Color(0xFFF9F9F9);
+  final Color kDarkNavy = const Color(0xFF0B162C);
 
+  // State Variables
   bool _isAdmin = false;
   String _searchQuery = "";
-  List<String> _selectedSports = [];
-  List<String> _selectedCountries = [];
+  String _selectedSport = "";
+  String _selectedCountry = "";
   List<String> _sportOptions = [];
   List<String> _countryOptions = [];
 
@@ -34,6 +37,7 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkAdminStatus();
+      _loadFilterOptions();
     });
   }
 
@@ -47,91 +51,102 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
         setState(() {
           _isAdmin = response['is_superuser'] ?? false;
         });
-      } catch (e) {}
+      } catch (e) {
+        // Handle error
+      }
+    }
+  }
+
+  Future<void> _loadFilterOptions() async {
+    final request = context.read<CookieRequest>();
+    try {
+      final response = await request.get(
+        'http://127.0.0.1:8000/athletes/json/',
+      );
+
+      Set<String> sports = {};
+      Set<String> countries = {};
+
+      for (var item in response) {
+        var athlete = AthleteEntry.fromJson(item);
+        sports.add(athlete.fields.sport);
+        countries.add(athlete.fields.country);
+      }
+
+      setState(() {
+        _sportOptions = sports.toList()..sort();
+        _countryOptions = countries.toList()..sort();
+      });
+    } catch (e) {
+      print("Error loading filter options: $e");
     }
   }
 
   Future<List<AthleteEntry>> fetchAthletes(CookieRequest request) async {
-    final response = await request.get(
-      'http://127.0.0.1:8000/athletes/flutter/',
-    );
-    List<AthleteEntry> listAthletes = [];
+    try {
+      print("Fetching athletes from Django...");
+      final response = await request.get(
+        'http://127.0.0.1:8000/athletes/flutter/',
+      );
 
-    Set<String> sportSet = {};
-    Set<String> countrySet = {};
+      print("Response type: ${response.runtimeType}");
+      print("Response: $response");
 
-    for (var d in response) {
-      if (d != null) {
-        final athlete = AthleteEntry.fromJson(d);
-        listAthletes.add(athlete);
-
-        if (athlete.fields.sport.isNotEmpty) {
-          sportSet.add(athlete.fields.sport);
+      if (response is List) {
+        print("Response is a list with ${response.length} items");
+        if (response.isNotEmpty) {
+          print("First item: ${response.first}");
         }
 
-        if (athlete.fields.country.isNotEmpty) {
-          countrySet.add(athlete.fields.country);
+        List<AthleteEntry> listAthletes = [];
+        for (var d in response) {
+          if (d != null) {
+            try {
+              listAthletes.add(AthleteEntry.fromJson(d));
+            } catch (e) {
+              print("Error parsing athlete: $e");
+              print("Problematic data: $d");
+            }
+          }
         }
+        print("Successfully parsed ${listAthletes.length} athletes");
+        return listAthletes;
+      } else {
+        print("Unexpected response format: $response");
+        return [];
       }
+    } catch (e) {
+      print("Error fetching athletes: $e");
+      return [];
     }
-
-    if (mounted) {
-      setState(() {
-        _sportOptions = sportSet.toList()..sort();
-        _countryOptions = countrySet.toList()..sort();
-      });
-    }
-
-    return listAthletes;
   }
 
   void _refreshAthletes() {
     setState(() {});
   }
 
+  // Filter Logic
   List<AthleteEntry> _applyFilters(List<AthleteEntry> allAthletes) {
     return allAthletes.where((athlete) {
       final name = athlete.fields.athleteName.toLowerCase();
-      if (!name.contains(_searchQuery.toLowerCase())) return false;
+      final sport = athlete.fields.sport.toLowerCase();
+      final country = athlete.fields.country.toLowerCase();
 
-      if (_selectedSports.isNotEmpty) {
-        bool sportMatch = _selectedSports.any(
-          (selected) =>
-              athlete.fields.sport.toLowerCase() == selected.toLowerCase(),
-        );
-        if (!sportMatch) return false;
+      if (_searchQuery.isNotEmpty && !name.contains(_searchQuery)) {
+        return false;
       }
 
-      if (_selectedCountries.isNotEmpty) {
-        bool countryMatch = _selectedCountries.any(
-          (selected) =>
-              athlete.fields.country.toLowerCase() == selected.toLowerCase(),
-        );
-        if (!countryMatch) return false;
+      if (_selectedSport.isNotEmpty && sport != _selectedSport.toLowerCase()) {
+        return false;
+      }
+
+      if (_selectedCountry.isNotEmpty &&
+          country != _selectedCountry.toLowerCase()) {
+        return false;
       }
 
       return true;
     }).toList();
-  }
-
-  void _showFilterModal() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => FilterAthleteSheet(
-        initialSports: _selectedSports,
-        initialCountries: _selectedCountries,
-        sportOptions: _sportOptions,
-        countryOptions: _countryOptions,
-        onApply: (sports, countries) {
-          setState(() {
-            _selectedSports = sports;
-            _selectedCountries = countries;
-          });
-        },
-      ),
-    );
   }
 
   @override
@@ -139,22 +154,22 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
-      backgroundColor: kBgGrey,
+      backgroundColor: kBgWhite,
       appBar: AppBar(
         title: Image.asset(
           'assets/wikilympics_banner.png',
           height: 60,
           fit: BoxFit.contain,
           errorBuilder: (ctx, _, __) => Text(
-            "WikiLympics",
+            "WikiLympics Athletes",
             style: GoogleFonts.poppins(
-              color: kPrimaryNavy,
+              color: kPrimaryBlue,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        backgroundColor: kBgGrey,
-        iconTheme: IconThemeData(color: kPrimaryNavy),
+        backgroundColor: kBgWhite,
+        iconTheme: IconThemeData(color: kPrimaryBlue),
         elevation: 0,
       ),
       drawer: const LeftDrawer(),
@@ -172,12 +187,12 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
               label: Text(
                 "ADD ATHLETE",
                 style: GoogleFonts.poppins(
-                  color: kPrimaryNavy,
+                  color: kPrimaryBlue,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              icon: Icon(Icons.add, color: kPrimaryNavy),
-              backgroundColor: kAccentLime,
+              icon: Icon(Icons.add, color: kPrimaryBlue),
+              backgroundColor: kAccentYellow,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -186,11 +201,12 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header Section
           Container(
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(30, 10, 30, 7),
             decoration: BoxDecoration(
-              color: kBgGrey,
+              color: kBgWhite,
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(24),
                 bottomRight: Radius.circular(24),
@@ -199,81 +215,138 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Search Bar
+                Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(color: Colors.grey.shade300),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.03),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: TextField(
+                    onChanged: (val) =>
+                        setState(() => _searchQuery = val.toLowerCase()),
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.search, color: kPrimaryBlue),
+                      hintText: "Search athletes...",
+                      hintStyle: GoogleFonts.poppins(
+                        color: Colors.black87,
+                        fontSize: 14,
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 15),
+
+                // Filters Row
                 Row(
                   children: [
+                    // Sport Filter
                     Expanded(
                       child: Container(
                         height: 40,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(15),
+                          borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: Colors.grey.shade300),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.03),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
                         ),
-                        child: TextField(
-                          onChanged: (val) =>
-                              setState(() => _searchQuery = val.toLowerCase()),
-                          decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.search, color: kPrimaryNavy),
-                            hintText: "Search athletes...",
-                            hintStyle: GoogleFonts.poppins(
-                              color: Colors.black87,
+                        child: DropdownButton<String>(
+                          value: _selectedSport.isEmpty ? null : _selectedSport,
+                          isExpanded: true,
+                          icon: Icon(
+                            Icons.arrow_drop_down,
+                            color: kPrimaryBlue,
+                          ),
+                          hint: Text(
+                            "All Sports",
+                            style: GoogleFonts.poppins(
+                              color: Colors.grey[600],
                               fontSize: 14,
                             ),
-                            border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 8,
-                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    GestureDetector(
-                      onTap: _showFilterModal,
-                      child: Container(
-                        height: 40,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        decoration: BoxDecoration(
-                          color: kPrimaryNavy,
-                          borderRadius: BorderRadius.circular(15),
-                          boxShadow: [
-                            BoxShadow(
-                              color: kPrimaryNavy.withOpacity(0.2),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
+                          items: [
+                            const DropdownMenuItem<String>(
+                              value: "",
+                              child: Text("All Sports"),
                             ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.tune,
-                              color: Colors.white,
-                              size: 18,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              "FILTERS",
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,
+                            ..._sportOptions.map(
+                              (sport) => DropdownMenuItem(
+                                value: sport,
+                                child: Text(sport),
                               ),
                             ),
                           ],
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedSport = value ?? "";
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+
+                    // Country Filter
+                    Expanded(
+                      child: Container(
+                        height: 40,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: DropdownButton<String>(
+                          value: _selectedCountry.isEmpty
+                              ? null
+                              : _selectedCountry,
+                          isExpanded: true,
+                          icon: Icon(
+                            Icons.arrow_drop_down,
+                            color: kPrimaryBlue,
+                          ),
+                          hint: Text(
+                            "All Countries",
+                            style: GoogleFonts.poppins(
+                              color: Colors.grey[600],
+                              fontSize: 14,
+                            ),
+                          ),
+                          items: [
+                            const DropdownMenuItem<String>(
+                              value: "",
+                              child: Text("All Countries"),
+                            ),
+                            ..._countryOptions.map(
+                              (country) => DropdownMenuItem(
+                                value: country,
+                                child: Text(country),
+                              ),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedCountry = value ?? "";
+                            });
+                          },
                         ),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 13),
+
+                // Title
                 Padding(
                   padding: const EdgeInsets.only(left: 15.0),
                   child: Text(
@@ -281,35 +354,41 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
                     style: GoogleFonts.poppins(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      color: kPrimaryNavy,
+                      color: kPrimaryBlue,
                       letterSpacing: -0.5,
                     ),
                   ),
                 ),
-                if (_selectedSports.isNotEmpty || _selectedCountries.isNotEmpty)
+
+                // Active Filters
+                if (_selectedSport.isNotEmpty || _selectedCountry.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: 10, left: 15),
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: [
-                          ..._selectedSports.map(
-                            (e) => _buildChip(e, Colors.blue.shade50),
-                          ),
-                          ..._selectedCountries.map(
-                            (e) => _buildChip(e, Colors.orange.shade50),
-                          ),
+                          if (_selectedSport.isNotEmpty)
+                            _buildChip(
+                              "Sport: $_selectedSport",
+                              Colors.blue.shade50,
+                            ),
+                          if (_selectedCountry.isNotEmpty)
+                            _buildChip(
+                              "Country: $_selectedCountry",
+                              Colors.orange.shade50,
+                            ),
                           GestureDetector(
                             onTap: () => setState(() {
-                              _selectedSports.clear();
-                              _selectedCountries.clear();
+                              _selectedSport = "";
+                              _selectedCountry = "";
                             }),
                             child: Padding(
                               padding: const EdgeInsets.only(left: 8.0),
                               child: Text(
-                                "Clear All",
+                                "Clear Filters",
                                 style: GoogleFonts.poppins(
-                                  color: kPrimaryNavy,
+                                  color: kPrimaryBlue,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -323,44 +402,60 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
               ],
             ),
           ),
+
+          // List Content
           Expanded(
             child: FutureBuilder<List<AthleteEntry>>(
               future: fetchAthletes(request),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(
-                    child: Text(
-                      'Error: ${snapshot.error}',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        color: Colors.red,
-                      ),
-                    ),
-                  );
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        Icon(Icons.people, size: 80, color: Colors.grey[300]),
+                        const SizedBox(height: 20),
                         Text(
-                          'No athletes found.',
+                          'No athletes yet.',
                           style: GoogleFonts.poppins(
                             fontSize: 20,
-                            color: kPrimaryNavy,
+                            color: kPrimaryBlue,
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        ElevatedButton(
-                          onPressed: _refreshAthletes,
-                          child: const Text('Retry'),
-                        ),
+                        if (_isAdmin)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 20),
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const AthleteEntryFormPage(),
+                                  ),
+                                );
+                                _refreshAthletes();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: kAccentYellow,
+                                foregroundColor: kPrimaryBlue,
+                              ),
+                              child: Text(
+                                "Add First Athlete",
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   );
                 } else {
                   final filteredList = _applyFilters(snapshot.data!);
+
                   if (filteredList.isEmpty) {
                     return Center(
                       child: Column(
@@ -376,10 +471,25 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
                             "No athletes match your filters.",
                             style: GoogleFonts.poppins(color: Colors.grey[600]),
                           ),
+                          const SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedSport = "";
+                                _selectedCountry = "";
+                                _searchQuery = "";
+                              });
+                            },
+                            child: Text(
+                              "Clear All Filters",
+                              style: GoogleFonts.poppins(),
+                            ),
+                          ),
                         ],
                       ),
                     );
                   }
+
                   return ListView.builder(
                     padding: const EdgeInsets.only(
                       top: 0,

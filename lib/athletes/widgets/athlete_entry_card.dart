@@ -1,3 +1,4 @@
+// widgets/athlete_entry_card.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wikilympics/athletes/models/athlete_entry.dart';
@@ -5,6 +6,7 @@ import 'package:wikilympics/athletes/models/athlete_entry.dart';
 class AthleteEntryCard extends StatelessWidget {
   final AthleteEntry athlete;
   final VoidCallback onTap;
+
   const AthleteEntryCard({
     super.key,
     required this.athlete,
@@ -14,7 +16,7 @@ class AthleteEntryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const Color darkCardColor = Color(0xFF0B162C);
-    const Color accentArrowColor = Color(0xFFCEF250);
+    const Color accentColor = Color(0xFFD2F665);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -37,85 +39,162 @@ class AthleteEntryCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // IMAGE SECTION
               Container(
                 height: 200,
                 color: Colors.grey[200],
-                child: Image.network(
-                  athlete.fields.athletePhoto.isNotEmpty
-                      ? athlete.fields.athletePhoto
-                      : 'https://via.placeholder.com/400x200?text=No+Image',
-                  fit: BoxFit.cover,
-                  alignment: Alignment.topCenter,
-                  errorBuilder: (context, error, stackTrace) => const Center(
-                    child: Icon(Icons.person, size: 50, color: Colors.grey),
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 16,
-                ),
-                decoration: const BoxDecoration(color: darkCardColor),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                child: Stack(
                   children: [
-                    Transform.rotate(
-                      angle: 0.785,
-                      child: const Icon(
-                        Icons.arrow_downward,
-                        color: accentArrowColor,
-                        size: 24,
+                    // Athlete Photo
+                    athlete.fields.athletePhoto.isNotEmpty
+                        ? Image.network(
+                            athlete.fields.athletePhoto,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            errorBuilder: (context, error, stackTrace) =>
+                                _buildPlaceholderImage(),
+                          )
+                        : _buildPlaceholderImage(),
+
+                    // Gradient Overlay
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            Colors.black.withOpacity(0.7),
+                            Colors.transparent,
+                          ],
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
+
+                    // Country Badge
+                    Positioned(
+                      top: 16,
+                      right: 16,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: darkCardColor.withOpacity(0.8),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: accentColor, width: 1),
+                        ),
+                        child: Text(
+                          athlete.fields.country.toUpperCase(),
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // Name Overlay
+                    Positioned(
+                      bottom: 20,
+                      left: 20,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            athlete.fields.athleteName,
+                            athlete.fields.athleteName.toUpperCase(),
                             style: GoogleFonts.poppins(
                               color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w900,
                               letterSpacing: 1.0,
                             ),
-                            maxLines: 1,
+                            maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '${athlete.fields.sport} • ${athlete.fields.country}',
+                            athlete.fields.sport,
                             style: GoogleFonts.poppins(
-                              color: Colors.blueGrey[200],
-                              fontSize: 12,
+                              color: accentColor,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
                       ),
                     ),
+                  ],
+                ),
+              ),
+
+              // INFO SECTION
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
+                decoration: const BoxDecoration(
+                  color: darkCardColor,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(24),
+                    bottomRight: Radius.circular(24),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    // Icon
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFFF00),
+                        color: accentColor.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.white24, width: 1),
                       ),
-                      child: Text(
-                        athlete.fields.sport.length >= 3
-                            ? athlete.fields.sport.substring(0, 3).toUpperCase()
-                            : athlete.fields.sport.toUpperCase(),
-                        style: GoogleFonts.poppins(
-                          color: const Color(0xFF1E3CC8),
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      padding: const EdgeInsets.all(10),
+                      child: const Icon(
+                        Icons.person,
+                        color: accentColor,
+                        size: 24,
                       ),
+                    ),
+                    const SizedBox(width: 16),
+
+                    // Biography Preview
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "BIOGRAPHY",
+                            style: GoogleFonts.poppins(
+                              color: Colors.white70,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.0,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            athlete.fields.biography.length > 100
+                                ? "${athlete.fields.biography.substring(0, 100)}..."
+                                : athlete.fields.biography,
+                            style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontSize: 12,
+                              height: 1.4,
+                            ),
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Arrow Icon
+                    const Icon(
+                      Icons.arrow_forward_ios,
+                      color: accentColor,
+                      size: 20,
                     ),
                   ],
                 ),
@@ -123,6 +202,15 @@ class AthleteEntryCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildPlaceholderImage() {
+    return Container(
+      color: const Color(0xFF162235),
+      child: const Center(
+        child: Icon(Icons.person, size: 80, color: Colors.white30),
       ),
     );
   }
