@@ -421,5 +421,10 @@ class _ArticleListPageState extends State<ArticleListPage> {
         ],
       ),
     );
+<<<<<<< HEAD
   }  
+=======
+  }
+  
+>>>>>>> d0a06c3df570a9d9c7cbf61eb05c3164b7f53676
 }

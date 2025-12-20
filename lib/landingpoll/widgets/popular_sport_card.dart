@@ -5,9 +5,17 @@ class PopularSportCard extends StatefulWidget {
   final String sportName;
   final String firstYear;
   final String imageUrl;
+<<<<<<< HEAD
   final String description; // Data tambahan untuk view detail
   final String origin;      // Data tambahan untuk view detail
   final String type;        // Data tambahan untuk view detail
+=======
+  final String flagUrl;
+  final String description;
+  final String origin;
+  final String type;
+  final VoidCallback onDetailTap;
+>>>>>>> d0a06c3df570a9d9c7cbf61eb05c3164b7f53676
 
   const PopularSportCard({
     super.key,
@@ -147,9 +155,18 @@ class _PopularSportCardState extends State<PopularSportCard> with SingleTickerPr
             ],
           ),
 
+<<<<<<< HEAD
           // ============================================
           // BAGIAN BAWAH (EXPANDABLE DETAIL)
           // ============================================
+=======
+          AnimatedCrossFade(
+            duration: const Duration(milliseconds: 300),
+            crossFadeState: _isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+            firstChild: const SizedBox.shrink(),
+            secondChild: _buildDetails(),
+          ),
+>>>>>>> d0a06c3df570a9d9c7cbf61eb05c3164b7f53676
 
           // Menggunakan AnimatedCrossFade untuk transisi muncul/hilang
           AnimatedCrossFade(
@@ -203,6 +220,7 @@ class _PopularSportCardState extends State<PopularSportCard> with SingleTickerPr
             duration: const Duration(milliseconds: 300),
           ),
 
+<<<<<<< HEAD
           // ============================================
           // TOMBOL EXPAND / COLLAPSE (PANAH)
           // ============================================
@@ -241,6 +259,43 @@ class _PopularSportCardState extends State<PopularSportCard> with SingleTickerPr
                     ),
                   ),
               ],
+=======
+  Widget _buildDetails() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Divider(color: Colors.white.withOpacity(0.1)),
+          const SizedBox(height: 12),
+          _buildDetailRow(Icons.category_outlined, "Type", widget.type),
+          const SizedBox(height: 12),
+          Text(
+            "Overview",
+            style: GoogleFonts.poppins(color: const Color(0xFFC8DB2C), fontWeight: FontWeight.bold, fontSize: 13),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            widget.description,
+            style: GoogleFonts.poppins(color: Colors.white.withOpacity(0.8), fontSize: 13, height: 1.6),
+          ),
+          const SizedBox(height: 20),
+
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: widget.onDetailTap,
+              icon: const Icon(Icons.arrow_forward_rounded, size: 16),
+              label: const Text("VIEW FULL SPORT PROFILE"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFC8DB2C),
+                foregroundColor: const Color(0xFF0F172A),
+                elevation: 0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                textStyle: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 12),
+              ),
+>>>>>>> d0a06c3df570a9d9c7cbf61eb05c3164b7f53676
             ),
           )
         ],

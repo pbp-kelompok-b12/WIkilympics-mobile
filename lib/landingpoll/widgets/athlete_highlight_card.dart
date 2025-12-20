@@ -37,7 +37,6 @@ class AthleteHighlightCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            /// ===== LEFT =====
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,7 +78,6 @@ class AthleteHighlightCard extends StatelessWidget {
                             ),
                             const SizedBox(height: 6),
 
-                            /// NEGARA (TEKS SAJA)
                             Row(
                               children: [
                                 const Icon(
@@ -120,7 +118,6 @@ class AthleteHighlightCard extends StatelessWidget {
 
             const SizedBox(width: 14),
 
-            /// ===== IMAGE PLACEHOLDER =====
             Container(
               width: 95,
               height: double.infinity,

@@ -18,27 +18,23 @@ class _PollFormPageState extends State<PollFormPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _questionController = TextEditingController();
 
-  // List Controller untuk Opsi Jawaban (Supaya Dinamis)
   List<TextEditingController> _optionControllers = [];
 
-  // --- Definisi Warna ---
-  final Color _backgroundColor = const Color(0xFFF8F9FA); // Abu muda background
+  final Color _backgroundColor = const Color(0xFFF8F9FA);
   final Color _cardColor = Colors.white;
-  final Color _primaryTextColor = const Color(0xFF03045E); // Navy Tua
+  final Color _primaryTextColor = const Color(0xFF03045E);
   final Color _borderColor = const Color(0xFF5C6BC0);
-  final Color _accentColor = const Color(0xFFC8DB2C); // Lime Green
+  final Color _accentColor = const Color(0xFFC8DB2C);
 
   @override
   void initState() {
     super.initState();
     if (widget.poll != null) {
-      // MODE EDIT: Isi data dari yang sudah ada
       _questionController.text = widget.poll!.questionText;
       for (var option in widget.poll!.options) {
         _optionControllers.add(TextEditingController(text: option.optionText));
       }
     } else {
-      // MODE ADD: Default kasih 2 kolom opsi kosong
       _optionControllers.add(TextEditingController());
       _optionControllers.add(TextEditingController());
     }
@@ -100,19 +96,17 @@ class _PollFormPageState extends State<PollFormPage> {
     return Scaffold(
       backgroundColor: _backgroundColor,
 
-      // --- APP BAR DENGAN LOGO ---
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        centerTitle: true, // Logo di tengah
+        centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new, color: _primaryTextColor),
           onPressed: () => Navigator.pop(context),
         ),
-        // Logo Wikilympics
         title: Image.asset(
           'assets/wikilympics_banner.png',
-          height: 32, // Ukuran disesuaikan agar rapi
+          height: 32,
           fit: BoxFit.contain,
         ),
         bottom: PreferredSize(
@@ -145,7 +139,6 @@ class _PollFormPageState extends State<PollFormPage> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // JUDUL FORM
                   Center(
                     child: Text(
                       isEdit ? "Edit Poll" : "Create New Poll",
@@ -168,7 +161,6 @@ class _PollFormPageState extends State<PollFormPage> {
                   ),
                   const SizedBox(height: 32),
 
-                  // INPUT QUESTION
                   Text(
                     "Question",
                     style: GoogleFonts.poppins(
@@ -187,7 +179,6 @@ class _PollFormPageState extends State<PollFormPage> {
                   ),
                   const SizedBox(height: 24),
 
-                  // HEADER OPTIONS
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -224,7 +215,6 @@ class _PollFormPageState extends State<PollFormPage> {
                   ),
                   const SizedBox(height: 8),
 
-                  // DYNAMIC INPUT OPTIONS
                   ..._optionControllers.asMap().entries.map((entry) {
                     int index = entry.key;
                     TextEditingController controller = entry.value;
@@ -263,7 +253,6 @@ class _PollFormPageState extends State<PollFormPage> {
 
                   const SizedBox(height: 32),
 
-                  // TOMBOL SAVE
                   Align(
                     alignment: Alignment.centerRight,
                     child: ElevatedButton(
