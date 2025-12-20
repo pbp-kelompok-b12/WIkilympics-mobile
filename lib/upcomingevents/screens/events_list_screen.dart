@@ -6,6 +6,7 @@ import 'package:wikilympics/upcomingevents/widgets/events_card.dart';
 import 'package:wikilympics/upcomingevents/screens/add_event_screen.dart';
 import 'package:wikilympics/upcomingevents/screens/events_detail_screen.dart';
 import 'package:wikilympics/upcomingevents/screens/edit_event_screen.dart';
+import 'package:wikilympics/widgets/left_drawer.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class EventsListScreen extends StatefulWidget {
@@ -28,7 +29,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
 
   void _deleteEvent(CookieRequest request, int id) async {
     final response = await request.post(
-      'http://127.0.0.1:8000/upcoming_event/delete-flutter/$id/',
+      'http://127.0.0.1:8000/upcoming_event/delete-event-flutter/$id/',
       {},
     );
 
@@ -58,25 +59,32 @@ class _EventsListScreenState extends State<EventsListScreen> {
     bool isAdmin = request.jsonData['is_superuser'] ?? false;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
-        title: Text(
-          'WIKilympics',
-          style: GoogleFonts.orbitron(
-            color: const Color(0xFF03045E),
-            fontWeight: FontWeight.w900,
-            fontSize: 22,
-            letterSpacing: 1.5,
+        title: Image.asset(
+          'assets/wikilympics_banner.png',
+          height: 60,
+          fit: BoxFit.contain,
+          errorBuilder: (ctx, _, __) => Text(
+            "WikiLympics",
+            style: GoogleFonts.orbitron(
+              color: const Color(0xFF03045E),
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
-        automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
+        // iconTheme
+        iconTheme: const IconThemeData(color: Color(0xFF03045E)),
       ),
+      //  drawer navigasi
+      drawer: const LeftDrawer(),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Center(
@@ -97,7 +105,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30.0),
-                      borderSide: const BorderSide(color: Color(0xFF03045E)),
+                      borderSide: const BorderSide(color: const Color(0xFF03045E)),
                     ),
                   ),
                 ),

@@ -34,7 +34,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
     final request = context.read<CookieRequest>();
     if (_formKey.currentState!.validate() && _selectedDate != null) {
       final response = await request.post(
-        'http://127.0.0.1:8000/upcoming_event/edit-flutter/${widget.event.id}/',
+        'http://127.0.0.1:8000/upcoming_event/edit-event-flutter/${widget.event.id}/',
         {
           'name': _eventNameController.text,
           'organizer': _organizerController.text,
