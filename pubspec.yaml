@@ -37,7 +37,10 @@ dependencies:
   provider: ^6.1.5+1
   pbp_django_auth: ^0.4.0
   google_fonts: ^6.1.0
+<<<<<<< HEAD
   intl: ^0.19.0
+=======
+>>>>>>> ad0bb4bfd292ff7da6a8588347504c593755cad2
   http: ^1.6.0
 
 dev_dependencies:
