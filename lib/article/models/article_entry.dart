@@ -18,6 +18,7 @@ class ArticleEntry {
   int likes;
   bool isLiked;
   bool isDisliked;
+  String? sportId;
 
   ArticleEntry({
     required this.id,
@@ -29,6 +30,7 @@ class ArticleEntry {
     required this.likes,
     required this.isLiked,
     required this.isDisliked,
+    this.sportId,
   });
 
   factory ArticleEntry.fromJson(Map<String, dynamic> json) => ArticleEntry(
@@ -41,6 +43,7 @@ class ArticleEntry {
     likes: json["likes"] ?? 0,
     isLiked: json["is_liked"] ?? false,
     isDisliked: json["is_disliked"] ?? false,
+    sportId: json["sport_id"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -53,5 +56,6 @@ class ArticleEntry {
     "likes": likes,
     "is_liked": isLiked,
     "is_disliked": isDisliked,
+    "sport_id": sportId,
   };
 }

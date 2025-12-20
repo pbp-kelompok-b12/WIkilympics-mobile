@@ -6,6 +6,8 @@ import 'package:wikilympics/article/models/article_entry.dart';
 import 'package:intl/intl.dart';
 import 'package:wikilympics/article/screens/article_form.dart';
 import 'package:wikilympics/screens/login.dart';
+import 'package:wikilympics/sports/models/sport_entry.dart';
+import 'package:wikilympics/sports/screens/sport_entry_detail.dart';
 
 class ArticleDetailPage extends StatefulWidget {
   final ArticleEntry article;
@@ -292,7 +294,20 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                 ),
                 child: Row(
                   children: [
-                    Expanded(child: _buildStatItem(Icons.category, "CATEGORY", _article.category.toUpperCase(), kLimeColor)),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          if (_article.sportId != null) {
+                            _navigateToSportDetail(_article.sportId!);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Detail Sport tidak ditemukan")),
+                            );
+                          }
+                        },
+                        child: _buildStatItem(Icons.category, "CATEGORY", _article.category.toUpperCase(), kLimeColor),
+                      ),
+                    ),
                     _buildDivider(),
                     Expanded(child: _buildStatItem(Icons.favorite, "LIKES", "$_currentLikes", Colors.pinkAccent)),
                     _buildDivider(),
@@ -340,12 +355,23 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
       children: [
         Icon(icon, color: color, size: 18),
         const SizedBox(height: 8),
-        Text(label, style: const TextStyle(color: Colors.white38, fontSize: 9, fontWeight: FontWeight.w700)),
+        Text(label, 
+          style: const TextStyle(color: Colors.white38, fontSize: 9, fontWeight: FontWeight.w700)),
         const SizedBox(height: 4),
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
-          child: Text(value, key: ValueKey<String>(value),
-            style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w900)),
+          child: Text(
+            value, 
+            key: ValueKey<String>(value),
+            style: TextStyle(
+              color: label == "CATEGORY" ? Color(0xFFD2F665) : Colors.white,
+              fontSize: 12, 
+              fontWeight: FontWeight.w900,
+              decoration: label == "CATEGORY" ? TextDecoration.underline : TextDecoration.none,
+              decorationColor: Color(0xFFD2F665),
+              decorationThickness: 2.0,
+            ),
+          ),
         ),
       ],
     );
@@ -369,5 +395,48 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
         ],
       ),
     );
+  }
+
+  Future<void> _navigateToSportDetail(String sportId) async {
+    final request = context.read<CookieRequest>();
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator(color: Color(0xFFD2F665))),
+    );
+
+    try {
+      // Ambil semua data sports
+      final response = await request.get('http://127.0.0.1:8000/sports/json/');
+      
+      SportEntry? targetSport;
+      for (var item in response) {
+        if (item['pk'].toString() == sportId) {
+          targetSport = SportEntry.fromJson(item);
+          break;
+        }
+      }
+
+      if (mounted) Navigator.pop(context); // Hilangkan loading spinner
+
+      if (targetSport != null && mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SportDetailPage(sport: targetSport!),
+          ),
+        );
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Detail cabang olahraga tidak ditemukan")),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) Navigator.pop(context);
+      debugPrint("Error: $e");
+    }
   }
 }

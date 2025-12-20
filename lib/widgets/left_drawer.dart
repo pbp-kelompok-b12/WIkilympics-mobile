@@ -96,7 +96,7 @@ class LeftDrawer extends StatelessWidget {
             title: const Text('Articles'),
             // Bagian redirection ke MyHomePage
             onTap: () {
-              Navigator.pushReplacement(
+              Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => ArticleListPage(),

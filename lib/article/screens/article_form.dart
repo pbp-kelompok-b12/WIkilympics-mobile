@@ -164,8 +164,17 @@ class _ArticleFormPageState extends State<ArticleFormPage> {
                     decoration: _buildInputDecoration("Thumbnail URL", Icons.link_rounded),
                     style: TextStyle(color: kPrimaryNavy),
                     onChanged: (value) => _thumbnail = value,
-                    validator: (value) =>
-                        (value == null || value.isEmpty) ? "Thumbnail URL cannot be empty" : null,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Thumbnail URL cannot be empty";
+                      }
+
+                      final uri = Uri.tryParse(value);
+                      if (uri == null || !uri.hasAbsolutePath) {
+                        return "Please enter a valid URL";
+                      }
+                      return null;
+                    }
                   ),
                   const SizedBox(height: 16),
 
