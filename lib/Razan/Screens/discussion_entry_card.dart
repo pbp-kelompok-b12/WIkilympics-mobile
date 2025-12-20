@@ -140,6 +140,7 @@ class _DiscussionEntryCardState extends State<DiscussionEntryCard> {
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
+                      
                     ),
                   ),
                 ),
@@ -177,7 +178,10 @@ class _DiscussionEntryCardState extends State<DiscussionEntryCard> {
             const SizedBox(height: 10),
             Text(
               widget.discussion.fields.discuss,
-              style: const TextStyle(fontSize: 15),
+              style: const TextStyle(fontSize: 15,
+              color: Color(0xFF03045e),)
+              ,
+              
             ),
           ],
         ),

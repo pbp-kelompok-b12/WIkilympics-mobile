@@ -52,17 +52,31 @@ class _ForumListPageState extends State<ForumListPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FB),
       appBar: AppBar(
-        title: const Text('Forums'),
-        backgroundColor: const Color(0xFF3f5f90),
-        titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        toolbarHeight: 80,
+        title: Image.asset(
+          'assets/wikilympics_banner.png',
+          fit: BoxFit.contain,
+          height: 60,
+        ),
+        centerTitle: false,
       ),
       drawer: const LeftDrawer(),
       
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
+            padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Forums',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF03045e),),
+                ),
+                const SizedBox(height: 12),
+                TextField(
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: 'Search forums by name...',
@@ -77,6 +91,8 @@ class _ForumListPageState extends State<ForumListPage> {
                   _searchQuery = value;
                 });
               },
+            ),
+              ],
             ),
           ),
           Expanded(

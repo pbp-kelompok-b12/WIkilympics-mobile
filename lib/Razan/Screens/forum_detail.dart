@@ -69,16 +69,21 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.forum.fields.topic),
-        backgroundColor: const Color(0xFF3f5f90),
-        titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        toolbarHeight: 80,
+        title: Image.asset(
+          'assets/wikilympics_banner.png',
+          fit: BoxFit.contain,
+          height: 60,
+        ),
+        centerTitle: false,
       ),
       drawer: const LeftDrawer(),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            
             Container(
               padding: const EdgeInsets.all(16.0),
               width: double.infinity,
@@ -88,7 +93,7 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                 children: [
                   Text(
                     widget.forum.fields.topic,
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF03045e),),
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -98,7 +103,7 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                   const SizedBox(height: 16),
                   Text(
                     widget.forum.fields.description,
-                    style: const TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16, color: Color(0xFF03045e),),
                   ),
                 ],
               ),

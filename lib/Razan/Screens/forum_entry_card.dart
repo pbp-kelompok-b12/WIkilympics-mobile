@@ -155,9 +155,11 @@ class _ForumEntryCardState extends State<ForumEntryCard> {
                         style: const TextStyle(
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold,
+                          color: Color(0xFF03045e),
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
+                        
                       ),
                       const SizedBox(height: 6),
                       Text(
