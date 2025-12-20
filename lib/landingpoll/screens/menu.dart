@@ -20,6 +20,11 @@ import 'package:wikilympics/upcomingevents/models/events_entry.dart';
 import 'package:wikilympics/upcomingevents/screens/events_detail_screen.dart';
 import 'package:wikilympics/upcomingevents/screens/events_list_screen.dart'; // <--- IMPORT LIST EVENTS
 
+// --- IMPORTS MODUL FORUM (PUNYA RAZAN) ---
+import 'package:wikilympics/Razan/models/forum_entry.dart';
+import 'package:wikilympics/Razan/Screens/forum_main.dart';
+import 'package:wikilympics/Razan/Screens/forum_detail.dart';
+
 // --- IMPORTS AUTH & DRAWER ---
 import 'package:wikilympics/screens/login.dart';
 import '../../widgets/left_drawer.dart';
@@ -58,10 +63,10 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget? _selectedPage;
 
   final List<Widget> _navbarPages = const [
-    Placeholder(), // Landing (index 0)
-    ForumPage(),   // Forum (index 1)
-    Placeholder(), // Menu Sheet (index 2)
-    ProfilePage(), // Profil (index 3)
+    Placeholder(),     // Landing (index 0)
+    ForumListPage(),   // Forum Razan (index 1)
+    Placeholder(),     // Menu Sheet (index 2)
+    ProfilePage(),     // Profil (index 3)
   ];
 
   @override
@@ -658,7 +663,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
 
-          // ===== FORUM & REVIEWS =====
+          // ===== FORUM & REVIEWS (DATA RAZAN) =====
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
@@ -669,25 +674,43 @@ class _MyHomePageState extends State<MyHomePage> {
                   style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.w700, color: const Color(0xFF155F90)),
                 ),
                 const SizedBox(height: 16),
-                ForumReviewCard(
-                  username: "Tassy Omah",
-                  profileImage: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
-                  timeAgo: "6h ago",
-                  title: "The Raptors Don't Need Leonard To be in that game! They really don't!",
-                  contentImage: "https://images.unsplash.com/photo-1546519638-68e109498ee2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-                  likeCount: 334,
-                  commentCount: 23440,
-                  onTap: () {},
-                ),
-                ForumReviewCard(
-                  username: "Jhon Doe",
-                  profileImage: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
-                  timeAgo: "2h ago",
-                  title: "Why Swimming is the best cardio workout you can do right now.",
-                  contentImage: "https://images.unsplash.com/photo-1530549387789-4c1017266635?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-                  likeCount: 120,
-                  commentCount: 45,
-                  onTap: () {},
+                FutureBuilder<List<ForumEntry>>(
+                  future: fetchForums(request),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Text("Error: ${snapshot.error}");
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Text("No forums available.");
+                    }
+
+                    // Ambil 2 forum terbaru saja untuk ditampilkan di landing page
+                    final forums = snapshot.data!.take(2).toList();
+
+                    return Column(
+                      children: forums.map((forum) {
+                        return ForumReviewCard(
+                          username: "Topic: ${forum.fields.topic}",
+                          // Kita gunakan thumbnail dari forum, jika kosong pakai placeholder
+                          profileImage: "https://ui-avatars.com/api/?name=${forum.fields.topic}&background=random",
+                          timeAgo: "${forum.fields.dateCreated.day}-${forum.fields.dateCreated.month}-${forum.fields.dateCreated.year}",
+                          title: forum.fields.description,
+                          contentImage: fixImageUrl(forum.fields.thumbnail),
+                          likeCount: 0, // Data like tidak ada di model, kita set 0 atau sembunyikan
+                          commentCount: 0,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ForumDetailPage(forum: forum),
+                              ),
+                            );
+                          },
+                        );
+                      }).toList(),
+                    );
+                  },
                 ),
                 const SizedBox(height: 8),
                 Container(
@@ -705,7 +728,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: InkWell(
                       borderRadius: BorderRadius.circular(20),
                       onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const ForumPage()));
+                        // Pindah ke tab Forum (Index 1)
+                        setState(() {
+                          _selectedIndex = 1;
+                        });
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 18),
@@ -908,4 +934,18 @@ Future<List<EventEntry>> fetchEvents(CookieRequest request) async {
     }
   }
   return listEvents;
+}
+
+Future<List<ForumEntry>> fetchForums(CookieRequest request) async {
+  final String baseUrl = kIsWeb ? "http://127.0.0.1:8000" : "http://10.0.2.2:8000";
+  // Menggunakan endpoint yang sama dengan yang ada di Screens/forum_main.dart Razan
+  final response = await request.get('$baseUrl/forum_section/forums/json-for/');
+
+  List<ForumEntry> listForums = [];
+  for (var d in response) {
+    if (d != null) {
+      listForums.add(ForumEntry.fromJson(d));
+    }
+  }
+  return listForums;
 }
