@@ -15,12 +15,18 @@ class EditEventScreen extends StatefulWidget {
 
 class _EditEventScreenState extends State<EditEventScreen> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController _eventNameController, _organizerController, _locationController, _sportController, _photoUrlController, _descriptionController;
+  late TextEditingController _eventNameController;
+  late TextEditingController _organizerController;
+  late TextEditingController _locationController;
+  late TextEditingController _sportController;
+  late TextEditingController _photoUrlController;
+  late TextEditingController _descriptionController;
   DateTime? _selectedDate;
 
   @override
   void initState() {
     super.initState();
+    // Pre-fill data lama ke controller
     _eventNameController = TextEditingController(text: widget.event.name);
     _organizerController = TextEditingController(text: widget.event.organizer);
     _locationController = TextEditingController(text: widget.event.location);
@@ -47,21 +53,9 @@ class _EditEventScreenState extends State<EditEventScreen> {
       );
 
       if (mounted) {
-        if (response['status'] == 'success' || response['success'] == true) {
-          EventEntry updatedEvent = EventEntry(
-            id: widget.event.id,
-            name: _eventNameController.text,
-            organizer: _organizerController.text,
-            date: _selectedDate!,
-            location: _locationController.text,
-            sportBranch: _sportController.text,
-            imageUrl: _photoUrlController.text,
-            description: _descriptionController.text,
-          );
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Event updated successfully!", style: GoogleFonts.poppins()), backgroundColor: Colors.green),
-          );
-          Navigator.pop(context, updatedEvent);
+        if (response['status'] == 'success') {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Event updated successfully!")));
+          Navigator.pop(context, true);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: ${response['message']}")));
         }
@@ -100,7 +94,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
                       DateTime? picked = await showDatePicker(
                         context: context,
                         initialDate: _selectedDate ?? DateTime.now(),
-                        firstDate: DateTime(2000),
+                        firstDate: DateTime(2020),
                         lastDate: DateTime(2101),
                       );
                       if (picked != null) setState(() => _selectedDate = picked);
@@ -109,29 +103,16 @@ class _EditEventScreenState extends State<EditEventScreen> {
                       hintText: _selectedDate == null ? 'Select Date' : DateFormat('dd/MM/yyyy').format(_selectedDate!),
                       suffixIcon: const Icon(Icons.calendar_today, color: Color(0xFF03045E)),
                       enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xFF03045E)), borderRadius: BorderRadius.circular(12)),
-                      focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xFF03045E), width: 2), borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
-                  _buildLabel("Sport"),
-                  _buildTextField(_sportController, "Enter sport category"),
-                  _buildLabel("Location"),
-                  _buildTextField(_locationController, "Enter location"),
-                  _buildLabel("Photo URL (Optional)"),
-                  _buildTextField(_photoUrlController, "https://example.com/image.jpg",
-                  isOptional: true,
-                  ),
                   _buildLabel("Description"),
-                  _buildTextField(_descriptionController, "Write description", maxLines: 4),
+                  _buildTextField(_descriptionController, "Enter description", maxLines: 4),
                   const SizedBox(height: 30),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: _submitForm,
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF378355),
-                          padding: const EdgeInsets.all(15),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))
-                      ),
+                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF378355), padding: const EdgeInsets.all(15)),
                       child: Text("UPDATE EVENT", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
                     ),
                   ),
@@ -149,17 +130,9 @@ class _EditEventScreenState extends State<EditEventScreen> {
     child: Text(text, style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: const Color(0xFF03045E))),
   );
 
-  Widget _buildTextField(TextEditingController controller, String hint, {int maxLines = 1, bool isOptional = false}) => TextFormField(
+  Widget _buildTextField(TextEditingController controller, String hint, {int maxLines = 1}) => TextFormField(
     controller: controller,
     maxLines: maxLines,
-    // Validator untuk mengecek apakah field ini opsional atau tidak
-    validator: (value) {
-      if (isOptional) return null;
-      if (value == null || value.isEmpty) {
-        return "Field cannot be empty";
-      }
-      return null;
-    },
     decoration: InputDecoration(
       hintText: hint,
       enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xFF03045E)), borderRadius: BorderRadius.circular(12)),

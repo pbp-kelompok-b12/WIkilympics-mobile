@@ -1,272 +1,160 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
-import 'package:pbp_django_auth/pbp_django_auth.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:wikilympics/upcomingevents/models/events_entry.dart';
-import 'package:wikilympics/upcomingevents/screens/edit_event_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class EventDetailScreen extends StatefulWidget {
+class EventDetailScreen extends StatelessWidget {
   final EventEntry event;
   const EventDetailScreen({super.key, required this.event});
 
   @override
-  State<EventDetailScreen> createState() => _EventDetailScreenState();
-}
-
-class _EventDetailScreenState extends State<EventDetailScreen> {
-  // === COLOR PALETTE ===
-  static const Color kNavyColor = Color(0xFF0F1929);
-  static const Color kLimeColor = Color(0xFFD2F665);
-  static const Color kDarkBlue = Color(0xFF162235);
-  static const Color kRedAlert = Color(0xFFFF4C4C);
-
-  late EventEntry _event;
-  bool _isAdmin = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _event = widget.event;
-    _checkAdminStatus();
-  }
-
-  // Cek status admin untuk menampilkan tombol edit/delete
-  void _checkAdminStatus() {
-    final request = context.read<CookieRequest>();
-    setState(() {
-      _isAdmin = request.jsonData['is_superuser'] ?? false;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: kNavyColor,
-
-      // Tombol Edit
-      floatingActionButton: _isAdmin
-          ? FloatingActionButton.extended(
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => EditEventScreen(event:_event),
-            ),
-          );
-          if (result != null && result is EventEntry) {
-            setState(() {
-              _event = result;
-            });
-          }
-        },
-        backgroundColor: kLimeColor,
-        icon: const Icon(Icons.edit, color: kNavyColor),
-        label: Text("EDIT EVENT",
-            style: GoogleFonts.poppins(color: kNavyColor, fontWeight: FontWeight.bold)),
-      )
-          : null,
-
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          // Header
-          SliverAppBar(
-            expandedHeight: 400,
-            pinned: true,
-            stretch: true,
-            backgroundColor: kNavyColor,
-            leading: Padding(
-              padding: const EdgeInsets.only(left: 12),
-              child: CircleAvatar(
-                backgroundColor: Colors.black45,
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ),
-            ),
-
-            flexibleSpace: FlexibleSpaceBar(
-              background: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.network(
-                    _event.imageUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (ctx, err, stack) => Container(color: kDarkBlue),
-                  ),
-                  const DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Colors.black45, Colors.transparent, kNavyColor],
-                        stops: [0.0, 0.5, 1.0],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 40,
-                    left: 20,
-                    right: 20,
-                    child: Text(
-                      _event.name.toUpperCase(),
-                      style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontSize: 32,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: -1,
-                          height: 1.1,
-                          shadows: [const Shadow(color: Colors.black, blurRadius: 10)]
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Color(0xFF03045E)),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          "Upcoming Events",
+          style: GoogleFonts.montserrat(
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
+              color: Color(0xFF03045E)
           ),
-
-          // Ringkasan Info
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-                decoration: BoxDecoration(
-                    color: kDarkBlue,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withOpacity(0.05)),
-                    boxShadow: [
-                      BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 5))
-                    ]
-                ),
-                child: IntrinsicHeight(
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 3,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "ORGANIZER",
-                              style: GoogleFonts.poppins(color: Colors.white38, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              _event.organizer,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                            ),
-                          ],
-                        ),
-                      ),
-                      _buildVerticalDivider(),
-                      Expanded(
-                        flex: 2,
-                        child: _buildSimpleStat("DATE", DateFormat('dd MMM').format(_event.date), Icons.calendar_month),
-                      ),
-                      _buildVerticalDivider(),
-                      Expanded(
-                        flex: 2,
-                        child: _buildSimpleStat("SPORT", _event.sportBranch, Icons.sports_basketball),
-                      ),
-                    ],
-                  ),
-                ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Gambar Utama
+            Image.network(
+              event.imageUrl,
+              width: double.infinity,
+              height: 280,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                height: 280,
+                color: Colors.grey.shade200,
+                child: const Icon(Icons.broken_image, size: 50),
               ),
             ),
-          ),
 
-          // Deskripsi & Detail Lokasi
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+            Padding(
+              padding: const EdgeInsets.all(24.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 10),
-                  _buildSectionHeader("DESCRIPTION"),
-                  const SizedBox(height: 15),
+                  // Title Event
                   Text(
-                    _event.description,
-                    style: GoogleFonts.poppins(color: Colors.white.withOpacity(0.85), fontSize: 15, height: 1.8),
-                    textAlign: TextAlign.justify,
+                    event.name,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                      color: Color(0xFF001D3D),
+                      letterSpacing: -0.5,
+                    ),
                   ),
-                  const SizedBox(height: 35),
+                  const SizedBox(height: 25),
 
-                  // Detail Lokasi Box
-                  _buildSectionHeader("EVENT'S LOCATION"),
-                  const SizedBox(height: 15),
+                  // General Info Box
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                          colors: [kDarkBlue, kNavyColor],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: kLimeColor.withOpacity(0.3)),
+                      color: Colors.white,
+                      border: Border.all(color: const Color(0xFF03045E), width: 2),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.location_on, color: kLimeColor, size: 20),
-                            const SizedBox(width: 12),
-                            Text(
-                              "ADDRESS",
-                              style: GoogleFonts.poppins(color: kLimeColor, fontWeight: FontWeight.w900, fontSize: 12, letterSpacing: 1),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
                         Text(
-                          _event.location,
-                          style: GoogleFonts.poppins(color: Colors.white, fontSize: 15, height: 1.6),
+                          "General Info",
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 20,
+                            color: Color(0xFF03045E),
+                          ),
+                        ),
+                        const SizedBox(height: 15),
+                        _infoRow(Icons.person_outline, "Organizer", event.organizer),
+                        _infoRow(Icons.location_on_outlined, "Location", event.location),
+                        _infoRow(Icons.calendar_today_outlined, "Date", DateFormat('dd MMMM yyyy').format(event.date)),
+                        _infoRow(Icons.sports_outlined, "Sports", event.sportBranch),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Description Box
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF03045E),
+                      border: Border.all(color: const Color(0xFFD9E74C), width: 2),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Description",
+                          style: GoogleFonts.poppins(
+                            color: Color(0xFFD9E74C),
+                            fontWeight: FontWeight.w700,
+                            fontSize: 18,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          event.description,
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 15,
+                            height: 1.6,
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 100),
                 ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Widget helper
+  Widget _infoRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 20, color: const Color(0xFF03045E)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              "$label: $value",
+              style: GoogleFonts.poppins(
+                fontSize: 15,
+                color: Color(0xFF03045E),
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),
         ],
       ),
-    );
-  }
-
-  // === HELPERS ===
-  Widget _buildVerticalDivider() => Container(width: 1, color: Colors.white.withOpacity(0.1), margin: const EdgeInsets.symmetric(horizontal: 10));
-
-  Widget _buildSectionHeader(String title) {
-    return Row(
-      children: [
-        Container(width: 4, height: 16, color: kLimeColor),
-        const SizedBox(width: 10),
-        Text(title, style: GoogleFonts.poppins(color: Colors.white54, letterSpacing: 2, fontWeight: FontWeight.bold, fontSize: 11)),
-      ],
-    );
-  }
-
-  Widget _buildSimpleStat(String label, String value, IconData icon) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(icon, color: kLimeColor, size: 18),
-        const SizedBox(height: 6),
-        Text(value.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.poppins(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 2),
-        Text(label, style: GoogleFonts.poppins(color: Colors.white38, fontSize: 8, fontWeight: FontWeight.bold)),
-      ],
     );
   }
 }

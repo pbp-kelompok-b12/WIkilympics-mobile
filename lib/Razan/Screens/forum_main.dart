@@ -55,15 +55,10 @@ class _ForumListPageState extends State<ForumListPage> {
         backgroundColor: Colors.white,
         elevation: 0,
         toolbarHeight: 80,
-        title: Row(
-          children: [
-            
-            Image.asset(
-              'assets/wikilympics_banner.png',
-              fit: BoxFit.contain,
-              height: 60,
-            ),
-          ],
+        title: Image.asset(
+          'assets/wikilympics_banner.png',
+          fit: BoxFit.contain,
+          height: 60,
         ),
         centerTitle: false,
       ),

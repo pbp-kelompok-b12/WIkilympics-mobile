@@ -16,35 +16,15 @@ class SportDetailPage extends StatefulWidget {
 }
 
 class _SportDetailPageState extends State<SportDetailPage> {
+  // === COLOR PALETTE ===
   static const Color kNavyColor = Color(0xFF0F1929);
   static const Color kLimeColor = Color(0xFFD2F665);
   static const Color kDarkBlue = Color(0xFF162235);
   static const Color kRedAlert = Color(0xFFFF4C4C);
 
+  // === STATE VARIABLES ===
   bool _isAdmin = false;
   late SportEntry _sport;
-
-  IconData _getSportIcon(String label) {
-    switch (label.toLowerCase()) {
-      case 'water': return Icons.pool;
-      case 'strength': return Icons.fitness_center;
-      case 'athletic': return Icons.directions_run;
-      case 'racket': return Icons.sports_tennis;
-      case 'ball': return Icons.sports_soccer;
-      case 'combat': return Icons.sports_martial_arts;
-      case 'target': return Icons.ads_click;
-      default: return Icons.sports;
-    }
-  }
-
-  IconData _getParticipationIcon(String label) {
-    switch (label.toLowerCase()) {
-      case 'team': return Icons.groups;
-      case 'individual': return Icons.person;
-      case 'both': return Icons.compare_arrows;
-      default: return Icons.groups;
-    }
-  }
 
   @override
   void initState() {
@@ -74,8 +54,8 @@ class _SportDetailPageState extends State<SportDetailPage> {
     final request = context.read<CookieRequest>();
     try {
       final response = await request.get('http://127.0.0.1:8000/sports/json/');
-      var updatedItemData;
 
+      var updatedItemData;
       for (var item in response) {
         if (item['pk'] == _sport.pk) {
           updatedItemData = item;
@@ -88,11 +68,11 @@ class _SportDetailPageState extends State<SportDetailPage> {
           _sport = SportEntry.fromJson(updatedItemData);
         });
 
-//         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-//           content: Text("Data successfully updated!", style: GoogleFonts.poppins()),
-//           backgroundColor: kLimeColor,
-//           duration: const Duration(milliseconds: 1000),
-//         ));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Data successfully updated!", style: GoogleFonts.poppins()),
+          backgroundColor: kLimeColor,
+          duration: const Duration(milliseconds: 1000),
+        ));
       }
     } catch (e) {
       print("Error refreshing data: $e");
@@ -126,7 +106,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
     if (confirm == true) {
       final response = await request.postJson(
         'http://127.0.0.1:8000/sports/delete-flutter/${_sport.pk}/',
-        null,
+        {}
       );
 
       if (context.mounted) {
@@ -151,13 +131,28 @@ class _SportDetailPageState extends State<SportDetailPage> {
     final request = context.watch<CookieRequest>();
     final f = _sport.fields;
 
-    String typeLabel = _formatEnum(f.sportType.toString());
-    String partLabel = _formatEnum(f.participationStructure.toString());
-    IconData typeIcon = _getSportIcon(typeLabel);
-    IconData partIcon = _getParticipationIcon(partLabel);
-
     return Scaffold(
       backgroundColor: kNavyColor,
+
+      floatingActionButton: _isAdmin
+          ? FloatingActionButton.extended(
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SportEntryFormPage(sportEntry: _sport),
+                  ),
+                );
+                _refreshSportData();
+              },
+              backgroundColor: kLimeColor,
+              icon: const Icon(Icons.edit, color: kNavyColor),
+              label: Text("EDIT DATA",
+                style: GoogleFonts.poppins(color: kNavyColor, fontWeight: FontWeight.bold)
+              ),
+            )
+          : null,
+
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -181,46 +176,10 @@ class _SportDetailPageState extends State<SportDetailPage> {
                 Padding(
                   padding: const EdgeInsets.only(right: 12),
                   child: CircleAvatar(
-                    backgroundColor: Colors.black38,
-                    child: PopupMenuButton<String>(
-                      icon: const Icon(Icons.more_vert, color: Colors.white),
-                      color: kDarkBlue,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      onSelected: (value) async {
-                        if (value == 'edit') {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SportEntryFormPage(sportEntry: _sport),
-                            ),
-                          );
-                          _refreshSportData();
-                        } else if (value == 'delete') {
-                          _handleDelete(context, request);
-                        }
-                      },
-                      itemBuilder: (BuildContext context) => [
-                        const PopupMenuItem(
-                          value: 'edit',
-                          child: Row(
-                            children: [
-                              Icon(Icons.edit, color: Colors.white70, size: 20),
-                              SizedBox(width: 12),
-                              Text("Edit", style: TextStyle(color: Colors.white)),
-                            ],
-                          ),
-                        ),
-                        const PopupMenuItem(
-                          value: 'delete',
-                          child: Row(
-                            children: [
-                              Icon(Icons.delete, color: Colors.redAccent, size: 20),
-                              SizedBox(width: 12),
-                              Text("Delete", style: TextStyle(color: Colors.redAccent)),
-                            ],
-                          ),
-                        ),
-                      ],
+                    backgroundColor: kRedAlert.withOpacity(0.8),
+                    child: IconButton(
+                      icon: const Icon(Icons.delete_forever, color: Colors.white, size: 20),
+                      onPressed: () => _handleDelete(context, request),
                     ),
                   ),
                 )
@@ -229,13 +188,6 @@ class _SportDetailPageState extends State<SportDetailPage> {
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  f.sportImg.isEmpty
-                      ? Container(color: kDarkBlue)
-                      : Image.network(
-                          f.sportImg,
-                          fit: BoxFit.cover,
-                          errorBuilder: (ctx, err, stack) => Container(color: kDarkBlue),
-                        ),
                   Image.network(
                     f.sportImg,
                     fit: BoxFit.cover,
@@ -282,7 +234,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: Colors.white.withOpacity(0.05)),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 5))
+                     BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10, offset: const Offset(0,5))
                   ]
                 ),
                 child: IntrinsicHeight(
@@ -298,13 +250,8 @@ class _SportDetailPageState extends State<SportDetailPage> {
                               children: [
                                 CircleAvatar(
                                   radius: 10,
+                                  backgroundImage: NetworkImage(f.countryFlagImg),
                                   backgroundColor: kNavyColor,
-                                  backgroundImage: f.countryFlagImg.isNotEmpty
-                                      ? NetworkImage(f.countryFlagImg)
-                                      : null,
-                                  child: f.countryFlagImg.isEmpty
-                                      ? const Icon(Icons.flag, color: Colors.white, size: 12)
-                                      : null,
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
@@ -333,12 +280,12 @@ class _SportDetailPageState extends State<SportDetailPage> {
                       _buildVerticalDivider(),
                       Expanded(
                         flex: 2,
-                        child: _buildSimpleStat("TYPE", typeLabel, typeIcon),
+                        child: _buildSimpleStat("TYPE", _formatEnum(f.sportType.toString()), Icons.grid_view),
                       ),
                       _buildVerticalDivider(),
                       Expanded(
                         flex: 2,
-                        child: _buildSimpleStat("PLAYERS", partLabel, partIcon),
+                        child: _buildSimpleStat("PLAYERS", _formatEnum(f.participationStructure.toString()), Icons.groups),
                       ),
                     ],
                   ),
@@ -362,7 +309,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
                     textAlign: TextAlign.justify,
                   ),
                   const SizedBox(height: 35),
-                  _buildSectionHeader("HISTORY"),
+                  _buildSectionHeader("HISTORICAL CONTEXT"),
                   const SizedBox(height: 15),
                   Container(
                     padding: const EdgeInsets.only(left: 15),
@@ -396,7 +343,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
                             Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(color: kLimeColor.withOpacity(0.1), shape: BoxShape.circle),
-                              child: const Icon(Icons.backpack, color: kLimeColor, size: 20),
+                              child: const Icon(Icons.fitness_center, color: kLimeColor, size: 20),
                             ),
                             const SizedBox(width: 12),
                             Text(
@@ -423,6 +370,7 @@ class _SportDetailPageState extends State<SportDetailPage> {
     );
   }
 
+  // === HELPERS ===
   Widget _buildVerticalDivider() => Container(width: 1, color: Colors.white.withOpacity(0.1), margin: const EdgeInsets.symmetric(horizontal: 10));
 
   Widget _buildSectionHeader(String title) {
@@ -453,8 +401,6 @@ class _SportDetailPageState extends State<SportDetailPage> {
     try {
       String raw = enumString.split('.').last.replaceAll('_', ' ').replaceAll(' SPORT', '');
       return raw;
-    } catch (e) {
-      return enumString;
-    }
+    } catch (e) { return enumString; }
   }
 }
