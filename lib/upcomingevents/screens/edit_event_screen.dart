@@ -48,10 +48,20 @@ class _EditEventScreenState extends State<EditEventScreen> {
 
       if (mounted) {
         if (response['status'] == 'success' || response['success'] == true) {
+          EventEntry updatedEvent = EventEntry(
+            id: widget.event.id,
+            name: _eventNameController.text,
+            organizer: _organizerController.text,
+            date: _selectedDate!,
+            location: _locationController.text,
+            sportBranch: _sportController.text,
+            imageUrl: _photoUrlController.text,
+            description: _descriptionController.text,
+          );
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("Event updated successfully!", style: GoogleFonts.poppins()), backgroundColor: Colors.green),
           );
-          Navigator.pop(context, true);
+          Navigator.pop(context, updatedEvent);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: ${response['message']}")));
         }
