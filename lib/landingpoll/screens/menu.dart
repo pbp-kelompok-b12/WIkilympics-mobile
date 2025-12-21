@@ -9,10 +9,14 @@ import 'package:wikilympics/sports/models/sport_entry.dart';
 import 'package:wikilympics/sports/screens/sport_entry_list.dart';
 import 'package:wikilympics/sports/screens/sport_entry_detail.dart';
 
+import 'package:wikilympics/athletes/models/athlete_entry.dart';
+// Perhatikan huruf 's' di athletes_entry_list.dart sesuai gambar kamu
+import 'package:wikilympics/athletes/screens/athletes_entry_list.dart';
+import 'package:wikilympics/athletes/screens/athlete_entry_detail.dart';
+
 import 'package:wikilympics/article/models/article_entry.dart';
 import 'package:wikilympics/article/screens/article_detail.dart';
 import 'package:wikilympics/article/screens/article_list.dart';
-
 
 import 'package:wikilympics/upcomingevents/models/events_entry.dart';
 import 'package:wikilympics/upcomingevents/screens/events_detail_screen.dart';
@@ -160,15 +164,6 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    //if (!_alreadyLoad) {
-    //_alreadyLoad = true;
-    //_loadPoll();
-    //}
-  }
-
   Future<void> _checkAdminStatus() async {
     final request = context.read<CookieRequest>();
     if (request.loggedIn) {
@@ -267,7 +262,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   onTap: () => _selectMenuPage(const SportEntryListPage()),
                 ),
 
-
                 _menuItem(
                   icon: Icons.article_outlined,
                   label: "Article",
@@ -283,14 +277,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 _menuItem(
                   icon: Icons.person_search_outlined,
                   label: "Athletes",
-                  onTap: () => _selectMenuPage(
-                    Scaffold(
-                      backgroundColor: Colors.white,
-                      body: Center(
-                        child: Text("Halaman Athletes Segera Hadir!"),
-                      ),
-                    ),
-                  ),
+                  onTap: () => _selectMenuPage(AthleteEntryListPage()), // Hapus 'const'
                 ),
 
                 if (_isAdmin) ...[
@@ -359,12 +346,8 @@ class _MyHomePageState extends State<MyHomePage> {
               padding: const EdgeInsets.only(bottom: 80),
               child: _selectedPage!,
             )
-
-
           else if (_selectedIndex == 0)
             _buildLandingContent(request)
-
-
           else
             Padding(
               padding: const EdgeInsets.only(bottom: 80),
@@ -555,7 +538,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
 
-          // ATHLETES
+          // ATHLETES HIGHLIGHT
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
@@ -563,27 +546,49 @@ class _MyHomePageState extends State<MyHomePage> {
               children: [
                 Text(
                   "Athletes Highlight",
-                  style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: const Color(0xFF01203F)),
+                  style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF01203F)
+                  ),
                 ),
                 const SizedBox(height: 12),
-                AthleteHighlightCard(
-                  rank: 1,
-                  athleteName: "Verstappen",
-                  sportName: "Handball",
-                  country: "Netherlands",
-                  onTap: () {},
-                ),
-                AthleteHighlightCard(
-                  rank: 2,
-                  athleteName: "Verstappen",
-                  sportName: "Archery",
-                  country: "Netherlands",
-                ),
-                AthleteHighlightCard(
-                  rank: 3,
-                  athleteName: "Verstappen",
-                  sportName: "Basketball",
-                  country: "Netherlands",
+                FutureBuilder<List<AthleteEntry>>(
+                  future: fetchAthletes(request),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Text("Error loading athletes: ${snapshot.error}");
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Text("No athletes data available");
+                    }
+
+                    final topAthletes = snapshot.data!.take(3).toList();
+                    return Column(
+                      // Penting: map<Widget> untuk mencegah error List<dynamic>
+                      children: topAthletes.asMap().entries.map<Widget>((entry) {
+                        int index = entry.key;
+                        AthleteEntry athlete = entry.value;
+
+                        return AthleteHighlightCard(
+                          rank: index + 1,
+                          athleteName: athlete.fields.athleteName,
+                          sportName: athlete.fields.sport,
+                          country: athlete.fields.country,
+                          imageUrl: fixImageUrl(athlete.fields.athletePhoto),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AthleteDetailPage(athlete: athlete),
+                              ),
+                            );
+                          },
+                        );
+                      }).toList(),
+                    );
+                  },
                 ),
                 const SizedBox(height: 8),
                 Container(
@@ -593,12 +598,22 @@ class _MyHomePageState extends State<MyHomePage> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
-                      BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+                      BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4)
+                      ),
                     ],
                   ),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(20),
-                    onTap: () {},
+                    onTap: () {
+                      setState(() {
+                        // Pastikan nama class ini sesuai dengan file atlet temanmu
+                        _selectedPage = AthleteEntryListPage();
+                        _selectedIndex = 2;
+                      });
+                    },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 18),
                       child: Row(
@@ -606,7 +621,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: const [
                           Text(
                             "SEE ALL ATHLETES",
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFFC8DB2C)),
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFFC8DB2C)
+                            ),
                           ),
                           SizedBox(width: 4),
                           Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFFC8DB2C)),
@@ -619,7 +638,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
 
-          // UPCOMING EVENTS
+          // UPCOMING EVENTS ... (Sisa kode tetap sama)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
@@ -672,7 +691,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
 
-          // LATEST ARTICLES
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
@@ -728,7 +746,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
 
-          // FORUM & REVIEWS
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1033,6 +1050,19 @@ Future<List<SportEntry>> fetchSports(CookieRequest request) async {
     }
   }
   return listSports;
+}
+
+Future<List<AthleteEntry>> fetchAthletes(CookieRequest request) async {
+  final String baseUrl = kIsWeb ? "http://127.0.0.1:8000" : "http://10.0.2.2:8000";
+  final response = await request.get('$baseUrl/athletes/flutter/');
+
+  List<AthleteEntry> listAthletes = [];
+  for (var d in response) {
+    if (d != null) {
+      listAthletes.add(AthleteEntry.fromJson(d));
+    }
+  }
+  return listAthletes;
 }
 
 Future<List<ArticleEntry>> fetchArticles(CookieRequest request) async {
