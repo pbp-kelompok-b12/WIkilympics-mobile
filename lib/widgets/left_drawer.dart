@@ -6,7 +6,6 @@ import 'package:wikilympics/sports/screens/sport_entry_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 // IMPORT ATHLETES YANG DIPERLUKAN
 import 'package:wikilympics/athletes/screens/athletes_entry_list.dart'; // INI HARUS ADA

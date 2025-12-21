@@ -16,8 +16,6 @@ class EventDetailScreen extends StatefulWidget {
 }
 
 class _EventDetailScreenState extends State<EventDetailScreen> {
-  static const Color kRedAlert = Color(0xFFFF4C4C);
-
   late EventEntry _event;
   bool _isAdmin = false;
 
