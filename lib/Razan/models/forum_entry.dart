@@ -13,7 +13,6 @@ class ForumEntry {
     int pk;
     Fields fields;
 
-
     ForumEntry({
         required this.model,
         required this.pk,

@@ -45,7 +45,6 @@ class Fields {
         required this.dateCreated,
     });
 
-
     factory Fields.fromJson(Map<String, dynamic> json) => Fields(
         username: json["username"] is int ? "User #${json["username"]}" : json["username"].toString(),
         username_id: json["username_id"] ?? (json["username"] is int ? json["username"] : 0),
