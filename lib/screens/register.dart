@@ -122,7 +122,8 @@ class _RegisterPageState extends State<RegisterPage> {
                             _confirmPasswordController.text;
 
                         final response = await request.postJson(
-                          "http://localhost:8000/auth/register/",
+                          "http://127.0.0.1:8000/auth/register/",
+                          // "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id/auth/register/",
                           jsonEncode({
                             "username": username,
                             "password1": password1,
