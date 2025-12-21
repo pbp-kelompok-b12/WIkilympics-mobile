@@ -38,16 +38,36 @@ class _FilterSportSheetState extends State<FilterSportSheet> {
 
   IconData _getIconForLabel(String label) {
     switch (label.toLowerCase()) {
-      case 'ball': return Icons.sports_soccer;
-      case 'target': return Icons.ads_click;
-      case 'water': return Icons.waves;
-      case 'combat': return Icons.sports_martial_arts;
-      case 'athletics': return Icons.directions_run;
-      case 'gymnastics': return Icons.accessibility_new;
-      case 'team': return Icons.groups;
-      case 'individual': return Icons.person;
-      case 'both': return Icons.compare_arrows;
-      default: return Icons.sports;
+      case 'water':
+        return Icons.pool;
+
+      case 'strength':
+        return Icons.fitness_center;
+
+      case 'athletic':
+        return Icons.directions_run;
+
+      case 'racket':
+        return Icons.sports_tennis;
+
+      case 'ball':
+        return Icons.sports_soccer;
+
+      case 'combat':
+        return Icons.sports_martial_arts;
+
+      case 'target':
+        return Icons.ads_click;
+
+      case 'team':
+        return Icons.groups;
+      case 'individual':
+        return Icons.person;
+      case 'both':
+        return Icons.compare_arrows;
+
+      default:
+        return Icons.sports;
     }
   }
 
@@ -61,7 +81,6 @@ class _FilterSportSheetState extends State<FilterSportSheet> {
       ),
       child: Column(
         children: [
-          // --- HEADER MODAL ---
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
             decoration: BoxDecoration(
@@ -83,26 +102,22 @@ class _FilterSportSheetState extends State<FilterSportSheet> {
               ],
             ),
           ),
-
-          // --- CONTENT SCROLLABLE ---
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(24),
               children: [
                 _buildSectionTitle("Sport Category"),
                 const SizedBox(height: 10),
-                ...widget.typeOptions.map((opt) => _buildCustomCheckbox(opt, _tempTypes)),
-
+                ...widget.typeOptions
+                    .map((opt) => _buildCustomCheckbox(opt, _tempTypes)),
                 const SizedBox(height: 30),
-
                 _buildSectionTitle("Participation Type"),
                 const SizedBox(height: 10),
-                ...widget.partOptions.map((opt) => _buildCustomCheckbox(opt, _tempParts)),
+                ...widget.partOptions
+                    .map((opt) => _buildCustomCheckbox(opt, _tempParts)),
               ],
             ),
           ),
-
-          // --- FOOTER BUTTONS ---
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
@@ -130,9 +145,7 @@ class _FilterSportSheetState extends State<FilterSportSheet> {
                     ),
                     child: Text("Reset",
                         style: GoogleFonts.poppins(
-                            color: kPrimaryNavy,
-                            fontWeight: FontWeight.w600
-                        )),
+                            color: kPrimaryNavy, fontWeight: FontWeight.w600)),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -168,11 +181,10 @@ class _FilterSportSheetState extends State<FilterSportSheet> {
     return Text(
       title.toUpperCase(),
       style: GoogleFonts.poppins(
-        fontSize: 12,
-        fontWeight: FontWeight.w700,
-        color: Colors.grey[500],
-        letterSpacing: 1.2
-      ),
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+          color: Colors.grey[500],
+          letterSpacing: 1.2),
     );
   }
 
@@ -200,8 +212,13 @@ class _FilterSportSheetState extends State<FilterSportSheet> {
           ),
           borderRadius: BorderRadius.circular(16),
           boxShadow: isSelected
-            ? [BoxShadow(color: kPrimaryNavy.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 4))]
-            : [],
+              ? [
+                  BoxShadow(
+                      color: kPrimaryNavy.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4))
+                ]
+              : [],
         ),
         child: Row(
           children: [

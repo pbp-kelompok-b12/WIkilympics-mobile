@@ -4,6 +4,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:wikilympics/screens/register.dart';
 import 'package:wikilympics/landingpoll/screens/menu.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -117,6 +118,19 @@ class _LoginPageState extends State<LoginPage> {
 
                         if (context.mounted) {
                           if (request.loggedIn) {
+                            final prefs = await SharedPreferences.getInstance();
+                            await prefs.setString('username', username);
+                            try {
+                                final userInfoResponse = await request.get('http://127.0.0.1:8000/forum_section/get-user-info/');
+                                if (userInfoResponse is Map) {
+                                    final userId = userInfoResponse['user_id'] ?? 0;
+                                    final isSuperuser = userInfoResponse['is_superuser'] ?? false;
+                                    await prefs.setInt('user_id', userId);
+                                    await prefs.setBool('is_superuser', isSuperuser);
+                                }
+                            }
+                            catch(e) {}
+
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Login successful!'),
