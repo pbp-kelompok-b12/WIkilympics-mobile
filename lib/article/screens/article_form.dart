@@ -3,9 +3,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:wikilympics/article/models/article_entry.dart';
 
 class ArticleFormPage extends StatefulWidget {
-  const ArticleFormPage({super.key});
+  final ArticleEntry? article;
+  const ArticleFormPage({super.key, this.article});
 
   @override
   State<ArticleFormPage> createState() => _ArticleFormPageState();
@@ -61,6 +63,18 @@ class _ArticleFormPageState extends State<ArticleFormPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    // Jika widget.article tidak null, isi variabel dengan data yang ada (Mode Edit)
+    if (widget.article != null) {
+      _title = widget.article!.title;
+      _content = widget.article!.content;
+      _category = widget.article!.category;
+      _thumbnail = widget.article!.thumbnail;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
 
@@ -106,7 +120,7 @@ class _ArticleFormPageState extends State<ArticleFormPage> {
                   Padding(
                     padding: const EdgeInsets.only(left: 25),
                     child: Text(
-                      "Add Article",
+                      widget.article == null ? "Add Article" : "Edit Article",
                       style: GoogleFonts.poppins(
                         fontSize: 26,
                         fontWeight: FontWeight.w700, 
@@ -118,6 +132,7 @@ class _ArticleFormPageState extends State<ArticleFormPage> {
 
                   // 1. Title
                   TextFormField(
+                    initialValue: _title,
                     decoration: _buildInputDecoration("Article Title", Icons.title),
                     style: TextStyle(color: kPrimaryNavy),
                     onChanged: (value) => _title = value,
@@ -145,29 +160,39 @@ class _ArticleFormPageState extends State<ArticleFormPage> {
 
                   // 3. Thumbnail
                   TextFormField(
+                    initialValue: _thumbnail,
                     decoration: _buildInputDecoration("Thumbnail URL", Icons.link_rounded),
                     style: TextStyle(color: kPrimaryNavy),
                     onChanged: (value) => _thumbnail = value,
-                    validator: (value) =>
-                        (value == null || value.isEmpty) ? "Thumbnail URL cannot be empty" : null,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Thumbnail URL cannot be empty";
+                      }
+
+                      final uri = Uri.tryParse(value);
+                      if (uri == null || !uri.hasAbsolutePath) {
+                        return "Please enter a valid URL";
+                      }
+                      return null;
+                    }
                   ),
                   const SizedBox(height: 16),
 
-                  // === CONTENT FIELD (ICON DI FORCE NAIK) ===
+                  // 4. Content
                   TextFormField(
+                    initialValue: _content,
                     maxLines: 10,
                     decoration: _buildInputDecoration("Content", Icons.article_rounded).copyWith(
                        alignLabelWithHint: true,
                        hintText: "Content",
                        prefixIcon: Container(
-                         height: 200, 
-                         width: 40, 
-                         alignment: Alignment.topCenter, // Nempel di atas container
-                         child: Transform.translate(
-                           // UBAH DISINI: Geser Y ke negatif (-8) untuk naik ke atas secara visual
-                           offset: const Offset(0, -20), 
-                           child: Icon(Icons.article_rounded, color: kPrimaryNavy),
-                         ),
+                        height: 200, 
+                        width: 40, 
+                        alignment: Alignment.topCenter, 
+                        child: Transform.translate(
+                          offset: const Offset(0, -20), 
+                          child: Icon(Icons.article_rounded, color: kPrimaryNavy),
+                        ),
                        ),
                     ),
                     style: TextStyle(color: kPrimaryNavy),
@@ -195,8 +220,12 @@ class _ArticleFormPageState extends State<ArticleFormPage> {
                         ),
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
+                            final String url = widget.article == null
+                              ? "http://127.0.0.1:8000/article/create-flutter/"
+                              : "http://127.0.0.1:8000/article/edit-flutter/${widget.article!.id}/";
+
                             final response = await request.postJson(
-                              "http://127.0.0.1:8000/article/create-flutter/",
+                              url,
                               jsonEncode({
                                 "title": _title,
                                 "content": _content,
@@ -209,7 +238,10 @@ class _ArticleFormPageState extends State<ArticleFormPage> {
                                 if (response['status'] == 'success') {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: const Text("Article saved successfully!"),
+                                      content: Text(
+                                        "Article saved successfully!",
+                                        style: TextStyle(color: kPrimaryNavy, fontWeight: FontWeight.bold),
+                                      ),
                                       backgroundColor: kAccentLime,
                                       behavior: SnackBarBehavior.floating,
                                       action: SnackBarAction(label: 'OK', textColor: kPrimaryNavy, onPressed: (){}),

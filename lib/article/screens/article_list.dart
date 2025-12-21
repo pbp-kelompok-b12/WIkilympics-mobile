@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:wikilympics/article/models/article_entry.dart';
-import 'package:wikilympics/widgets/left_drawer.dart';
-import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:wikilympics/article/screens/article_detail.dart';
-import 'package:wikilympics/article/widgets/article_card.dart';
-import 'package:wikilympics/article/screens/article_form.dart'; 
+import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import 'package:wikilympics/article/models/article_entry.dart';
+import 'package:wikilympics/article/screens/article_form.dart';
 import 'package:wikilympics/screens/login.dart';
+import 'package:wikilympics/widgets/left_drawer.dart';
+import 'package:wikilympics/article/widgets/article_card.dart'; 
+import 'package:wikilympics/article/widgets/trending_card.dart'; 
+import 'package:wikilympics/article/screens/article_detail.dart';
 
 class ArticleListPage extends StatefulWidget {
   const ArticleListPage({super.key});
@@ -17,49 +19,82 @@ class ArticleListPage extends StatefulWidget {
 }
 
 class _ArticleListPageState extends State<ArticleListPage> {
-  final Color kPrimaryNavy = const Color(0xFF03045E); // Saya update ke Navy yang benar
-  final Color kAccentLime = const Color(0xFFD9E74C);
+  final Color kPrimaryNavy = const Color(0xFF03045E);
   final Color kBgGrey = const Color(0xFFF9F9F9);
+  final Color kAccentLime = const Color(0xFFD9E74C);
 
-  String _selectedCategory = "All Categories";
   bool _isAdmin = false;
 
-  final List<String> _categories = [
-    'All Categories',
-    'athletics', 'archery', 'artistic_gymnastics', 'artistic_swimming',
-    'badminton', 'baseball_softball', 'basketball', 'beach_volleyball',
-    'boxing', 'canoe_slalom', 'cycling_road', 'diving', 'fencing',
-    'football', 'handball', 'hockey', 'judo', 'karate', 'marathon_swimming',
-    'rowing', 'rhythmic_gymnastics', 'sailing', 'shooting', 'swimming',
-    'table_tennis', 'taekwondo', 'trampoline_gymnastics', 'triathlon',
-    'water_polo', 'weightlifting', 'wrestling',
+  // Filter
+  String _searchQuery = "";
+  List<String> _selectedCategories = [];
+
+  final List<String> _categoryOptions = [
+    'Athletics', 'Archery', 'Artistic Gymnastics', 'Artistic Swimming',
+    'Badminton', 'Baseball Softball', 'Basketball', 'Beach Volleyball',
+    'Boxing', 'Canoe Slalom', 'Cycling Road', 'Diving', 'Fencing',
+    'Football', 'Handball', 'Hockey', 'Judo', 'Karate', 'Marathon Swimming',
+    'Rowing', 'Rhythmic Gymnastics', 'Sailing', 'Shooting', 'Swimming',
+    'Table Tennis', 'Taekwondo', 'Trampoline Gymnastics', 'Triathlon',
+    'Water Polo', 'Weightlifting', 'Wrestling',
   ];
+
+  IconData getSportIcon(String sportName) {
+    String sport = sportName.toLowerCase().replaceAll(" ", "_");
+
+    if (['football', 'basketball', 'baseball_softball', 'beach_volleyball', 
+         'handball', 'hockey', 'table_tennis', 'water_polo', 'badminton'].contains(sport)) {
+      return Icons.sports_soccer;
+    }
+    
+    if (['archery', 'shooting', 'fencing'].contains(sport)) {
+      return Icons.ads_click;
+    }
+
+    if (['swimming', 'artistic_swimming', 'marathon_swimming', 'diving', 
+         'rowing', 'sailing', 'canoe_slalom'].contains(sport)) {
+      return Icons.waves;
+    }
+
+    if (['boxing', 'judo', 'karate', 'taekwondo', 'wrestling'].contains(sport)) {
+      return Icons.sports_martial_arts;
+    }
+
+    if (['athletics', 'cycling_road', 'triathlon'].contains(sport)) {
+      return Icons.directions_run;
+    }
+
+    if (['artistic_gymnastics', 'rhythmic_gymnastics', 'trampoline_gymnastics'].contains(sport)) {
+      return Icons.accessibility_new;
+    }
+
+    if (['weightlifting'].contains(sport)) {
+      return Icons.fitness_center;
+    }
+
+    return Icons.sports;
+  }
 
   @override
   void initState() {
     super.initState();
-    // Cek status admin saat halaman dimuat
-    // Gunakan addPostFrameCallback karena butuh context/provider
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkAdminStatus();
-    });
+    _checkAdminStatus();
   }
 
   Future<void> _checkAdminStatus() async {
     final request = context.read<CookieRequest>();
-    
     if (request.loggedIn) {
       final response = await request.get("http://127.0.0.1:8000/auth/status/");
-      
-      setState(() {
-        _isAdmin = response['is_superuser'] ?? false;
-      });
+      if (mounted) {
+        setState(() {
+          _isAdmin = response['is_superuser'] ?? false;
+        });
+      }
     }
   }
 
   Future<List<ArticleEntry>> fetchArticles(CookieRequest request) async {
     final response = await request.get('http://127.0.0.1:8000/article/json/');
-
     List<ArticleEntry> listArticles = [];
     for (var d in response) {
       if (d != null) {
@@ -68,9 +103,118 @@ class _ArticleListPageState extends State<ArticleListPage> {
     }
     return listArticles;
   }
-  
-  void _refreshArticles() {
-    setState(() {});
+
+  // Filter logic
+  List<ArticleEntry> _applyFilters(List<ArticleEntry> allArticles) {
+    return allArticles.where((article) {
+      final title = article.title.toLowerCase();
+      if (!title.contains(_searchQuery)) return false;
+
+      if (_selectedCategories.isNotEmpty) {
+        String rawCat = article.category.toString().replaceAll("_", " ").toLowerCase();
+        bool catMatch = _selectedCategories.any((selected) =>
+            rawCat == selected.toLowerCase());
+        if (!catMatch) return false;
+      }
+      return true;
+    }).toList();
+  }
+
+  void _showFilterModal() {
+    List<String> tempSelected = List.from(_selectedCategories);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.7,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(25),
+                  topRight: Radius.circular(25),
+                ),
+              ),
+              child: Column(
+                children: [
+                  // Handle Bar
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 12),
+                    height: 4, width: 40,
+                    decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(10)),
+                  ),
+                  Text("Filter by Category", 
+                    style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold, color: kPrimaryNavy)),
+                  const Divider(),
+                  
+                  // Daftar Kategori
+                  Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      itemCount: _categoryOptions.length,
+                      itemBuilder: (context, index) {
+                        final cat = _categoryOptions[index];
+                        final isSelected = tempSelected.contains(cat);
+                        
+                        return CheckboxListTile(
+                          secondary: Icon(getSportIcon(cat), color: kPrimaryNavy),
+                          title: Text(cat, style: GoogleFonts.poppins(fontSize: 14)),
+                          value: isSelected,
+                          activeColor: kPrimaryNavy,
+                          onChanged: (bool? value) {
+                            setModalState(() {
+                              if (value == true) {
+                                tempSelected.add(cat);
+                              } else {
+                                tempSelected.remove(cat);
+                              }
+                            });
+                          },
+                        );
+                      },
+                    ),
+                  ),
+
+                  // Action Buttons
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text("Cancel", style: TextStyle(color: Colors.grey[600])),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: kPrimaryNavy,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                            onPressed: () {
+                              // Simpan perubahan ke State utama aplikasi
+                              setState(() => _selectedCategories = tempSelected);
+                              Navigator.pop(context);
+                            },
+                            child: const Text("Apply Filters", style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+        );
+      },
+    );
   }
 
   @override
@@ -80,416 +224,207 @@ class _ArticleListPageState extends State<ArticleListPage> {
     return Scaffold(
       backgroundColor: kBgGrey,
       appBar: AppBar(
-        title: Image.asset(
-          'assets/wikilympics_banner.png', 
-          height: 60,
-          fit: BoxFit.contain,
-        ),
+        title: Image.asset('assets/wikilympics_banner.png', height: 60, fit: BoxFit.contain),
         backgroundColor: kBgGrey,
         iconTheme: IconThemeData(color: kPrimaryNavy),
         elevation: 0,
       ),
-
       drawer: const LeftDrawer(),
-      
-      // Button add article
-      floatingActionButton: _isAdmin 
+      floatingActionButton: _isAdmin
         ? FloatingActionButton.extended(
-          onPressed: () async {
-            await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ArticleFormPage()),
-            );
-            
-            _refreshArticles();
-          },
-          label: Text("ADD ARTICLE", style: TextStyle(color: kPrimaryNavy, fontWeight: FontWeight.bold)),
-          icon: Icon(Icons.add, color: kPrimaryNavy),
-          backgroundColor: kAccentLime,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        )
+            onPressed: () async {
+              await Navigator.push(context, MaterialPageRoute(builder: (context) => const ArticleFormPage()));
+              setState(() {
+                fetchArticles(request);
+              });
+            },
+            label: Text("ADD ARTICLE", style: TextStyle(color: kPrimaryNavy, fontWeight: FontWeight.bold)),
+            icon: Icon(Icons.add, color: kPrimaryNavy),
+            backgroundColor: kAccentLime,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          )
         : null,
-      
-      body: FutureBuilder(
-        future: fetchArticles(request),
-        builder: (context, AsyncSnapshot snapshot) {
-          if (snapshot.data == null) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(30, 10, 30, 7),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   children: [
-                    Text(
-                      'No articles yet.',
-                      style: TextStyle(fontSize: 20, color: kPrimaryNavy),
+                    Expanded(
+                      child: Container(
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: TextField(
+                          onChanged: (val) => setState(() => _searchQuery = val.toLowerCase()),
+                          decoration: InputDecoration(
+                            prefixIcon: Icon(Icons.search, color: kPrimaryNavy, size: 20),
+                            hintText: "Search articles...",
+                            hintStyle: GoogleFonts.poppins(color: Colors.grey, fontSize: 13),
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    GestureDetector(
+                      onTap: _showFilterModal,
+                      child: Container(
+                        height: 40,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: BoxDecoration(color: kPrimaryNavy, borderRadius: BorderRadius.circular(15)),
+                        child: const Icon(Icons.tune, color: Colors.white, size: 18),
+                      ),
                     ),
                   ],
                 ),
-              );
-            } else {
-              List<ArticleEntry> allArticles = snapshot.data!;
-              List<ArticleEntry> filteredArticles;
-
-              if (_selectedCategory == "All Categories") {
-                filteredArticles = allArticles;
-              } else {
-                filteredArticles = allArticles
-                    .where((article) => article.category == _selectedCategory)
-                    .toList();
-              }
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // === HEADER (Dropdown & Title) ===
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: kBgGrey, // Background Abu-abu
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(24),
-                        bottomRight: Radius.circular(24),
-                      ),
-                    ),
-                    padding: const EdgeInsets.fromLTRB(30, 10, 30, 7),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                const SizedBox(height: 10),
+                if (_selectedCategories.isNotEmpty)
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
                       children: [
-                        
-                        // Dropdown Search Bar
-                        Container(
-                          height: 40,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(15),
-                            border: Border.all(color: Colors.grey.shade300),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.03),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              isExpanded: true,
-                              value: _categories.contains(_selectedCategory)
-                                  ? _selectedCategory
-                                  : _categories.first,
-                              icon: Icon(Icons.search, color: kPrimaryNavy),
-                              style: GoogleFonts.poppins(
-                                color: Colors.black87,
-                                fontSize: 14,
-                              ),
-                              dropdownColor: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  _selectedCategory = newValue!;
-                                });
-                              },
-                              items: _categories.map<DropdownMenuItem<String>>((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(
-                                    value == "All Categories"
-                                        ? "Search by category..."
-                                        : value.replaceAll("_", " ").toUpperCase(),
-                                    style: TextStyle(
-                                      color: value == "All Categories" ? Colors.grey : kPrimaryNavy,
-                                      fontWeight: value == "All Categories" ? FontWeight.normal : FontWeight.w600
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 13),
-
-                        // === JUDUL DIGESER ===
-                        Padding(
-                          padding: const EdgeInsets.only(left: 15.0), // <--- UBAH DISINI: Geser lebih banyak (12.0)
-                          child: Text(
-                            "Olympic Articles",
-                            style: GoogleFonts.inter( 
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                              color: kPrimaryNavy,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                        ),
+                        ..._selectedCategories.map((e) => _buildChip(e)),
+                        GestureDetector(
+                          onTap: () => setState(() => _selectedCategories.clear()),
+                          child: Text(" Clear All", style: TextStyle(color: kPrimaryNavy, fontSize: 12, fontWeight: FontWeight.bold)),
+                        )
                       ],
                     ),
                   ),
+              ],
+            ),
+          ),
 
-                  // === LIST ARTIKEL ===
-                  Expanded(
-                    child: filteredArticles.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.search_off, size: 60, color: Colors.grey[300]),
-                                const SizedBox(height: 16),
-                                Text(
-                                  "No articles found in\n$_selectedCategory",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(color: Colors.grey[500]),
-                                ),
-                              ],
-                            ),
-                          )
-                        : ListView.builder(
-                            padding: const EdgeInsets.only(top: 0, left: 20, right: 20, bottom: 80),
-                            itemCount: filteredArticles.length,
-                            itemBuilder: (_, index) => ArticleCard(
-                              article: filteredArticles[index],
-                              onTap: () {
-                                if (!request.loggedIn) {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      title: const Text('Login Required'),
-                                      content: const Text(
-                                          'You need to be logged in to view the details. Would you like to login now?'),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () => Navigator.pop(context),
-                                          child: const Text('Cancel'),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(builder: (context) => const LoginPage()),
-                                            );
-                                          },
-                                          child: const Text('Login'),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                } else {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ArticleDetailPage(
-                                        article: filteredArticles[index],
-                                      ),
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
-                          ),
-                  ),
-                ],
-              );
-            }
-          }
-        },
+          // List
+          Expanded(
+            child: FutureBuilder<List<ArticleEntry>>(
+              future: fetchArticles(request),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+                if (!snapshot.hasData || snapshot.data!.isEmpty) return const Center(child: Text('No articles yet.'));
+
+                final filteredAll = _applyFilters(snapshot.data!);
+                
+                final trendingList = filteredAll.where((a) => a.likes >= 7).toList();
+                final regularList = filteredAll.where((a) => a.likes < 7).toList();
+
+                if (filteredAll.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.search_off, size: 60, color: Colors.grey[300]),
+                        Text("No articles match your filters.", style: TextStyle(color: Colors.grey[600])),
+                      ],
+                    ),
+                  );
+                }
+
+                return ListView(
+                  padding: const EdgeInsets.only(bottom: 80),
+                  children: [
+                    // Trending list
+                    if (trendingList.isNotEmpty) ...[
+                      _buildSectionTitle("Trending Now", Icons.whatshot, Colors.orange),
+                      SizedBox(
+                        height: 165,
+                        child: ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 25),
+                          scrollDirection: Axis.horizontal,
+                          itemCount: trendingList.length,
+                          itemBuilder: (context, index) {
+                            return SizedBox(
+                              width: 280,
+                              child: TrendingCard(
+                                article: trendingList[index],
+                                onTap: () => _handleNavigation(request, trendingList[index]),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+
+                    // Article list
+                    _buildSectionTitle("Olympic Articles", Icons.article_outlined, kPrimaryNavy),
+                    ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: filteredAll.length,
+                      itemBuilder: (context, index) => ArticleCard(
+                        article: filteredAll[index],
+                        onTap: () => _handleNavigation(request, filteredAll[index]),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
+
+  Widget _buildSectionTitle(String title, IconData icon, Color iconColor) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(30, 10, 30, 15),
+      child: Row(
+        children: [
+          Icon(icon, color: iconColor, size: 24),
+          const SizedBox(width: 8),
+          Text(title, style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w800, color: kPrimaryNavy)),
+        ],
+      ),
+    );
+  }
+
+  void _handleNavigation(CookieRequest request, ArticleEntry article) async{
+      // Navigator.push(context, MaterialPageRoute(builder: (context) => ArticleDetailPage(article: article)));
+      await Navigator.push(
+        context, 
+        MaterialPageRoute(builder: (context) => ArticleDetailPage(article: article))
+      );
+      
+      // KETIKA KEMBALI DARI DETAIL, REFRESH LIST
+      if (mounted) {
+        setState(() {
+          // Ini akan memicu FutureBuilder untuk memanggil fetchArticles lagi
+        });
+      }
+  }
+
+  Widget _buildChip(String label) {
+    return Container(
+      margin: const EdgeInsets.only(right: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: kPrimaryNavy.withOpacity(0.1), 
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: kPrimaryNavy.withOpacity(0.2)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(getSportIcon(label), size: 14, color: kPrimaryNavy),
+          const SizedBox(width: 6),
+          Text(label, style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.bold, color: kPrimaryNavy)),
+        ],
+      ),
+    );
+  }
+  
 }
-
-
-
-
-
-//       // Body List Artikel
-//       body: FutureBuilder(
-//         future: fetchArticles(request),
-//         builder: (context, AsyncSnapshot snapshot) {
-//           if (snapshot.data == null) {
-//             return const Center(child: CircularProgressIndicator());
-//           } else {
-//             if (!snapshot.hasData || snapshot.data!.isEmpty) {
-//               return Center(
-//                 child: Column(
-//                   mainAxisAlignment: MainAxisAlignment.center,
-//                   children: [
-//                     Text(
-//                       'No articles yet.',
-//                       style: TextStyle(fontSize: 20, color: kPrimaryNavy),
-//                     ),
-//                     const SizedBox(height: 8),
-//                   ],
-//                 ),
-//               );
-//             } else {
-//               List<ArticleEntry> allArticles = snapshot.data!;
-//               List<ArticleEntry> filteredArticles;
-              
-//               if (_selectedCategory == "All Categories") {
-//                 filteredArticles = allArticles;
-//               } else {
-//                 // Pastikan akses category sesuai modelmu (bisa .category atau .fields.category)
-//                 filteredArticles = allArticles
-//                     .where((article) => article.category == _selectedCategory) 
-//                     .toList();
-//               }
-
-//               return Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   // === HEADER (Dropdown & Title) ===
-//                   Container(
-//                     width: double.infinity,
-//                     // PERBAIKAN: HAPUS 'const' DI SINI & GANTI WARNA JADI kBgGrey
-//                     decoration: BoxDecoration( // <--- Tanpa const
-//                       color: kBgGrey, // <--- Warna jadi Abu
-//                       borderRadius: const BorderRadius.only(
-//                         bottomLeft: Radius.circular(24),
-//                         bottomRight: Radius.circular(24),
-//                       ),
-//                     ),
-//                     padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-//                     child: Column(
-//                       crossAxisAlignment: CrossAxisAlignment.start,
-//                       children: [
-                        
-//                         // Dropdown Search Bar
-//                         Container(
-//                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-//                           decoration: BoxDecoration(
-//                             color: Colors.white, // Input field tetap putih agar kontras
-//                             borderRadius: BorderRadius.circular(30),
-//                             border: Border.all(color: Colors.grey.shade300),
-//                             boxShadow: [
-//                               BoxShadow(
-//                                 color: Colors.black.withOpacity(0.05),
-//                                 blurRadius: 10,
-//                                 offset: const Offset(0, 4),
-//                               ),
-//                             ],
-//                           ),
-//                           child: DropdownButtonHideUnderline(
-//                             child: DropdownButton<String>(
-//                               isExpanded: true,
-//                               value: _categories.contains(_selectedCategory) 
-//                                   ? _selectedCategory 
-//                                   : _categories.first,
-//                               icon: Icon(Icons.search, color: kPrimaryNavy),
-//                               style: GoogleFonts.poppins(
-//                                 color: Colors.black87,
-//                                 fontSize: 14,
-//                               ),
-//                               dropdownColor: Colors.white,
-//                               borderRadius: BorderRadius.circular(16),
-//                               onChanged: (String? newValue) {
-//                                 setState(() {
-//                                   _selectedCategory = newValue!;
-//                                 });
-//                               },
-//                               items: _categories.map<DropdownMenuItem<String>>((String value) {
-//                                 return DropdownMenuItem<String>(
-//                                   value: value,
-//                                   child: Text(
-//                                     value == "All Categories" 
-//                                       ? "Search by category..."
-//                                       : value.replaceAll("_", " ").toUpperCase(),
-//                                     style: TextStyle(
-//                                       color: value == "All Categories" ? Colors.grey : kPrimaryNavy,
-//                                       fontWeight: value == "All Categories" ? FontWeight.normal : FontWeight.w600
-//                                     ),
-//                                   ),
-//                                 );
-//                               }).toList(),
-//                             ),
-//                           ),
-//                         ),
-
-//                         const SizedBox(height: 24),
-
-//                         // Judul Section
-//                         Text(
-//                           "Olympic Articles",
-//                           style: GoogleFonts.poppins(
-//                             fontSize: 20,
-//                             fontWeight: FontWeight.bold,
-//                             color: kPrimaryNavy,
-//                           ),
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-
-//                   Expanded(
-//                     child: filteredArticles.isEmpty
-//                         ? Center(
-//                             child: Column(
-//                               mainAxisAlignment: MainAxisAlignment.center,
-//                               children: [
-//                                 Icon(Icons.search_off, size: 60, color: Colors.grey[300]),
-//                                 const SizedBox(height: 16),
-//                                 Text(
-//                                   "No articles found in\n$_selectedCategory",
-//                                   textAlign: TextAlign.center,
-//                                   style: TextStyle(color: Colors.grey[500]),
-//                                 ),
-//                               ],
-//                             ),
-//                           )
-//                         : ListView.builder(
-//                             padding: const EdgeInsets.only(top: 16, left: 20, right: 20, bottom: 80),
-//                             itemCount: filteredArticles.length,
-//                             itemBuilder: (_, index) => ArticleCard(
-//                               article: filteredArticles[index],
-//                               onTap: () {
-//                                 if (!request.loggedIn) {
-//                                   showDialog(
-//                                     context: context,
-//                                     builder: (context) => AlertDialog(
-//                                       title: const Text('Login Required'),
-//                                       content: const Text(
-//                                           'You need to be logged in to view the details. Would you like to login now?'),
-//                                       actions: [
-//                                         TextButton(
-//                                           onPressed: () => Navigator.pop(context),
-//                                           child: const Text('Cancel'),
-//                                         ),
-//                                         TextButton(
-//                                           onPressed: () {
-//                                             Navigator.pop(context);
-//                                             Navigator.push(
-//                                               context,
-//                                               MaterialPageRoute(builder: (context) => const LoginPage()),
-//                                             );
-//                                           },
-//                                           child: const Text('Login'),
-//                                         ),
-//                                       ],
-//                                     ),
-//                                   );
-//                                 } else {
-//                                   Navigator.push(
-//                                     context,
-//                                     MaterialPageRoute(
-//                                       builder: (context) => ArticleDetailPage(
-//                                         article: filteredArticles[index],
-//                                       ),
-//                                     ),
-//                                   );
-//                                 }
-//                               },
-//                             ),
-//                           ),
-//                   ),
-//                 ],
-//               );
-//             }
-//           }
-//         },
-//       ),
-//     );
-//   }
-// }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:wikilympics/landingpoll/screens/menu.dart';
 import 'package:wikilympics/article/screens/article_list.dart';
+import 'package:wikilympics/sports/screens/sport_entry_list.dart';
+import 'package:wikilympics/Razan/Screens/forum_main.dart';
 
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -30,7 +32,7 @@ class LeftDrawer extends StatelessWidget {
                   ),
                 ),
                 Padding(padding: EdgeInsets.all(10)),
-                Text("Seluruh berita olahraga terkini di sini!",
+                Text("Seluruh berita olahraga terkini di sini",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 15,
@@ -58,10 +60,10 @@ class LeftDrawer extends StatelessWidget {
             title: const Text('Sports'),
             // Bagian redirection ke MyHomePage
             onTap: () {
-              Navigator.pushReplacement(
+              Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MyHomePage(),
+                    builder: (context) => SportEntryListPage(),
                   ));
             },
           ),
@@ -94,7 +96,7 @@ class LeftDrawer extends StatelessWidget {
             title: const Text('Articles'),
             // Bagian redirection ke MyHomePage
             onTap: () {
-              Navigator.pushReplacement(
+              Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => ArticleListPage(),
@@ -109,7 +111,7 @@ class LeftDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MyHomePage(),
+                    builder: (context) => ForumListPage(),
                   ));
             },
           ),
@@ -119,8 +121,23 @@ class LeftDrawer extends StatelessWidget {
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),
             onTap: () async {
+              if(!request.loggedIn) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Anda belum login, tidak bisa logout."),
+                  ),
+                );
+
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const MyHomePage()),
+                  );
+
+                return;
+              }
               final response = await request.logout(
                   "http://127.0.0.1:8000/auth/logout/");
+                  // "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id/auth/logout/");
               String message = response["message"];
               if (context.mounted) {
                 if (response['status']) {
@@ -128,12 +145,6 @@ class LeftDrawer extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text("$message See you again, $uname."),
                   ));
-
-                  // Navigator.pushAndRemoveUntil(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => const LoginPage()),
-                  //       (Route<dynamic> route) => false,
-                  // );
 
                   Navigator.pushReplacement(
                     context,
