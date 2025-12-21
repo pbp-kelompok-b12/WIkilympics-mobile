@@ -24,13 +24,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text("My Profile", 
-          style: GoogleFonts.poppins(color: AppColors.kSecondaryNavy, fontWeight: FontWeight.bold, fontSize: 18)),
-        backgroundColor: Colors.white,
-        elevation: 0.5,
-        iconTheme: const IconThemeData(color: AppColors.kSecondaryNavy),
-      ),
+      
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -54,7 +48,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: navy),
           onPressed: () {
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
           },
           child: const Text("Go to Login", style: TextStyle(color: Colors.white)),
         ),
@@ -164,40 +158,7 @@ class _ProfilePageState extends State<ProfilePage> {
           leading: const Icon(Icons.logout, color: Color(0xFF03045E)),
           title: const Text("Logout", style: TextStyle(color: Color(0xFF03045E), fontWeight: FontWeight.w600)),
         ),
-
-        ListTile(
-          onTap: () => _confirmDelete(context, request, navy),
-          leading: const Icon(Icons.delete_forever, color: Colors.red),
-          title: const Text("Delete Account Permanently", style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600)),
-        ),
       ],
-    );
-  }
-
-  void _confirmDelete(BuildContext context, CookieRequest request, Color navy) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text("Are you sure?"),
-        content: const Text("This will delete your account forever."),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Cancel")),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () async {
-              final response = await request.post("https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//auth/delete-account/", {});
-              if (response['status'] == 'success') {
-                request.jsonData.clear();
-                if (context.mounted) {
-                  Navigator.pushAndRemoveUntil(
-                    context, MaterialPageRoute(builder: (context) => const MyHomePage()), (route) => false);
-                }
-              }
-            },
-            child: const Text("Delete", style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
     );
   }
 }

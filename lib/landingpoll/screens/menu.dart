@@ -27,7 +27,6 @@ import 'package:wikilympics/Razan/Screens/forum_main.dart';
 import 'package:wikilympics/Razan/Screens/forum_detail.dart';
 
 import 'package:wikilympics/screens/login.dart';
-import '../../widgets/left_drawer.dart';
 
 import '../models/poll_model.dart';
 import '../widgets/poll_service.dart';
@@ -37,9 +36,7 @@ import '../widgets/popular_sport_card.dart';
 import '../widgets/athlete_highlight_card.dart';
 import '../widgets/upcoming_event_card.dart';
 import '../widgets/latest_article_card.dart';
-import '../widgets/forum_review_card.dart';
 
-import 'forum_page.dart';
 import 'profile_page.dart';
 
 
@@ -334,11 +331,56 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       backgroundColor: const Color(0xFFD6E4E5),
       extendBody: true,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(1),
-        child: AppBar(backgroundColor: Colors.white, elevation: 0),
+
+      appBar: AppBar(
+        toolbarHeight: 70,
+        leadingWidth: 110,
+
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 30.0),
+          child: Transform.scale(
+            scale: 1.5, 
+            child: Image.asset(
+              'assets/logo.jpg',
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+
+        title: Padding(
+          padding: const EdgeInsets.only(top: 5.0),
+          child: Image.asset('assets/wikilympics_banner.png', height: 60, fit: BoxFit.contain),
+        ),
+        backgroundColor: AppColors.kBgGrey,
+        iconTheme: IconThemeData(color: AppColors.kSecondaryNavy),
+        elevation: 0,
+        actions: [
+          if (username == null)
+            Padding(
+              padding: const EdgeInsets.only(right: 30.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginPage()));
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF01203F),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                ),
+                child: const Text("SIGN IN", style: TextStyle(color: Colors.white, fontSize: 12)),
+              ),
+            )
+          else
+            Padding(
+              padding: const EdgeInsets.only(right: 30.0),
+              child: Text(
+                username,
+                style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF01203F)),
+              ),
+            ),
+        ],
       ),
-      drawer: const LeftDrawer(),
+      
       body: Stack(
         children: [
           if (_selectedIndex == 2 && _selectedPage != null)
@@ -368,45 +410,6 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Column(
         children: [
         
-          Container(
-            width: double.infinity,
-            color: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-            child: Row(
-              children: [
-                Builder(
-                  builder: (context) {
-                    return IconButton(
-                      icon: const Icon(Icons.menu, color: Colors.black),
-                      onPressed: () => Scaffold.of(context).openDrawer(),
-                    );
-                  },
-                ),
-                Expanded(
-                  child: Center(
-                    child: Image.asset("assets/wikilympics_banner.png", height: 40),
-                  ),
-                ),
-                username == null
-                    ? ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginPage()));
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF01203F),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-                  ),
-                  child: const Text("SIGN IN", style: TextStyle(color: Colors.white, fontSize: 12)),
-                )
-                    : Text(
-                  username,
-                  style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF01203F)),
-                ),
-              ],
-            ),
-          ),
-
           SizedBox(
             width: double.infinity,
             child: Image.asset("assets/hero_wikilympics.jpg", fit: BoxFit.cover),

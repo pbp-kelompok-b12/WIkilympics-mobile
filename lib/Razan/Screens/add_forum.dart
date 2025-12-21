@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wikilympics/app_colors.dart';
-import 'package:wikilympics/widgets/left_drawer.dart';
 import 'package:wikilympics/Razan/models/forum_entry.dart';
 
 class AddForumPage extends StatefulWidget {
@@ -174,6 +173,14 @@ class _AddForumPageState extends State<AddForumPage> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: AppColors.kBgGrey,
+        elevation: 0,
+        toolbarHeight: 80,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.kSecondaryNavy),
+          onPressed: () => Navigator.pop(context),
+        ),
+        
         title: Row(
           children: [
             
@@ -184,10 +191,8 @@ class _AddForumPageState extends State<AddForumPage> {
             ),
           ],
         ),
-        backgroundColor: const Color(0xFFf5f7fb),
-        
       ),
-      drawer: const LeftDrawer(),
+      
       body: Container(
         color: const Color(0xFFF5F7FB),
         child: Padding(

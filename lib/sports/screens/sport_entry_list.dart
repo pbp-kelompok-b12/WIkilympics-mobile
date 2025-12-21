@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:wikilympics/app_colors.dart';
 
 import 'package:wikilympics/sports/models/sport_entry.dart';
-import 'package:wikilympics/widgets/left_drawer.dart';
 import 'package:wikilympics/sports/widgets/sport_entry_card.dart';
 import 'package:wikilympics/sports/widgets/filter_sport.dart';
 import 'package:wikilympics/sports/screens/sport_entry_form.dart';
@@ -128,20 +127,7 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
 
     return Scaffold(
       backgroundColor: AppColors.kBgGrey,
-      appBar: AppBar(
-        title: Image.asset(
-          'assets/wikilympics_banner.png',
-          height: 60,
-          fit: BoxFit.contain,
-          errorBuilder: (ctx, _, __) => Text("WikiLympics",
-              style: GoogleFonts.poppins(
-                  color: AppColors.kSecondaryNavy, fontWeight: FontWeight.bold)),
-        ),
-        backgroundColor: AppColors.kBgGrey,
-        iconTheme: IconThemeData(color: AppColors.kSecondaryNavy),
-        elevation: 0,
-      ),
-      drawer: const LeftDrawer(),
+    
       floatingActionButton: _isAdmin
           ? FloatingActionButton.extended(
               onPressed: () async {

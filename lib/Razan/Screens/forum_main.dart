@@ -6,7 +6,6 @@ import 'package:wikilympics/Razan/Screens/forum_entry_card.dart';
 import 'package:wikilympics/Razan/Screens/forum_detail.dart';
 import 'package:wikilympics/Razan/Screens/add_forum.dart';
 import 'package:wikilympics/app_colors.dart';
-import 'package:wikilympics/widgets/left_drawer.dart';
 
 class ForumListPage extends StatefulWidget {
   const ForumListPage({super.key});
@@ -52,23 +51,6 @@ class _ForumListPageState extends State<ForumListPage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FB),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        toolbarHeight: 80,
-        title: Row(
-          children: [
-            
-            Image.asset(
-              'assets/wikilympics_banner.png',
-              fit: BoxFit.contain,
-              height: 60,
-            ),
-          ],
-        ),
-        centerTitle: false,
-      ),
-      drawer: const LeftDrawer(),
       
       body: Column(
         children: [

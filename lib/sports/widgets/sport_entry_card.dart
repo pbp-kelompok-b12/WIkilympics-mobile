@@ -67,7 +67,7 @@ class SportEntryCard extends StatelessWidget {
                         child: Icon(Icons.sports, size: 60, color: Colors.grey),
                       )
                     : Image.network(
-                        'http://localhost:8000/sports/proxy-image/?url=${Uri.encodeComponent(sport.fields.sportImg)}',
+                        'https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id/sports/proxy-image/?url=${Uri.encodeComponent(sport.fields.sportImg)}',
                         fit: BoxFit.cover,
                         alignment: Alignment.topCenter,
                         errorBuilder: (context, error, stackTrace) =>
@@ -136,7 +136,7 @@ class SportEntryCard extends StatelessWidget {
                                     color: Colors.white, size: 20),
                               )
                             : Image.network(
-                                'http://localhost:8000/sports/proxy-image/?url=${Uri.encodeComponent(sport.fields.countryFlagImg)}',
+                                'https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id/sports/proxy-image/?url=${Uri.encodeComponent(sport.fields.countryFlagImg)}',
                                 width: 32,
                                 height: 22,
                                 fit: BoxFit.cover,

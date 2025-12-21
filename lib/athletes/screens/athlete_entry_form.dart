@@ -260,10 +260,10 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
                             String url;
                             if (isEdit) {
                               url =
-                                  "http://localhost:8000/athletes/flutter/${widget.athleteEntry!.pk}/edit/";
+                                  "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id/athletes/flutter/${widget.athleteEntry!.pk}/edit/";
                             } else {
                               url =
-                                  "http://localhost:8000/athletes/flutter/create/";
+                                  "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id/athletes/flutter/create/";
                             }
 
                             final response = await request.postJson(

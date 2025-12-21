@@ -7,7 +7,6 @@ import 'package:wikilympics/upcomingevents/widgets/events_card.dart';
 import 'package:wikilympics/upcomingevents/screens/add_event_screen.dart';
 import 'package:wikilympics/upcomingevents/screens/events_detail_screen.dart';
 import 'package:wikilympics/upcomingevents/screens/edit_event_screen.dart';
-import 'package:wikilympics/widgets/left_drawer.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class EventsListScreen extends StatefulWidget {
@@ -61,16 +60,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      
-      appBar: AppBar(
-        title: Image.asset('assets/wikilympics_banner.png', height: 60, fit: BoxFit.contain),
-        backgroundColor: AppColors.kBgGrey,
-        iconTheme: IconThemeData(color: AppColors.kPrimaryNavy),
-        elevation: 0,
-      ),
 
-      //  drawer navigasi
-      drawer: const LeftDrawer(),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

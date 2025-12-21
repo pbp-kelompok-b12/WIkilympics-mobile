@@ -335,9 +335,9 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
                             String url;
                             if (isEdit) {
                               url =
-                                  "http://localhost:8000/sports/edit-flutter/${widget.sportEntry!.pk}/";
+                                  "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id/sports/edit-flutter/${widget.sportEntry!.pk}/";
                             } else {
-                              url = "http://localhost:8000/sports/create-flutter/";
+                              url = "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id/sports/create-flutter/";
                             }
 
                             final response = await request.postJson(

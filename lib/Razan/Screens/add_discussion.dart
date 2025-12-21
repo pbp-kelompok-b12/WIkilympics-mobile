@@ -4,7 +4,6 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wikilympics/Razan/models/forum_entry.dart';
 import 'package:wikilympics/app_colors.dart';
-import 'package:wikilympics/widgets/left_drawer.dart';
 
 class AddDiscussionPage extends StatefulWidget {
   final ForumEntry forum;
@@ -135,6 +134,14 @@ class _AddDiscussionPageState extends State<AddDiscussionPage> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: AppColors.kBgGrey,
+        elevation: 0,
+        toolbarHeight: 80,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.kSecondaryNavy),
+          onPressed: () => Navigator.pop(context),
+        ),
+
         title: Row(
           children: [
             
@@ -145,10 +152,8 @@ class _AddDiscussionPageState extends State<AddDiscussionPage> {
             ),
           ],
         ),
-        backgroundColor: const Color(0xFFf5f7fb),
-       
       ),
-      drawer: const LeftDrawer(),
+
       body: Container(
         color: AppColors.kBgGrey,
         child: Padding(

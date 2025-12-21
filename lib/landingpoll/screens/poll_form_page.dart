@@ -118,7 +118,6 @@ class _PollFormPageState extends State<PollFormPage> {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
           child: Container(
-            // --- CARD FORM ---
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
             decoration: BoxDecoration(
@@ -173,7 +172,7 @@ class _PollFormPageState extends State<PollFormPage> {
                     controller: _questionController,
                     maxLines: 2,
                     style: GoogleFonts.poppins(fontSize: 14, color: Colors.black87),
-                    decoration: _buildInputDecoration("e.g. Siapa atlet favoritmu?"),
+                    decoration: _buildInputDecoration("e.g. Who is your favorite athletes?"),
                     validator: (val) => val == null || val.isEmpty ? "Required" : null,
                   ),
                   const SizedBox(height: 24),
@@ -264,7 +263,7 @@ class _PollFormPageState extends State<PollFormPage> {
 
                           if (options.length < 2) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Minimal harus ada 2 opsi jawaban!")),
+                              const SnackBar(content: Text("Minimum 2 options")),
                             );
                             return;
                           }

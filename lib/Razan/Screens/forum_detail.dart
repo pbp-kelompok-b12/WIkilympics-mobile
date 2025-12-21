@@ -7,7 +7,6 @@ import 'package:wikilympics/Razan/models/discussion_entry.dart';
 import 'package:wikilympics/Razan/Screens/discussion_entry_card.dart';
 import 'package:wikilympics/Razan/Screens/add_discussion.dart';
 import 'package:wikilympics/app_colors.dart';
-import 'package:wikilympics/widgets/left_drawer.dart';
 import 'package:wikilympics/Razan/Screens/add_forum.dart';
 
 
@@ -70,15 +69,17 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.kBgGrey,
         elevation: 0,
         toolbarHeight: 80,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.kSecondaryNavy),
+          onPressed: () => Navigator.pop(context),
+        ),
+        
         title: Row(
           children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black),
-              onPressed: () => Navigator.pop(context),
-            ),
+            
             Image.asset(
               'assets/wikilympics_banner.png',
               fit: BoxFit.contain,
@@ -86,9 +87,7 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
             ),
           ],
         ),
-        centerTitle: false,
       ),
-      drawer: const LeftDrawer(),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

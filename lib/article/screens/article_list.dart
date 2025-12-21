@@ -6,7 +6,6 @@ import 'package:wikilympics/app_colors.dart';
 
 import 'package:wikilympics/article/models/article_entry.dart';
 import 'package:wikilympics/article/screens/article_form.dart';
-import 'package:wikilympics/widgets/left_drawer.dart';
 import 'package:wikilympics/article/widgets/article_card.dart'; 
 import 'package:wikilympics/article/widgets/trending_card.dart'; 
 import 'package:wikilympics/article/screens/article_detail.dart';
@@ -219,13 +218,7 @@ class _ArticleListPageState extends State<ArticleListPage> {
 
     return Scaffold(
       backgroundColor: AppColors.kBgGrey,
-      appBar: AppBar(
-        title: Image.asset('assets/wikilympics_banner.png', height: 60, fit: BoxFit.contain),
-        backgroundColor: AppColors.kBgGrey,
-        iconTheme: IconThemeData(color: AppColors.kSecondaryNavy),
-        elevation: 0,
-      ),
-      drawer: const LeftDrawer(),
+     
       floatingActionButton: _isAdmin
         ? FloatingActionButton.extended(
             onPressed: () async {

@@ -4,7 +4,6 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wikilympics/Razan/models/discussion_entry.dart';
 import 'package:wikilympics/app_colors.dart';
-import 'package:wikilympics/widgets/left_drawer.dart';
 
 class EditDiscussionPage extends StatefulWidget {
   final DiscussionEntry discussion;
@@ -142,16 +141,26 @@ class _EditDiscussionPageState extends State<EditDiscussionPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Edit Discussion"),
-        backgroundColor: const Color(0xFF3f5f90),
-        titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-
+        backgroundColor: AppColors.kBgGrey,
+        elevation: 0,
+        toolbarHeight: 80,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: AppColors.kSecondaryNavy),
           onPressed: () => Navigator.pop(context),
         ),
+        
+        title: Row(
+          children: [
+            
+            Image.asset(
+              'assets/wikilympics_banner.png',
+              fit: BoxFit.contain,
+              height: 60,
+            ),
+          ],
+        ),
       ),
-      drawer: const LeftDrawer(),
+     
       body: Container(
         color: const Color(0xFFF5F7FB),
         child: Padding(

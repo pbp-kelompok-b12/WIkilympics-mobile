@@ -299,7 +299,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                             _navigateToSportDetail(_article.sportId!);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Detail Sport tidak ditemukan")),
+                              const SnackBar(content: Text("Sport category not found")),
                             );
                           }
                         },
@@ -327,7 +327,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                     children: [
                       Container(width: 4, height: 16, color: AppColors.kAccentLime),
                       const SizedBox(width: 10),
-                      const Text("STORY COVERAGE",
+                      const Text("ARTICLE COVERAGE",
                         style: TextStyle(color: Colors.white54, letterSpacing: 2, fontWeight: FontWeight.bold, fontSize: 11)),
                     ],
                   ),
@@ -428,7 +428,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Detail cabang olahraga tidak ditemukan")),
+            const SnackBar(content: Text("Sport details not found")),
           );
         }
       }

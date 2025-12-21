@@ -65,27 +65,27 @@ class _PollListPageState extends State<PollListPage> {
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
-      backgroundColor: kBgGrey,
-
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.kBgGrey,
         elevation: 0,
-        centerTitle: true,
+        toolbarHeight: 80,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: AppColors.kSecondaryNavy),
+          icon: const Icon(Icons.arrow_back, color: AppColors.kSecondaryNavy),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Image.asset(
-          'assets/wikilympics_banner.png',
-          height: 32,
-          fit: BoxFit.contain,
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1.0),
-          child: Container(color: Colors.grey.shade200, height: 1.0),
+        
+        title: Row(
+          children: [
+            
+            Image.asset(
+              'assets/wikilympics_banner.png',
+              fit: BoxFit.contain,
+              height: 60,
+            ),
+          ],
         ),
       ),
-
+      backgroundColor: kBgGrey,
       floatingActionButton: _isAdmin
           ? FloatingActionButton.extended(
         backgroundColor: AppColors.kAccentLime,

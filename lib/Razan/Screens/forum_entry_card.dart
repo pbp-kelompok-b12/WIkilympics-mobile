@@ -139,10 +139,10 @@ class _ForumEntryCardState extends State<ForumEntryCard> {
                     width: 80,
                     height: 80,
                     decoration: BoxDecoration(
-                      color: Colors.indigo.shade100,
+                      color: AppColors.kPrimaryNavy,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.forum, color: Colors.indigo, size: 40),
+                    child: const Icon(Icons.forum, color: AppColors.kAccentLime, size: 40),
                   ),
                 
                 const SizedBox(width: 16),
@@ -240,11 +240,11 @@ class _ThumbnailImage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.broken_image, color: Colors.grey, size: 20),
+              const Icon(Icons.broken_image, color: AppColors.kPrimaryNavy, size: 20),
               const SizedBox(height: 4),
               Text(
                 'Failed to load',
-                style: TextStyle(fontSize: 8, color: Colors.grey.shade500),
+                style: TextStyle(fontSize: 8, color: AppColors.kPrimaryNavy),
                 textAlign: TextAlign.center,
               ),
             ],
