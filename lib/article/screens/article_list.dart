@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:wikilympics/article/models/article_entry.dart';
 import 'package:wikilympics/article/screens/article_form.dart';
-import 'package:wikilympics/screens/login.dart';
 import 'package:wikilympics/widgets/left_drawer.dart';
 import 'package:wikilympics/article/widgets/article_card.dart'; 
 import 'package:wikilympics/article/widgets/trending_card.dart'; 
@@ -393,16 +392,13 @@ class _ArticleListPageState extends State<ArticleListPage> {
   }
 
   void _handleNavigation(CookieRequest request, ArticleEntry article) async{
-      // Navigator.push(context, MaterialPageRoute(builder: (context) => ArticleDetailPage(article: article)));
       await Navigator.push(
         context, 
         MaterialPageRoute(builder: (context) => ArticleDetailPage(article: article))
       );
       
-      // KETIKA KEMBALI DARI DETAIL, REFRESH LIST
       if (mounted) {
         setState(() {
-          // Ini akan memicu FutureBuilder untuk memanggil fetchArticles lagi
         });
       }
   }
@@ -425,6 +421,5 @@ class _ArticleListPageState extends State<ArticleListPage> {
         ],
       ),
     );
-  }
-  
+  }  
 }

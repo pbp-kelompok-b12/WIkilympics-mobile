@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:wikilympics/Razan/Screens/forum_main.dart';
 import 'package:wikilympics/landingpoll/screens/menu.dart';
 import 'package:wikilympics/article/screens/article_list.dart';
 import 'package:wikilympics/sports/screens/sport_entry_list.dart';
-import 'package:wikilympics/Razan/Screens/forum_main.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+// IMPORT ATHLETES YANG DIPERLUKAN
+import 'package:wikilympics/athletes/screens/athletes_entry_list.dart'; // INI HARUS ADA
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -108,7 +112,7 @@ class LeftDrawer extends StatelessWidget {
             title: const Text('Forum & Reviews'),
             // Bagian redirection ke MyHomePage
             onTap: () {
-              Navigator.pushReplacement(
+              Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => ForumListPage(),
@@ -142,6 +146,8 @@ class LeftDrawer extends StatelessWidget {
               if (context.mounted) {
                 if (response['status']) {
                   String uname = response["username"];
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.clear();
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text("$message See you again, $uname."),
                   ));
@@ -161,7 +167,6 @@ class LeftDrawer extends StatelessWidget {
               }
             },
           ),
-
         ],
       ),
     );

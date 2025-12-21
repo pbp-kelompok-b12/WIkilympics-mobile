@@ -5,15 +5,15 @@ import 'package:wikilympics/upcomingevents/models/events_entry.dart';
 class EventsCard extends StatelessWidget {
   final EventEntry event;
   final VoidCallback onTap;
-  final VoidCallback onEdit;
-  final VoidCallback onDelete;
+  final VoidCallback? onEdit;
+  final VoidCallback?  onDelete;
 
   const EventsCard({
     super.key,
     required this.event,
     required this.onTap,
-    required this.onEdit,
-    required this.onDelete,
+    this.onEdit,
+    this.onDelete,
   });
 
   @override
@@ -39,14 +39,17 @@ class EventsCard extends StatelessWidget {
             ),
 
             // Admin (Edit & Delete)
+            if (onEdit != null || onDelete != null)
             Positioned(
               top: 8,
               right: 8,
               child: Row(
                 children: [
-                  _adminButton(Icons.edit, Colors.blue, onEdit),
-                  const SizedBox(width: 5),
-                  _adminButton(Icons.delete, Colors.red, onDelete),
+                  //if (onEdit != null)
+                  //_adminButton(Icons.edit, Colors.blue, onEdit!),
+                  //const SizedBox(width: 5),
+                  if (onDelete != null)
+                  _adminButton(Icons.delete, Colors.red, onDelete!),
                 ],
               ),
             ),
@@ -110,7 +113,7 @@ class EventsCard extends StatelessWidget {
         shape: BoxShape.circle,
       ),
       child: IconButton(
-        constraints: const BoxConstraints(), // Menghilangkan padding bawaan
+        constraints: const BoxConstraints(),
         padding: const EdgeInsets.all(6),
         icon: Icon(icon, size: 18, color: color),
         onPressed: pressed,

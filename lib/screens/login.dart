@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wikilympics/screens/register.dart';
 import 'package:wikilympics/landingpoll/screens/menu.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -110,7 +110,6 @@ class _LoginPageState extends State<LoginPage> {
 
                         final response = await request.login(
                           "http://127.0.0.1:8000/auth/login/",
-                          // "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id/auth/login/",
                           {
                             "username": username,
                             "password": password,
@@ -121,21 +120,17 @@ class _LoginPageState extends State<LoginPage> {
                           if (request.loggedIn) {
                             final prefs = await SharedPreferences.getInstance();
                             await prefs.setString('username', username);
-                            
                             try {
-                              final userInfoResponse = await request.get(
-                                'http://localhost:8000/forum_section/get-user-info/'
-                              );
-                              
-                              if (userInfoResponse is Map) {
-                                final userId = userInfoResponse['user_id'] ?? 0;
-                                final isSuperuser = userInfoResponse['is_superuser'] ?? false;
-                                await prefs.setInt('user_id', userId);
-                                await prefs.setBool('is_superuser', isSuperuser);
-                              }
-                            } catch (e) {
+                                final userInfoResponse = await request.get('http://127.0.0.1:8000/forum_section/get-user-info/');
+                                if (userInfoResponse is Map) {
+                                    final userId = userInfoResponse['user_id'] ?? 0;
+                                    final isSuperuser = userInfoResponse['is_superuser'] ?? false;
+                                    await prefs.setInt('user_id', userId);
+                                    await prefs.setBool('is_superuser', isSuperuser);
+                                }
                             }
-                            
+                            catch(e) {}
+
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Login successful!'),
@@ -195,6 +190,8 @@ class _LoginPageState extends State<LoginPage> {
                   ),
 
                   const SizedBox(height: 20),
+
+                  // ===== SIGN UP LINK =====
                   Center(
                     child: GestureDetector(
                       onTap: () {
@@ -236,6 +233,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  // ===== INPUT FIELD (SAMA PERSIS REGISTER) =====
   Widget _buildInputField({
     required TextEditingController controller,
     required String hint,
@@ -274,8 +272,7 @@ class _LoginPageState extends State<LoginPage> {
             color: Colors.grey.shade400,
           ),
         ),
-        contentPadding:
-        const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       ),
     );
   }

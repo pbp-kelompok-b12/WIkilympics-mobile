@@ -221,38 +221,70 @@ class _PollListPageState extends State<PollListPage> {
                                       ),
                                       const SizedBox(width: 8),
                                       // Delete
+                                      // Delete Button
                                       _actionButton(
-                                          icon: Icons.delete_rounded,
-                                          color: Colors.red[600]!,
-                                          bg: Colors.red[50]!,
-                                          onTap: () async {
-                                            final confirm = await showDialog<bool>(
-                                              context: context,
-                                              builder: (context) => AlertDialog(
-                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                                title: const Text("Delete Poll"),
-                                                content: const Text("Are you sure you want to remove this poll permanently?"),
-                                                actions: [
-                                                  TextButton(onPressed: ()=>Navigator.pop(context,false), child: const Text("Cancel")),
-                                                  TextButton(onPressed: ()=>Navigator.pop(context,true), child: const Text("Delete", style: TextStyle(color: Colors.red))),
-                                                ],
-                                              ),
-                                            );
+                                        icon: Icons.delete_rounded,
+                                        color: Colors.red[600]!,
+                                        bg: Colors.red[50]!,
+                                        onTap: () async {
+                                          final confirm = await showDialog<bool>(
+                                            context: context,
+                                            builder: (context) => AlertDialog(
+                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                              title: const Text("Delete Poll"),
+                                              content: const Text("Are you sure you want to remove this poll permanently?"),
+                                              actions: [
+                                                TextButton(
+                                                    onPressed: () => Navigator.pop(context, false),
+                                                    child: const Text("Cancel")
+                                                ),
+                                                TextButton(
+                                                    onPressed: () => Navigator.pop(context, true),
+                                                    child: const Text("Delete", style: TextStyle(color: Colors.red))
+                                                ),
+                                              ],
+                                            ),
+                                          );
 
-                                            if (confirm == true) {
-                                              try {
-                                                final response = await request.post(
-                                                    'http://127.0.0.1:8000/landingpoll/delete/${poll.id}/',
-                                                    {});
-                                                if (response['status'] == 'success') {
-                                                  _refreshList();
+                                          if (confirm == true) {
+                                            try {
+                                              // Mengirim request POST ke endpoint delete
+                                              final response = await request.post(
+                                                'http://127.0.0.1:8000/landingpoll/delete/${poll.id}/',
+                                                {},
+                                              );
+
+                                              // Mengecek field 'status' sesuai dengan JsonResponse di Django kamu
+                                              if (response['status'] == 'success') {
+                                                // --- KUNCI UTAMA ---
+                                                // Memperbarui Future agar FutureBuilder melakukan rebuild otomatis
+                                                _refreshList();
+
+                                                if (mounted) {
                                                   ScaffoldMessenger.of(context).showSnackBar(
-                                                    const SnackBar(content: Text("Poll deleted")),
+                                                    const SnackBar(
+                                                      content: Text("Poll deleted successfully!"),
+                                                      backgroundColor: Colors.green,
+                                                    ),
                                                   );
                                                 }
-                                              } catch (e) { /* handle error */ }
+                                              } else {
+                                                // Jika status bukan success (misal error 403 atau data tidak ditemukan)
+                                                if (mounted) {
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(content: Text("Failed: ${response['message']}")),
+                                                  );
+                                                }
+                                              }
+                                            } catch (e) {
+                                              if (mounted) {
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(content: Text("Error connection: $e")),
+                                                );
+                                              }
                                             }
                                           }
+                                        },
                                       ),
                                     ],
                                   )
