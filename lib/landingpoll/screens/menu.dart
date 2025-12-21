@@ -270,7 +270,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
                 _menuItem(
                   icon: Icons.event_outlined,
-                  label: "Olympic Events",
+                  label: "Upcoming Events",
                   onTap: () => _selectMenuPage(const EventsListScreen()),
                 ),
 
