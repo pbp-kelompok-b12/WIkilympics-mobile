@@ -5,6 +5,7 @@ import 'package:wikilympics/screens/login.dart';
 
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -126,6 +127,8 @@ class LeftDrawer extends StatelessWidget {
               if (context.mounted) {
                 if (response['status']) {
                   String uname = response["username"];
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.clear();
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text("$message See you again, $uname."),
                   ));
