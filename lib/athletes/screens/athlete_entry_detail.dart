@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:wikilympics/athletes/models/athlete_entry.dart';
 import 'package:wikilympics/athletes/screens/athlete_entry_form.dart';
+import 'dart:convert';
 
 class AthleteDetailPage extends StatefulWidget {
   final AthleteEntry athlete;
@@ -98,6 +99,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
     }
   }
 
+  // screens/athlete_entry_detail.dart - bagian _handleDelete
   Future<void> _handleDelete(
     BuildContext context,
     CookieRequest request,
@@ -115,7 +117,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
           ),
         ),
         content: Text(
-          "Are you sure you want to delete this athlete? This action cannot be undone.",
+          "Are you sure you want to delete ${_athlete.fields.athleteName}? This action cannot be undone.",
           style: GoogleFonts.poppins(color: Colors.white70, fontSize: 14),
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -154,29 +156,57 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
 
     if (confirm == true) {
       try {
+        // TAMPILKAN LOADING
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) =>
+              const Center(child: CircularProgressIndicator(color: kLimeColor)),
+        );
+
+        // DEBUG: Print URL sebelum request
+        print("Attempting to delete athlete with ID: ${_athlete.pk}");
+        print(
+          "Delete URL: http://127.0.0.1:8000/athletes/flutter/${_athlete.pk}/delete/",
+        );
+
+        // COBA DENGAN METHOD YANG BERBEDA
         final response = await request.postJson(
           'http://127.0.0.1:8000/athletes/flutter/${_athlete.pk}/delete/',
-          {},
+          jsonEncode({}), // Kirim body kosong tapi JSON encoded
         );
+
+        // DEBUG: Print response
+        print("Delete response: $response");
+        print("Response type: ${response.runtimeType}");
+
+        // TUTUP LOADING
+        if (context.mounted) {
+          Navigator.pop(context); // Close loading dialog
+        }
 
         if (context.mounted) {
           if (response['status'] == 'success') {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  "Athlete deleted successfully!",
+                  "${_athlete.fields.athleteName} deleted successfully!",
                   style: GoogleFonts.poppins(),
                 ),
                 backgroundColor: kLimeColor,
                 duration: const Duration(seconds: 2),
               ),
             );
-            Navigator.pop(context);
+
+            // Tunggu sebentar sebelum navigate back
+            await Future.delayed(const Duration(milliseconds: 500));
+
+            Navigator.pop(context); // Kembali ke list page
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  "Failed to delete athlete: ${response['message']}",
+                  "Failed to delete: ${response['message'] ?? 'Unknown error'}",
                   style: GoogleFonts.poppins(),
                 ),
                 backgroundColor: kRedAlert,
@@ -185,17 +215,23 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
           }
         }
       } catch (e) {
+        // TUTUP LOADING JIKA MASIH TERBUKA
+        if (context.mounted) {
+          Navigator.pop(context); // Close loading dialog
+        }
+
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                "Network error: ${e.toString()}",
+                "Error: ${e.toString()}",
                 style: GoogleFonts.poppins(),
               ),
               backgroundColor: kRedAlert,
             ),
           );
         }
+        print("Delete error details: $e");
       }
     }
   }
