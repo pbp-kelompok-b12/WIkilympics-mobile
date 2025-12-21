@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wikilympics/Razan/Screens/forum_main.dart';
 import 'package:wikilympics/landingpoll/screens/menu.dart';
 import 'package:wikilympics/article/screens/article_list.dart';
 import 'package:wikilympics/sports/screens/sport_entry_list.dart';
@@ -108,10 +109,10 @@ class LeftDrawer extends StatelessWidget {
             title: const Text('Forum & Reviews'),
             // Bagian redirection ke MyHomePage
             onTap: () {
-              Navigator.pushReplacement(
+              Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MyHomePage(),
+                    builder: (context) => ForumListPage(),
                   ));
             },
           ),
