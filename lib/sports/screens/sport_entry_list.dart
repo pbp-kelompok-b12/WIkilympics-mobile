@@ -18,24 +18,21 @@ class SportEntryListPage extends StatefulWidget {
 }
 
 class _SportEntryListPageState extends State<SportEntryListPage> {
+  // === COLOR PALETTE ===
   final Color kPrimaryNavy = const Color(0xFF03045E);
   final Color kBgGrey = const Color(0xFFF9F9F9);
   final Color kAccentLime = const Color(0xFFD9E74C);
 
+  // === ADMIN STATE ===
   bool _isAdmin = false;
 
+  // === FILTER STATE ===
   String _searchQuery = "";
   List<String> _selectedSportTypes = [];
   List<String> _selectedParticipations = [];
 
   final List<String> _typeOptions = [
-    'Water',
-    'Strength',
-    'Athletic',
-    'Racket',
-    'Ball',
-    'Combat',
-    'Target'
+    'Ball', 'Target', 'Water', 'Combat', 'Athletics', 'Gymnastics'
   ];
   final List<String> _partOptions = ['Team', 'Individual', 'Both'];
 
@@ -51,12 +48,12 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
     final request = context.read<CookieRequest>();
     if (request.loggedIn) {
       try {
-        final response =
-            await request.get("http://127.0.0.1:8000/auth/status/");
+        final response = await request.get("http://127.0.0.1:8000/auth/status/");
         setState(() {
           _isAdmin = response['is_superuser'] ?? false;
         });
-      } catch (e) {}
+      } catch (e) {
+      }
     }
   }
 
@@ -75,18 +72,14 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
     setState(() {});
   }
 
+  // === FILTER LOGIC ===
   List<SportEntry> _applyFilters(List<SportEntry> allSports) {
     return allSports.where((sport) {
       final name = sport.fields.sportName.toLowerCase();
       if (!name.contains(_searchQuery)) return false;
 
-      String rawType =
-          sport.fields.sportType.toString().split('.').last.toUpperCase();
-      String rawPart = sport.fields.participationStructure
-          .toString()
-          .split('.')
-          .last
-          .toUpperCase();
+      String rawType = sport.fields.sportType.toString().split('.').last.toUpperCase();
+      String rawPart = sport.fields.participationStructure.toString().split('.').last.toUpperCase();
 
       if (_selectedSportTypes.isNotEmpty) {
         bool typeMatch = _selectedSportTypes.any((selected) =>
@@ -105,6 +98,7 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
     }).toList();
   }
 
+  // === SHOW MODAL ===
   void _showFilterModal() {
     showModalBottomSheet(
       context: context,
@@ -136,37 +130,37 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
           'assets/wikilympics_banner.png',
           height: 60,
           fit: BoxFit.contain,
-          errorBuilder: (ctx, _, __) => Text("WikiLympics",
-              style: GoogleFonts.poppins(
-                  color: kPrimaryNavy, fontWeight: FontWeight.bold)),
+          errorBuilder: (ctx, _, __) => Text(
+            "WikiLympics",
+            style: GoogleFonts.poppins(color: kPrimaryNavy, fontWeight: FontWeight.bold)
+          ),
         ),
         backgroundColor: kBgGrey,
         iconTheme: IconThemeData(color: kPrimaryNavy),
         elevation: 0,
       ),
       drawer: const LeftDrawer(),
+
       floatingActionButton: _isAdmin
-          ? FloatingActionButton.extended(
-              onPressed: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const SportEntryFormPage()),
-                );
-                _refreshSports();
-              },
-              label: Text("ADD SPORT",
-                  style: GoogleFonts.poppins(
-                      color: kPrimaryNavy, fontWeight: FontWeight.bold)),
-              icon: Icon(Icons.add, color: kPrimaryNavy),
-              backgroundColor: kAccentLime,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-            )
-          : null,
+        ? FloatingActionButton.extended(
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SportEntryFormPage()),
+              );
+              _refreshSports();
+            },
+            label: Text("ADD SPORT", style: GoogleFonts.poppins(color: kPrimaryNavy, fontWeight: FontWeight.bold)),
+            icon: Icon(Icons.add, color: kPrimaryNavy),
+            backgroundColor: kAccentLime,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          )
+        : null,
+
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // === HEADER SECTION ===
           Container(
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(30, 10, 30, 7),
@@ -182,6 +176,7 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
               children: [
                 Row(
                   children: [
+                    // Search Bar
                     Expanded(
                       child: Container(
                         height: 40,
@@ -203,6 +198,7 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
                           decoration: InputDecoration(
                             prefixIcon: Icon(Icons.search, color: kPrimaryNavy),
                             hintText: "Search sports...",
+                            // Already Poppins (OK)
                             hintStyle: GoogleFonts.poppins(
                                 color: Colors.black87, fontSize: 14),
                             border: InputBorder.none,
@@ -213,6 +209,8 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
                       ),
                     ),
                     const SizedBox(width: 10),
+
+                    // Filter Button
                     GestureDetector(
                       onTap: _showFilterModal,
                       child: Container(
@@ -228,14 +226,29 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
                                 offset: const Offset(0, 2))
                           ],
                         ),
-                        child: const Center (
-                            child: Icon(Icons.tune, color: Colors.white, size: 22),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.tune,
+                                color: Colors.white, size: 18),
+                            const SizedBox(width: 8),
+                            Text(
+                              "FILTERS",
+                              // Already Poppins (OK)
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 13),
+
                 Padding(
                   padding: const EdgeInsets.only(left: 15.0),
                   child: Text(
@@ -248,6 +261,7 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
                     ),
                   ),
                 ),
+
                 if (_selectedSportTypes.isNotEmpty ||
                     _selectedParticipations.isNotEmpty)
                   Padding(
@@ -269,9 +283,7 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
                               padding: const EdgeInsets.only(left: 8.0),
                               child: Text("Clear All",
                                   style: GoogleFonts.poppins(
-                                      color: kPrimaryNavy,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500)),
+                                      color: kPrimaryNavy, fontSize: 12, fontWeight: FontWeight.w500)),
                             ),
                           )
                         ],
@@ -281,6 +293,8 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
               ],
             ),
           ),
+
+          // === LIST CONTENT ===
           Expanded(
             child: FutureBuilder<List<SportEntry>>(
               future: fetchSports(request),
@@ -292,10 +306,8 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          'No sports yet.',
-                          style: GoogleFonts.poppins(
-                              fontSize: 20, color: kPrimaryNavy),
+                        Text('No sports yet.',
+                          style: GoogleFonts.poppins(fontSize: 20, color: kPrimaryNavy),
                         ),
                       ],
                     ),
@@ -308,20 +320,17 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.search_off,
-                              size: 60, color: Colors.grey[300]),
+                          Icon(Icons.search_off, size: 60, color: Colors.grey[300]),
                           const SizedBox(height: 10),
                           Text("No sports match your filters.",
-                              style:
-                                  GoogleFonts.poppins(color: Colors.grey[600])),
+                              style: GoogleFonts.poppins(color: Colors.grey[600])),
                         ],
                       ),
                     );
                   }
 
                   return ListView.builder(
-                    padding: const EdgeInsets.only(
-                        top: 0, left: 20, right: 20, bottom: 80),
+                    padding: const EdgeInsets.only(top: 0, left: 20, right: 20, bottom: 80),
                     itemCount: filteredList.length,
                     itemBuilder: (context, index) {
                       return SportEntryCard(
@@ -330,8 +339,7 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
                           await Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  SportDetailPage(sport: filteredList[index]),
+                              builder: (context) => SportDetailPage(sport: filteredList[index]),
                             ),
                           );
                           _refreshSports();
@@ -356,9 +364,7 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
           BoxDecoration(color: color, borderRadius: BorderRadius.circular(20)),
       child: Text(label,
           style: GoogleFonts.poppins(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87)),
+              fontSize: 11, fontWeight: FontWeight.w600, color: Colors.black87)),
     );
   }
 }

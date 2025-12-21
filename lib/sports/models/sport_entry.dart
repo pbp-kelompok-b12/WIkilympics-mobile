@@ -4,8 +4,10 @@
 
 import 'dart:convert';
 
-List<SportEntry> sportEntryFromJson(String str) => List<SportEntry>.from(json.decode(str).map((x) => SportEntry.fromJson(x)));
-String sportEntryToJson(List<SportEntry> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+List<SportEntry> sportEntryFromJson(String str) =>
+List<SportEntry>.from(json.decode(str).map((x) => SportEntry.fromJson(x)));
+String sportEntryToJson(List<SportEntry> data) =>
+json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class SportEntry {
     Model model;
@@ -58,12 +60,12 @@ class Fields {
 
     factory Fields.fromJson(Map<String, dynamic> json) => Fields(
         sportName: json["sport_name"],
-        sportImg: json["sport_img"] ?? "",
+        sportImg: json["sport_img"],
         sportDescription: json["sport_description"],
         participationStructure: participationStructureValues.map[json["participation_structure"]]!,
         sportType: sportTypeValues.map[json["sport_type"]]!,
         countryOfOrigin: json["country_of_origin"],
-        countryFlagImg: json["country_flag_img"] ?? "",
+        countryFlagImg: json["country_flag_img"],
         firstYearPlayed: json["first_year_played"],
         historyDescription: json["history_description"],
         equipment: json["equipment"],
@@ -123,7 +125,7 @@ final modelValues = EnumValues({
     "sports.sports": Model.SPORTS_SPORTS
 });
 
-// Helper class untuk melakukan mapping dua arah antara String (JSON) dan Enum (Dart).
+
 class EnumValues<T> {
     Map<String, T> map;
     late Map<T, String> reverseMap;

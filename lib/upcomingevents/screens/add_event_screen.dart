@@ -28,7 +28,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
 
     if (_formKey.currentState!.validate() && _selectedDate != null) {
       final response = await request.post(
-        'http://127.0.0.1:8000/upcoming_event/create-event-flutter/',
+        'http://127.0.0.1:8000/upcoming_event/create-flutter/',
         {
           'name': _eventNameController.text,
           'organizer': _organizerController.text,

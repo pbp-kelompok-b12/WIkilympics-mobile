@@ -72,18 +72,10 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
         backgroundColor: Colors.white,
         elevation: 0,
         toolbarHeight: 80,
-        title: Row(
-          children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black),
-              onPressed: () => Navigator.pop(context),
-            ),
-            Image.asset(
-              'assets/wikilympics_banner.png',
-              fit: BoxFit.contain,
-              height: 60,
-            ),
-          ],
+        title: Image.asset(
+          'assets/wikilympics_banner.png',
+          fit: BoxFit.contain,
+          height: 60,
         ),
         centerTitle: false,
       ),
