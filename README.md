@@ -80,3 +80,6 @@ Untuk Design terdapat pada page 2
 ## Download
 Download aplikasi versi terbaru: [Download APK] (https://app.bitrise.io/app/36f6be20-29ee-456f-914b-f207f3f24ee0/installable-artifacts/7a354edc6163de5f/public-install-page/e0640a9e0d5819514dd8716829accf6d)
 
+Link video promosi: https://drive.google.com/drive/folders/1kmu1qQYRPVU2ngwZmTAo4uRI7XpOXGjT?usp=sharing
+
+
