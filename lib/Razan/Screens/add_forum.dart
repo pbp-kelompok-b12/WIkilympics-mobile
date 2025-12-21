@@ -173,9 +173,18 @@ class _AddForumPageState extends State<AddForumPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.forum != null ? "Edit Forum" : "Create Forum"),
-        backgroundColor: const Color(0xFF3f5f90),
-        titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+        title: Row(
+          children: [
+            
+            Image.asset(
+              'assets/wikilympics_banner.png',
+              fit: BoxFit.contain,
+              height: 60,
+            ),
+          ],
+        ),
+        backgroundColor: const Color(0xFFf5f7fb),
+        
       ),
       drawer: const LeftDrawer(),
       body: Container(
