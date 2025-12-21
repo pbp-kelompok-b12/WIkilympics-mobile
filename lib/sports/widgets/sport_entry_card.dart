@@ -20,11 +20,8 @@ class SportEntryCard extends StatelessWidget {
         .replaceAll('_', ' ')
         .toUpperCase();
 
-    String rawStructure = fields.participationStructure
-        .toString()
-        .split('.')
-        .last
-        .toUpperCase();
+    String rawStructure =
+        fields.participationStructure.toString().split('.').last.toUpperCase();
 
     String structureDesc;
     if (rawStructure == 'BOTH') {
@@ -62,30 +59,34 @@ class SportEntryCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              /// ================= 1. TOP SECTION (IMAGE) =================
               Container(
                 height: 200,
                 color: Colors.grey[200],
-                child: Image.network(
-                  'http://localhost:8000/sports/proxy-image/?url=${Uri.encodeComponent(sport.fields.sportImg)}',
-                  fit: BoxFit.cover,
-                  alignment: Alignment.topCenter,
-                  errorBuilder: (context, error, stackTrace) => const Center(
-                    child: Icon(Icons.broken_image, size: 50, color: Colors.grey),
-                  ),
-                ),
+                width: double.infinity,
+                child: sport.fields.sportImg.isEmpty
+                    ? const Center(
+                        child: Icon(Icons.sports, size: 60, color: Colors.grey),
+                      )
+                    : Image.network(
+                        'http://localhost:8000/sports/proxy-image/?url=${Uri.encodeComponent(sport.fields.sportImg)}',
+                        fit: BoxFit.cover,
+                        alignment: Alignment.topCenter,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Center(
+                          child: Icon(Icons.broken_image,
+                              size: 50, color: Colors.grey),
+                        ),
+                      ),
               ),
-
-              /// ================= 2. BOTTOM SECTION (INFO) =================
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 decoration: const BoxDecoration(
                   color: darkCardColor,
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    /// --- Icon Panah Kuning ---
                     Transform.rotate(
                       angle: 0.785,
                       child: const Icon(
@@ -94,15 +95,11 @@ class SportEntryCard extends StatelessWidget {
                         size: 24,
                       ),
                     ),
-
                     const SizedBox(width: 16),
-
-                    /// --- Teks ---
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Sport Name
                           Text(
                             sport.fields.sportName.toUpperCase(),
                             style: GoogleFonts.poppins(
@@ -115,8 +112,6 @@ class SportEntryCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 4),
-
-                          // Info Category | Structure
                           Text(
                             _formatSportInfo(sport.fields),
                             style: GoogleFonts.poppins(
@@ -128,8 +123,6 @@ class SportEntryCard extends StatelessWidget {
                         ],
                       ),
                     ),
-
-                    /// --- Flag Image ---
                     Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(4),
@@ -137,14 +130,21 @@ class SportEntryCard extends StatelessWidget {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(4),
-                        child: Image.network(
-                          'http://localhost:8000/sports/proxy-image/?url=${Uri.encodeComponent(sport.fields.countryFlagImg)}',
-                          width: 32,
-                          height: 22,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Icon(Icons.flag, color: Colors.white, size: 20),
-                        ),
+                        child: sport.fields.countryFlagImg.isEmpty
+                            ? const Padding(
+                                padding: EdgeInsets.all(2.0),
+                                child: Icon(Icons.flag,
+                                    color: Colors.white, size: 20),
+                              )
+                            : Image.network(
+                                'http://localhost:8000/sports/proxy-image/?url=${Uri.encodeComponent(sport.fields.countryFlagImg)}',
+                                width: 32,
+                                height: 22,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    const Icon(Icons.flag,
+                                        color: Colors.white, size: 20),
+                              ),
                       ),
                     ),
                   ],
