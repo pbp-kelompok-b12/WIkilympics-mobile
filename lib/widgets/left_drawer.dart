@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wikilympics/landingpoll/screens/menu.dart';
 import 'package:wikilympics/article/screens/article_list.dart';
 import 'package:wikilympics/sports/screens/sport_entry_list.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 
@@ -141,6 +141,8 @@ class LeftDrawer extends StatelessWidget {
               if (context.mounted) {
                 if (response['status']) {
                   String uname = response["username"];
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.clear();
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text("$message See you again, $uname."),
                   ));
