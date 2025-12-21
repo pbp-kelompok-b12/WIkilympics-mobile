@@ -156,7 +156,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
       try {
         final response = await request.postJson(
           'http://127.0.0.1:8000/athletes/flutter/${_athlete.pk}/delete/',
-          {},
+          null,
         );
 
         if (context.mounted) {
