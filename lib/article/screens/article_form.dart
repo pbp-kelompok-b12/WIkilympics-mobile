@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:wikilympics/app_colors.dart';
 import 'package:wikilympics/article/models/article_entry.dart';
 
 class ArticleFormPage extends StatefulWidget {
@@ -21,10 +22,6 @@ class _ArticleFormPageState extends State<ArticleFormPage> {
   String _category = "football";
   String _thumbnail = "";
 
-  final Color kPrimaryNavy = const Color(0xFF03045E);
-  final Color kAccentLime = const Color(0xFFD9E74C);
-  final Color kBgGrey = const Color(0xFFF9F9F9);
-
   final List<String> _categories = [
     'athletics', 'archery', 'artistic_gymnastics', 'artistic_swimming',
     'badminton', 'baseball_softball', 'basketball', 'beach_volleyball',
@@ -39,17 +36,17 @@ class _ArticleFormPageState extends State<ArticleFormPage> {
     return InputDecoration(
       hintText: hint,
       hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
-      prefixIcon: Icon(icon, color: kPrimaryNavy),
+      prefixIcon: Icon(icon, color: AppColors.kSecondaryNavy),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       fillColor: Colors.white,
       filled: true,
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: kPrimaryNavy, width: 1.0),
+        borderSide: BorderSide(color: AppColors.kSecondaryNavy, width: 1.0),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: kPrimaryNavy, width: 2.0),
+        borderSide: BorderSide(color: AppColors.kSecondaryNavy, width: 2.0),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
@@ -65,7 +62,6 @@ class _ArticleFormPageState extends State<ArticleFormPage> {
   @override
   void initState() {
     super.initState();
-    // Jika widget.article tidak null, isi variabel dengan data yang ada (Mode Edit)
     if (widget.article != null) {
       _title = widget.article!.title;
       _content = widget.article!.content;
@@ -79,7 +75,7 @@ class _ArticleFormPageState extends State<ArticleFormPage> {
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
-      backgroundColor: kBgGrey,
+      backgroundColor: AppColors.kBgGrey,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
@@ -90,7 +86,7 @@ class _ArticleFormPageState extends State<ArticleFormPage> {
           style: TextStyle(color: Colors.black, fontSize: 16),
         ),
         titleSpacing: 0,
-        backgroundColor: kBgGrey,
+        backgroundColor: AppColors.kBgGrey,
         elevation: 0,
       ),
       body: Center(
@@ -124,7 +120,7 @@ class _ArticleFormPageState extends State<ArticleFormPage> {
                       style: GoogleFonts.poppins(
                         fontSize: 26,
                         fontWeight: FontWeight.w700, 
-                        color: kPrimaryNavy,
+                        color: AppColors.kSecondaryNavy,
                       ),
                     ),
                   ),
@@ -134,7 +130,7 @@ class _ArticleFormPageState extends State<ArticleFormPage> {
                   TextFormField(
                     initialValue: _title,
                     decoration: _buildInputDecoration("Article Title", Icons.title),
-                    style: TextStyle(color: kPrimaryNavy),
+                    style: TextStyle(color: AppColors.kSecondaryNavy),
                     onChanged: (value) => _title = value,
                     validator: (value) =>
                         (value == null || value.isEmpty) ? "Title cannot be empty" : null,
@@ -145,9 +141,9 @@ class _ArticleFormPageState extends State<ArticleFormPage> {
                   DropdownButtonFormField<String>(
                     decoration: _buildInputDecoration("Category", Icons.category_rounded),
                     value: _category,
-                    icon: Icon(Icons.keyboard_arrow_down_rounded, color: kPrimaryNavy),
+                    icon: Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.kSecondaryNavy),
                     dropdownColor: Colors.white,
-                    style: TextStyle(color: kPrimaryNavy, fontSize: 14),
+                    style: TextStyle(color: AppColors.kSecondaryNavy, fontSize: 14),
                     items: _categories
                         .map((c) => DropdownMenuItem(
                               value: c,
@@ -162,7 +158,7 @@ class _ArticleFormPageState extends State<ArticleFormPage> {
                   TextFormField(
                     initialValue: _thumbnail,
                     decoration: _buildInputDecoration("Thumbnail URL", Icons.link_rounded),
-                    style: TextStyle(color: kPrimaryNavy),
+                    style: TextStyle(color: AppColors.kSecondaryNavy),
                     onChanged: (value) => _thumbnail = value,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -191,11 +187,11 @@ class _ArticleFormPageState extends State<ArticleFormPage> {
                         alignment: Alignment.topCenter, 
                         child: Transform.translate(
                           offset: const Offset(0, -20), 
-                          child: Icon(Icons.article_rounded, color: kPrimaryNavy),
+                          child: Icon(Icons.article_rounded, color: AppColors.kSecondaryNavy),
                         ),
                        ),
                     ),
-                    style: TextStyle(color: kPrimaryNavy),
+                    style: TextStyle(color: AppColors.kSecondaryNavy),
                     onChanged: (value) => _content = value,
                     validator: (value) =>
                         (value == null || value.isEmpty) ? "Content cannot be empty" : null,
@@ -210,8 +206,8 @@ class _ArticleFormPageState extends State<ArticleFormPage> {
                       height: 40,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: kAccentLime,
-                          foregroundColor: kPrimaryNavy,
+                          backgroundColor: AppColors.kAccentLime,
+                          foregroundColor: AppColors.kSecondaryNavy,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -221,8 +217,8 @@ class _ArticleFormPageState extends State<ArticleFormPage> {
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
                             final String url = widget.article == null
-                              ? "http://127.0.0.1:8000/article/create-flutter/"
-                              : "http://127.0.0.1:8000/article/edit-flutter/${widget.article!.id}/";
+                              ? "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id/article/create-flutter/"
+                              : "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id/article/edit-flutter/${widget.article!.id}/";
 
                             final response = await request.postJson(
                               url,
@@ -240,11 +236,11 @@ class _ArticleFormPageState extends State<ArticleFormPage> {
                                     SnackBar(
                                       content: Text(
                                         "Article saved successfully!",
-                                        style: TextStyle(color: kPrimaryNavy, fontWeight: FontWeight.bold),
+                                        style: TextStyle(color: AppColors.kSecondaryNavy, fontWeight: FontWeight.bold),
                                       ),
-                                      backgroundColor: kAccentLime,
+                                      backgroundColor: AppColors.kAccentLime,
                                       behavior: SnackBarBehavior.floating,
-                                      action: SnackBarAction(label: 'OK', textColor: kPrimaryNavy, onPressed: (){}),
+                                      action: SnackBarAction(label: 'OK', textColor: AppColors.kSecondaryNavy, onPressed: (){}),
                                     ),
                                   );
                                   Navigator.pop(context);

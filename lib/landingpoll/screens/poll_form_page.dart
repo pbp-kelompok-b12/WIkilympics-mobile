@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:wikilympics/app_colors.dart';
 import 'package:wikilympics/landingpoll/models/poll_model.dart';
 
 class PollFormPage extends StatefulWidget {
-  final PollQuestion? poll; // Null = Mode Add, Ada Isi = Mode Edit
+  final PollQuestion? poll; 
 
   const PollFormPage({super.key, this.poll});
 
@@ -22,9 +23,7 @@ class _PollFormPageState extends State<PollFormPage> {
 
   final Color _backgroundColor = const Color(0xFFF8F9FA);
   final Color _cardColor = Colors.white;
-  final Color _primaryTextColor = const Color(0xFF03045E);
   final Color _borderColor = const Color(0xFF5C6BC0);
-  final Color _accentColor = const Color(0xFFC8DB2C);
 
   @override
   void initState() {
@@ -75,7 +74,7 @@ class _PollFormPageState extends State<PollFormPage> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: _primaryTextColor, width: 2.0),
+        borderSide: BorderSide(color: AppColors.kSecondaryNavy, width: 2.0),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -101,7 +100,7 @@ class _PollFormPageState extends State<PollFormPage> {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: _primaryTextColor),
+          icon: Icon(Icons.arrow_back_ios_new, color: AppColors.kSecondaryNavy),
           onPressed: () => Navigator.pop(context),
         ),
         title: Image.asset(
@@ -145,7 +144,7 @@ class _PollFormPageState extends State<PollFormPage> {
                       style: GoogleFonts.poppins(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: _primaryTextColor,
+                        color: AppColors.kSecondaryNavy,
                       ),
                     ),
                   ),
@@ -165,7 +164,7 @@ class _PollFormPageState extends State<PollFormPage> {
                     "Question",
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w600,
-                      color: _primaryTextColor,
+                      color: AppColors.kSecondaryNavy,
                       fontSize: 14,
                     ),
                   ),
@@ -186,7 +185,7 @@ class _PollFormPageState extends State<PollFormPage> {
                         "Options",
                         style: GoogleFonts.poppins(
                           fontWeight: FontWeight.w600,
-                          color: _primaryTextColor,
+                          color: AppColors.kSecondaryNavy,
                           fontSize: 14,
                         ),
                       ),
@@ -197,14 +196,14 @@ class _PollFormPageState extends State<PollFormPage> {
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           child: Row(
                             children: [
-                              Icon(Icons.add_circle, color: _primaryTextColor, size: 16),
+                              Icon(Icons.add_circle, color: AppColors.kSecondaryNavy, size: 16),
                               const SizedBox(width: 4),
                               Text(
                                 "Add Option",
                                 style: GoogleFonts.poppins(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
-                                    color: _primaryTextColor
+                                    color: AppColors.kSecondaryNavy
                                 ),
                               ),
                             ],
@@ -271,8 +270,8 @@ class _PollFormPageState extends State<PollFormPage> {
                           }
 
                           final url = isEdit
-                              ? "http://127.0.0.1:8000/landingpoll/edit/${widget.poll!.id}/"
-                              : "http://127.0.0.1:8000/landingpoll/create/";
+                              ? "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//landingpoll/edit/${widget.poll!.id}/"
+                              : "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//landingpoll/create/";
 
                           try {
                             final response = await request.post(url, {
@@ -298,14 +297,14 @@ class _PollFormPageState extends State<PollFormPage> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _accentColor,
-                        foregroundColor: _primaryTextColor,
+                        backgroundColor: AppColors.kAccentLime,
+                        foregroundColor: AppColors.kSecondaryNavy,
                         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
                         elevation: 4,
-                        shadowColor: _accentColor.withOpacity(0.4),
+                        shadowColor: AppColors.kAccentLime.withOpacity(0.4),
                       ),
                       child: Text(
                         "SAVE POLL",

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wikilympics/Razan/models/forum_entry.dart';
 import 'package:wikilympics/Razan/Screens/add_forum.dart';
+import 'package:wikilympics/app_colors.dart';
 
 class ForumEntryCard extends StatefulWidget {
   final ForumEntry forum;
@@ -75,7 +76,7 @@ class _ForumEntryCardState extends State<ForumEntryCard> {
                 final isSuperuser = prefs.getBool('is_superuser') ?? false;
                 
                 final response = await request.post(
-                  'http://127.0.0.1:8000/forum_section/forum/${widget.forum.pk}/delete/',
+                  'https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//forum_section/forum/${widget.forum.pk}/delete/',
                   {
                     '_method': 'DELETE',
                     'user_id': currentUserId.toString(),
@@ -235,7 +236,7 @@ class _ThumbnailImage extends StatelessWidget {
         return Container(
           width: 80,
           height: 80,
-          color: const Color(0xFFE6EC4C),
+          color: AppColors.kAccentLime,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -257,7 +258,7 @@ class _ThumbnailImage extends StatelessWidget {
         return Container(
           width: 80,
           height: 80,
-          color: const Color(0xFFE6EC4C),
+          color: AppColors.kAccentLime,
           child: Center(
             child: CircularProgressIndicator(
               value: loadingProgress.expectedTotalBytes != null

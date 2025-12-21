@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:wikilympics/landingpoll/screens/menu.dart'; // Ini adalah MyHomePage kamu
+import 'package:wikilympics/app_colors.dart';
+import 'package:wikilympics/landingpoll/screens/menu.dart';
 import 'package:wikilympics/screens/login.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -14,31 +15,28 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final _passwordController = TextEditingController();
-  final String baseUrl = "http://127.0.0.1:8000/auth";
-  bool _isObscure = true; // Untuk toggle lihat/sembunyi password
+  final String baseUrl = "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//auth";
+  bool _isObscure = true; 
 
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
-    
-    const Color kNavy = Color(0xFF03045E);
-    const Color kLime = Color(0xFFD9E74C);
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text("My Profile", 
-          style: GoogleFonts.poppins(color: kNavy, fontWeight: FontWeight.bold, fontSize: 18)),
+          style: GoogleFonts.poppins(color: AppColors.kSecondaryNavy, fontWeight: FontWeight.bold, fontSize: 18)),
         backgroundColor: Colors.white,
         elevation: 0.5,
-        iconTheme: const IconThemeData(color: kNavy),
+        iconTheme: const IconThemeData(color: AppColors.kSecondaryNavy),
       ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 30),
           child: !request.loggedIn 
-            ? _buildGuestContent(kNavy) 
-            : _buildProfileContent(request, kNavy, kLime),
+            ? _buildGuestContent(AppColors.kSecondaryNavy) 
+            : _buildProfileContent(request, AppColors.kSecondaryNavy, AppColors.kAccentLime),
         ),
       ),
     );
@@ -90,7 +88,7 @@ class _ProfilePageState extends State<ProfilePage> {
         const SizedBox(height: 12),
         TextField(
           controller: _passwordController,
-          obscureText: _isObscure, // Logic lihat password
+          obscureText: _isObscure, 
           decoration: InputDecoration(
             hintText: "Enter new password",
             filled: true,
@@ -121,13 +119,13 @@ class _ProfilePageState extends State<ProfilePage> {
               return;
             }
 
-            final response = await request.post("http://127.0.0.1:8000/auth/edit-profile/", {
+            final response = await request.post("https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//auth/edit-profile/", {
               'password': _passwordController.text,
             });
 
             if (response['status'] == 'success') {
               if (context.mounted) {
-                _passwordController.clear(); // Bersihkan field setelah save
+                _passwordController.clear(); 
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text("Password updated!"),
@@ -148,10 +146,9 @@ class _ProfilePageState extends State<ProfilePage> {
         
         const SizedBox(height: 40),
         
-        // LOGOUT: Balik ke MyHomePage (Landing Page)
         ListTile(
           onTap: () async {
-            final response = await request.logout("http://127.0.0.1:8000/auth/logout/");
+            final response = await request.logout("https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//auth/logout/");
             if (response['status'] == true) {
               request.jsonData.clear(); 
               if (context.mounted) {
@@ -168,7 +165,6 @@ class _ProfilePageState extends State<ProfilePage> {
           title: const Text("Logout", style: TextStyle(color: Color(0xFF03045E), fontWeight: FontWeight.w600)),
         ),
 
-        // DELETE ACCOUNT
         ListTile(
           onTap: () => _confirmDelete(context, request, navy),
           leading: const Icon(Icons.delete_forever, color: Colors.red),
@@ -189,7 +185,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
-              final response = await request.post("http://127.0.0.1:8000/auth/delete-account/", {});
+              final response = await request.post("https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//auth/delete-account/", {});
               if (response['status'] == 'success') {
                 request.jsonData.clear();
                 if (context.mounted) {

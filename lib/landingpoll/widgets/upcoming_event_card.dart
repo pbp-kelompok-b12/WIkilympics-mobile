@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wikilympics/app_colors.dart';
 
 class UpcomingEventCard extends StatelessWidget {
   final Widget image;
@@ -57,7 +58,7 @@ class UpcomingEventCard extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFC8DB2C),
+                          color: AppColors.kAccentLime,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Text(
@@ -82,7 +83,7 @@ class UpcomingEventCard extends StatelessWidget {
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF01203F),
+                          color: AppColors.kPrimaryNavy,
                           height: 1.3,
                         ),
                       ),

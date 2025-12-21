@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wikilympics/app_colors.dart';
 
 class AllMenuPage extends StatelessWidget {
   const AllMenuPage({super.key});
@@ -13,11 +14,11 @@ class AllMenuPage extends StatelessWidget {
         title: Text(
           "Menu",
           style: GoogleFonts.poppins(
-            color: const Color(0xFF01203F),
+            color: AppColors.kPrimaryNavy,
             fontWeight: FontWeight.w600,
           ),
         ),
-        iconTheme: const IconThemeData(color: Color(0xFF01203F)),
+        iconTheme: const IconThemeData(color: AppColors.kPrimaryNavy),
       ),
       body: ListView(
         padding: const EdgeInsets.all(20),
@@ -40,13 +41,13 @@ class AllMenuPage extends StatelessWidget {
       child: ListTile(
         tileColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        leading: Icon(icon, color: const Color(0xFF01203F)),
+        leading: Icon(icon, color: AppColors.kPrimaryNavy),
         title: Text(
           title,
           style: GoogleFonts.poppins(
             fontSize: 15,
             fontWeight: FontWeight.w500,
-            color: const Color(0xFF01203F),
+            color: AppColors.kPrimaryNavy,
           ),
         ),
         onTap: onTap,

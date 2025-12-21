@@ -6,6 +6,7 @@ import 'package:wikilympics/Razan/models/forum_entry.dart';
 import 'package:wikilympics/Razan/models/discussion_entry.dart';
 import 'package:wikilympics/Razan/Screens/discussion_entry_card.dart';
 import 'package:wikilympics/Razan/Screens/add_discussion.dart';
+import 'package:wikilympics/app_colors.dart';
 import 'package:wikilympics/widgets/left_drawer.dart';
 import 'package:wikilympics/Razan/Screens/add_forum.dart';
 
@@ -49,7 +50,7 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
   }
 
   Future<List<DiscussionEntry>> fetchDiscussions(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/forum_section/forums/json-dis/');
+    final response = await request.get('https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//forum_section/forums/json-dis/');
 
     List<DiscussionEntry> listDiscussions = [];
     for (var d in response) {
@@ -163,7 +164,7 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFFE6EC4C),
+        backgroundColor: AppColors.kAccentLime,
         onPressed: () async {
           final result = await Navigator.push(
             context,

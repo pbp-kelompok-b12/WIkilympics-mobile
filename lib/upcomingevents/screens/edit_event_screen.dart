@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wikilympics/app_colors.dart';
 import 'package:wikilympics/upcomingevents/models/events_entry.dart';
 
 class EditEventScreen extends StatefulWidget {
@@ -34,7 +35,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
     final request = context.read<CookieRequest>();
     if (_formKey.currentState!.validate() && _selectedDate != null) {
       final response = await request.post(
-        'http://127.0.0.1:8000/upcoming_event/edit-event-flutter/${widget.event.id}/',
+        'https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//upcoming_event/edit-event-flutter/${widget.event.id}/',
         {
           'name': _eventNameController.text,
           'organizer': _organizerController.text,
@@ -74,7 +75,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Edit Event', style: GoogleFonts.poppins(color: const Color(0xFF03045E), fontWeight: FontWeight.bold)),
+        title: Text('Edit Event', style: GoogleFonts.poppins(color: AppColors.kSecondaryNavy, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(icon: const Icon(Icons.arrow_back, color: Colors.black), onPressed: () => Navigator.pop(context)),
@@ -107,9 +108,9 @@ class _EditEventScreenState extends State<EditEventScreen> {
                     },
                     decoration: InputDecoration(
                       hintText: _selectedDate == null ? 'Select Date' : DateFormat('dd/MM/yyyy').format(_selectedDate!),
-                      suffixIcon: const Icon(Icons.calendar_today, color: Color(0xFF03045E)),
-                      enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xFF03045E)), borderRadius: BorderRadius.circular(12)),
-                      focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xFF03045E), width: 2), borderRadius: BorderRadius.circular(12)),
+                      suffixIcon: const Icon(Icons.calendar_today, color: AppColors.kSecondaryNavy),
+                      enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: AppColors.kSecondaryNavy), borderRadius: BorderRadius.circular(12)),
+                      focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: AppColors.kSecondaryNavy, width: 2), borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
                   _buildLabel("Sport"),
@@ -146,7 +147,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
 
   Widget _buildLabel(String text) => Padding(
     padding: const EdgeInsets.only(top: 16, bottom: 8),
-    child: Text(text, style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: const Color(0xFF03045E))),
+    child: Text(text, style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: AppColors.kSecondaryNavy)),
   );
 
   Widget _buildTextField(TextEditingController controller, String hint, {int maxLines = 1, bool isOptional = false}) => TextFormField(
@@ -162,8 +163,8 @@ class _EditEventScreenState extends State<EditEventScreen> {
     },
     decoration: InputDecoration(
       hintText: hint,
-      enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xFF03045E)), borderRadius: BorderRadius.circular(12)),
-      focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xFF03045E), width: 2), borderRadius: BorderRadius.circular(12)),
+      enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: AppColors.kSecondaryNavy), borderRadius: BorderRadius.circular(12)),
+      focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: AppColors.kSecondaryNavy, width: 2), borderRadius: BorderRadius.circular(12)),
     ),
   );
 }

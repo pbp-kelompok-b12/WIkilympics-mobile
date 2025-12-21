@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:wikilympics/app_colors.dart';
 import 'package:wikilympics/upcomingevents/models/events_entry.dart';
 import 'package:wikilympics/upcomingevents/widgets/events_card.dart';
 import 'package:wikilympics/upcomingevents/screens/add_event_screen.dart';
@@ -19,7 +20,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
   String _searchQuery = "";
 
   Future<List<EventEntry>> fetchEvents(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/upcoming_event/json/');
+    final response = await request.get('https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//upcoming_event/json/');
     List<EventEntry> events = [];
     for (var item in response) {
       events.add(EventEntry.fromJson(item));
@@ -29,7 +30,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
 
   void _deleteEvent(CookieRequest request, int id) async {
     final response = await request.post(
-      'http://127.0.0.1:8000/upcoming_event/delete-event-flutter/$id/',
+      'https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//upcoming_event/delete-event-flutter/$id/',
       {},
     );
 
@@ -60,25 +61,14 @@ class _EventsListScreenState extends State<EventsListScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
+      
       appBar: AppBar(
-        title: Image.asset(
-          'assets/wikilympics_banner.png',
-          height: 60,
-          fit: BoxFit.contain,
-          errorBuilder: (ctx, _, __) => Text(
-            "WikiLympics",
-            style: GoogleFonts.orbitron(
-              color: const Color(0xFF03045E),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        backgroundColor: Colors.white,
+        title: Image.asset('assets/wikilympics_banner.png', height: 60, fit: BoxFit.contain),
+        backgroundColor: AppColors.kBgGrey,
+        iconTheme: IconThemeData(color: AppColors.kPrimaryNavy),
         elevation: 0,
-        centerTitle: true,
-        // iconTheme
-        iconTheme: const IconThemeData(color: Color(0xFF03045E)),
       ),
+
       //  drawer navigasi
       drawer: const LeftDrawer(),
       body: Column(

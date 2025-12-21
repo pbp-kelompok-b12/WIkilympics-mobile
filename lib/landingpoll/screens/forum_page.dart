@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wikilympics/app_colors.dart';
 
 class ForumPage extends StatelessWidget {
   const ForumPage({super.key});
@@ -13,11 +14,11 @@ class ForumPage extends StatelessWidget {
         title: Text(
           "Forum & Review",
           style: GoogleFonts.poppins(
-            color: const Color(0xFF01203F),
+            color: AppColors.kPrimaryNavy,
             fontWeight: FontWeight.w600,
           ),
         ),
-        iconTheme: const IconThemeData(color: Color(0xFF01203F)),
+        iconTheme: const IconThemeData(color: AppColors.kPrimaryNavy),
       ),
       body: Center(
         child: Text(
@@ -25,7 +26,7 @@ class ForumPage extends StatelessWidget {
           textAlign: TextAlign.center,
           style: GoogleFonts.poppins(
             fontSize: 16,
-            color: const Color(0xFF01203F),
+            color: AppColors.kPrimaryNavy,
           ),
         ),
       ),

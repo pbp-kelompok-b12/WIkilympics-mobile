@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wikilympics/app_colors.dart';
 import 'package:wikilympics/article/models/article_entry.dart';
 
 class TrendingCard extends StatelessWidget {
@@ -66,7 +67,7 @@ class TrendingCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFD9E74C),
+                        color: AppColors.kAccentLime,
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -74,12 +75,12 @@ class TrendingCard extends StatelessWidget {
                         style: GoogleFonts.poppins(
                           fontSize: 8,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF03045E),
+                          color: AppColors.kSecondaryNavy,
                         ),
                       ),
                     ),
                     const SizedBox(height: 6),
-                    // Judul (Dibuat Bold dan Putih)
+                    // Judul
                     Text(
                       article.title,
                       maxLines: 2,

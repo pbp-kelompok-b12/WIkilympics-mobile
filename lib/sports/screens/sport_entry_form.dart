@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:wikilympics/app_colors.dart';
 import 'package:wikilympics/sports/models/sport_entry.dart';
 
 class SportEntryFormPage extends StatefulWidget {
@@ -27,10 +28,6 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
   String _countryFlagImg = "";
   String _sportDescription = "";
   String _historyDescription = "";
-
-  final Color kPrimaryNavy = const Color(0xFF03045E);
-  final Color kAccentLime = const Color(0xFFD9E74C);
-  final Color kBgGrey = const Color(0xFFF9F9F9);
 
   final List<String> _sportTypes = [
     'water_sport',
@@ -88,17 +85,17 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
     return InputDecoration(
       hintText: hint,
       hintStyle: GoogleFonts.poppins(color: Colors.grey[500], fontSize: 14),
-      prefixIcon: Icon(icon, color: kPrimaryNavy),
+      prefixIcon: Icon(icon, color: AppColors.kSecondaryNavy),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       fillColor: Colors.white,
       filled: true,
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: kPrimaryNavy, width: 1.0),
+        borderSide: BorderSide(color: AppColors.kSecondaryNavy, width: 1.0),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: kPrimaryNavy, width: 2.0),
+        borderSide: BorderSide(color: AppColors.kSecondaryNavy, width: 2.0),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
@@ -120,7 +117,7 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
         alignment: Alignment.topCenter,
         child: Transform.translate(
           offset: const Offset(0, 0),
-          child: Icon(icon, color: kPrimaryNavy),
+          child: Icon(icon, color: AppColors.kSecondaryNavy),
         ),
       ),
     );
@@ -132,13 +129,13 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
     final isEdit = widget.sportEntry != null;
 
     return Scaffold(
-      backgroundColor: kBgGrey,
+      backgroundColor: AppColors.kBgGrey,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        backgroundColor: kBgGrey,
+        backgroundColor: AppColors.kBgGrey,
         elevation: 0,
       ),
       body: Center(
@@ -170,7 +167,7 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
                       style: GoogleFonts.poppins(
                         fontSize: 26,
                         fontWeight: FontWeight.w700,
-                        color: kPrimaryNavy,
+                        color: AppColors.kSecondaryNavy,
                       ),
                     ),
                   ),
@@ -178,7 +175,7 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
                   TextFormField(
                     initialValue: _sportName,
                     decoration: _buildInputDecoration("Sport Name", Icons.sports_soccer),
-                    style: GoogleFonts.poppins(color: kPrimaryNavy),
+                    style: GoogleFonts.poppins(color: AppColors.kSecondaryNavy),
                     onChanged: (value) => _sportName = value,
                     validator: (value) {
                         if (value == null || value.isEmpty) return "Name cannot be empty!";
@@ -193,7 +190,7 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
                         child: DropdownButtonFormField<String>(
                           decoration: _buildInputDecoration("Type", Icons.category),
                           value: _sportType,
-                          icon: Icon(Icons.arrow_drop_down, color: kPrimaryNavy),
+                          icon: Icon(Icons.arrow_drop_down, color: AppColors.kSecondaryNavy),
                           isExpanded: true,
                           items: _sportTypes
                               .map((t) => DropdownMenuItem(
@@ -213,7 +210,7 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
                         child: DropdownButtonFormField<String>(
                           decoration: _buildInputDecoration("Partic.", Icons.groups),
                           value: _participation,
-                          icon: Icon(Icons.arrow_drop_down, color: kPrimaryNavy),
+                          icon: Icon(Icons.arrow_drop_down, color: AppColors.kSecondaryNavy),
                           isExpanded: true,
                           items: _participations
                               .map((p) => DropdownMenuItem(
@@ -233,7 +230,7 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
                   TextFormField(
                     initialValue: _countryOfOrigin,
                     decoration: _buildInputDecoration("Country of Origin", Icons.public),
-                    style: GoogleFonts.poppins(color: kPrimaryNavy),
+                    style: GoogleFonts.poppins(color: AppColors.kSecondaryNavy),
                     onChanged: (value) => _countryOfOrigin = value,
                     validator: (value) {
                         if (value == null || value.isEmpty) return "Country cannot be empty!";
@@ -247,7 +244,7 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
                     decoration: _buildInputDecoration(
                         "First Year Played (e.g., 1890)", Icons.calendar_month),
                     keyboardType: TextInputType.number,
-                    style: GoogleFonts.poppins(color: kPrimaryNavy),
+                    style: GoogleFonts.poppins(color: AppColors.kSecondaryNavy),
                     onChanged: (value) => _firstYearPlayed = value,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -268,7 +265,7 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
                   TextFormField(
                     initialValue: _equipment,
                     decoration: _buildInputDecoration("Equipment", Icons.fitness_center),
-                    style: GoogleFonts.poppins(color: kPrimaryNavy),
+                    style: GoogleFonts.poppins(color: AppColors.kSecondaryNavy),
                     onChanged: (value) => _equipment = value,
                     validator: (value) =>
                         (value == null || value.isEmpty) ? "Equipment cannot be empty!" : null,
@@ -280,7 +277,7 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
                         child: TextFormField(
                           initialValue: _sportImg,
                           decoration: _buildInputDecoration("Sport Img URL", Icons.image),
-                          style: GoogleFonts.poppins(color: kPrimaryNavy),
+                          style: GoogleFonts.poppins(color: AppColors.kSecondaryNavy),
                           onChanged: (value) => _sportImg = value,
                           validator: _validateUrl,
                         ),
@@ -290,7 +287,7 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
                         child: TextFormField(
                           initialValue: _countryFlagImg,
                           decoration: _buildInputDecoration("Flag Img URL", Icons.flag),
-                          style: GoogleFonts.poppins(color: kPrimaryNavy),
+                          style: GoogleFonts.poppins(color: AppColors.kSecondaryNavy),
                           onChanged: (value) => _countryFlagImg = value,
                           validator: _validateUrl,
                         ),
@@ -302,7 +299,7 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
                     initialValue: _sportDescription,
                     maxLines: 4,
                     decoration: _buildMultilineDecoration("Sport Description", Icons.description),
-                    style: GoogleFonts.poppins(color: kPrimaryNavy),
+                    style: GoogleFonts.poppins(color: AppColors.kSecondaryNavy),
                     onChanged: (value) => _sportDescription = value,
                     validator: (value) =>
                         (value == null || value.isEmpty) ? "Description cannot be empty!" : null,
@@ -312,7 +309,7 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
                     initialValue: _historyDescription,
                     maxLines: 4,
                     decoration: _buildMultilineDecoration("History Description", Icons.history_edu),
-                    style: GoogleFonts.poppins(color: kPrimaryNavy),
+                    style: GoogleFonts.poppins(color: AppColors.kSecondaryNavy),
                     onChanged: (value) => _historyDescription = value,
                     validator: (value) =>
                         (value == null || value.isEmpty) ? "History cannot be empty!" : null,
@@ -325,8 +322,8 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
                       height: 45,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: kAccentLime,
-                          foregroundColor: kPrimaryNavy,
+                          backgroundColor: AppColors.kAccentLime,
+                          foregroundColor: AppColors.kSecondaryNavy,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -364,11 +361,11 @@ class _SportEntryFormPageState extends State<SportEntryFormPage> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(isEdit ? "Data updated!" : "Sport added!"),
-                                    backgroundColor: kAccentLime,
+                                    backgroundColor: AppColors.kAccentLime,
                                     behavior: SnackBarBehavior.floating,
                                     action: SnackBarAction(
                                         label: 'OK',
-                                        textColor: kPrimaryNavy,
+                                        textColor: AppColors.kSecondaryNavy,
                                         onPressed: () {}),
                                   ),
                                 );

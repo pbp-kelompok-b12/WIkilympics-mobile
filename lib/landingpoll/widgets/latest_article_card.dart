@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wikilympics/app_colors.dart';
 
 class LatestArticleCard extends StatelessWidget {
   final String imageUrl;
   final String title;
-  final String author; // Category
+  final String author;
   final String date;
   final VoidCallback? onTap;
 
@@ -19,8 +20,8 @@ class LatestArticleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color navyColor = const Color(0xFF01203F);
-    final Color limeColor = const Color(0xFFC8DB2C);
+    // final Color AppColors.kPrimaryNavy = const Color(0xFF01203F);
+    // final Color AppColors.kAccentLime = const Color(0xFFC8DB2C);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
@@ -38,7 +39,7 @@ class LatestArticleCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
         child: Material(
-          color: navyColor,
+          color: AppColors.kPrimaryNavy,
           child: InkWell(
             onTap: onTap,
             child: Stack(
@@ -48,7 +49,7 @@ class LatestArticleCard extends StatelessWidget {
                     imageUrl,
                     fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) => Container(
-                      color: navyColor,
+                      color: AppColors.kPrimaryNavy,
                       child: Icon(Icons.broken_image, color: Colors.white24, size: 50),
                     ),
                   ),
@@ -62,8 +63,8 @@ class LatestArticleCard extends StatelessWidget {
                         end: Alignment.bottomCenter,
                         colors: [
                           Colors.transparent,
-                          navyColor.withOpacity(0.4),
-                          navyColor.withOpacity(0.95),
+                          AppColors.kPrimaryNavy.withOpacity(0.4),
+                          AppColors.kPrimaryNavy.withOpacity(0.95),
                         ],
                         stops: const [0.3, 0.65, 1.0],
                       ),
@@ -77,7 +78,7 @@ class LatestArticleCard extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                        color: limeColor.withOpacity(0.9),
+                        color: AppColors.kAccentLime.withOpacity(0.9),
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
@@ -92,7 +93,7 @@ class LatestArticleCard extends StatelessWidget {
                       style: GoogleFonts.poppins(
                         fontSize: 10,
                         fontWeight: FontWeight.w800,
-                        color: navyColor,
+                        color: AppColors.kPrimaryNavy,
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -109,7 +110,7 @@ class LatestArticleCard extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.calendar_today_rounded, size: 12, color: limeColor),
+                          Icon(Icons.calendar_today_rounded, size: 12, color: AppColors.kAccentLime),
                           const SizedBox(width: 6),
                           Text(
                             date,
@@ -144,12 +145,12 @@ class LatestArticleCard extends StatelessWidget {
                             "Read More",
                             style: GoogleFonts.poppins(
                               fontSize: 12,
-                              color: limeColor,
+                              color: AppColors.kAccentLime,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                           const SizedBox(width: 4),
-                          Icon(Icons.arrow_forward_rounded, color: limeColor, size: 16),
+                          Icon(Icons.arrow_forward_rounded, color: AppColors.kAccentLime, size: 16),
                         ],
                       ),
                     ],

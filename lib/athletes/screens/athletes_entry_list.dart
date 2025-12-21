@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wikilympics/app_colors.dart';
 
 import 'package:wikilympics/widgets/left_drawer.dart';
 import 'package:wikilympics/athletes/models/athlete_entry.dart';
@@ -18,12 +19,6 @@ class AthleteEntryListPage extends StatefulWidget {
 }
 
 class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
-  // Color Palette
-  final Color kPrimaryBlue = const Color(0xFF1E3CC8);
-  final Color kAccentYellow = const Color(0xFFFFD700);
-  final Color kBgWhite = const Color(0xFFF9F9F9);
-  final Color kDarkNavy = const Color(0xFF0B162C);
-
   // State Variables
   bool _isAdmin = false;
   String _searchQuery = "";
@@ -46,7 +41,7 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
     if (request.loggedIn) {
       try {
         final response = await request.get(
-          "http://127.0.0.1:8000/auth/status/",
+          "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//auth/status/",
         );
         setState(() {
           _isAdmin = response['is_superuser'] ?? false;
@@ -61,7 +56,7 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
     final request = context.read<CookieRequest>();
     try {
       final response = await request.get(
-        'http://127.0.0.1:8000/athletes/json/',
+        'https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//athletes/json/',
       );
 
       Set<String> sports = {};
@@ -86,7 +81,7 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
     try {
       print("Fetching athletes from Django...");
       final response = await request.get(
-        'http://127.0.0.1:8000/athletes/flutter/',
+        'https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//athletes/flutter/',
       );
 
       print("Response type: ${response.runtimeType}");
@@ -154,7 +149,7 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
-      backgroundColor: kBgWhite,
+      backgroundColor: AppColors.kBgGrey,
       appBar: AppBar(
         title: Image.asset(
           'assets/wikilympics_banner.png',
@@ -163,13 +158,13 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
           errorBuilder: (ctx, _, __) => Text(
             "WikiLympics Athletes",
             style: GoogleFonts.poppins(
-              color: kPrimaryBlue,
+              color: AppColors.kSecondaryNavy,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        backgroundColor: kBgWhite,
-        iconTheme: IconThemeData(color: kPrimaryBlue),
+        backgroundColor: AppColors.kBgGrey,
+        iconTheme: IconThemeData(color: AppColors.kSecondaryNavy),
         elevation: 0,
       ),
       drawer: const LeftDrawer(),
@@ -187,12 +182,12 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
               label: Text(
                 "ADD ATHLETE",
                 style: GoogleFonts.poppins(
-                  color: kPrimaryBlue,
+                  color: AppColors.kSecondaryNavy,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              icon: Icon(Icons.add, color: kPrimaryBlue),
-              backgroundColor: kAccentYellow,
+              icon: Icon(Icons.add, color: AppColors.kSecondaryNavy),
+              backgroundColor: AppColors.kAccentLime,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -206,7 +201,7 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(30, 10, 30, 7),
             decoration: BoxDecoration(
-              color: kBgWhite,
+              color: AppColors.kBgGrey,
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(24),
                 bottomRight: Radius.circular(24),
@@ -234,7 +229,7 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
                     onChanged: (val) =>
                         setState(() => _searchQuery = val.toLowerCase()),
                     decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.search, color: kPrimaryBlue),
+                      prefixIcon: Icon(Icons.search, color: AppColors.kSecondaryNavy),
                       hintText: "Search athletes...",
                       hintStyle: GoogleFonts.poppins(
                         color: Colors.black87,
@@ -265,7 +260,7 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
                           isExpanded: true,
                           icon: Icon(
                             Icons.arrow_drop_down,
-                            color: kPrimaryBlue,
+                            color: AppColors.kSecondaryNavy,
                           ),
                           hint: Text(
                             "All Sports",
@@ -313,7 +308,7 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
                           isExpanded: true,
                           icon: Icon(
                             Icons.arrow_drop_down,
-                            color: kPrimaryBlue,
+                            color: AppColors.kSecondaryNavy,
                           ),
                           hint: Text(
                             "All Countries",
@@ -354,7 +349,7 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
                     style: GoogleFonts.poppins(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      color: kPrimaryBlue,
+                      color: AppColors.kSecondaryNavy,
                       letterSpacing: -0.5,
                     ),
                   ),
@@ -388,7 +383,7 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
                               child: Text(
                                 "Clear Filters",
                                 style: GoogleFonts.poppins(
-                                  color: kPrimaryBlue,
+                                  color: AppColors.kSecondaryNavy,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -421,7 +416,7 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
                           'No athletes yet.',
                           style: GoogleFonts.poppins(
                             fontSize: 20,
-                            color: kPrimaryBlue,
+                            color: AppColors.kSecondaryNavy,
                           ),
                         ),
                         if (_isAdmin)
@@ -439,8 +434,8 @@ class _AthleteEntryListPageState extends State<AthleteEntryListPage> {
                                 _refreshAthletes();
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: kAccentYellow,
-                                foregroundColor: kPrimaryBlue,
+                                backgroundColor: AppColors.kAccentLime,
+                                foregroundColor: AppColors.kSecondaryNavy,
                               ),
                               child: Text(
                                 "Add First Athlete",

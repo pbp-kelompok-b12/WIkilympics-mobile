@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wikilympics/app_colors.dart';
 import 'package:wikilympics/article/models/article_entry.dart';
 import 'package:intl/intl.dart';
 import 'package:wikilympics/article/screens/article_form.dart';
@@ -41,7 +42,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
   Future<void> _checkAdminStatus() async {
     final request = context.read<CookieRequest>();
     if (request.loggedIn) {
-      final response = await request.get("http://127.0.0.1:8000/auth/status/");
+      final response = await request.get("https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//auth/status/");
       if (mounted) {
         setState(() {
           _isAdmin = response['is_superuser'] ?? false;
@@ -53,7 +54,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
   Future<void> _refreshArticleData() async {
     final request = context.read<CookieRequest>();
     try {
-      final response = await request.get('http://127.0.0.1:8000/article/json/');
+      final response = await request.get('https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//article/json/');
       for (var item in response) {
         if (item['id'] == _article.id) {
           setState(() {
@@ -89,7 +90,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
 
     if (confirm == true) {
       final response = await request.postJson(
-        'http://127.0.0.1:8000/article/delete-flutter/${_article.id}/',
+        'https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//article/delete-flutter/${_article.id}/',
         null,
       );
       if (mounted && response['status'] == 'success') {
@@ -118,7 +119,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
 
     try {
       final response = await request.post(
-        'http://127.0.0.1:8000/article/like/${_article.id}/',
+        'https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//article/like/${_article.id}/',
         {},
       );
 
@@ -151,16 +152,13 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
     final formattedDate = DateFormat('MMMM dd, yyyy').format(_article.created);
-    const Color kNavyColor = Color(0xFF0F1929);
-    const Color kLimeColor = Color(0xFFD2F665);
-    const Color kDarkBlue = Color(0xFF162235);
 
     return Scaffold(
-      backgroundColor: kNavyColor,
+      backgroundColor: AppColors.kPrimaryNavy,
       bottomNavigationBar: Container(
         padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
         decoration: BoxDecoration(
-          color: kNavyColor,
+          color: AppColors.kPrimaryNavy,
           border: Border(top: BorderSide(color: Colors.white.withOpacity(0.05))),
         ),
         child: InkWell(
@@ -170,18 +168,18 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
             duration: const Duration(milliseconds: 300),
             height: 56,
             decoration: BoxDecoration(
-              color: _isUpvoting ? Colors.grey : kLimeColor,
+              color: _isUpvoting ? Colors.grey : AppColors.kAccentLime,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 _isUpvoting 
-                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: kNavyColor, strokeWidth: 2))
-                  : const Icon(Icons.thumb_up_alt_rounded, color: kNavyColor),
+                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: AppColors.kPrimaryNavy, strokeWidth: 2))
+                  : const Icon(Icons.thumb_up_alt_rounded, color: AppColors.kPrimaryNavy),
                 const SizedBox(width: 12),
                 Text(_isUpvoting ? "PROCESSING..." : "UPVOTE THIS ARTICLE",
-                  style: const TextStyle(color: kNavyColor, fontWeight: FontWeight.w900)),
+                  style: const TextStyle(color: AppColors.kPrimaryNavy, fontWeight: FontWeight.w900)),
               ],
             ),
           ),
@@ -194,7 +192,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
             expandedHeight: 380,
             pinned: true,
             stretch: true,
-            backgroundColor: kNavyColor,
+            backgroundColor: AppColors.kPrimaryNavy,
             leading: Padding(
               padding: const EdgeInsets.all(8.0),
               child: CircleAvatar(
@@ -215,7 +213,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                     backgroundColor: Colors.black38,
                     child: PopupMenuButton<String>(
                       icon: const Icon(Icons.more_vert, color: Colors.white),
-                      color: kDarkBlue,
+                      color: AppColors.kDarkBlueDetail,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       onSelected: (value) async {
                         if (value == 'edit') {
@@ -267,7 +265,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [Colors.black45, Colors.transparent, kNavyColor],
+                        colors: [Colors.black45, Colors.transparent, AppColors.kPrimaryNavy],
                         stops: [0.0, 0.4, 1.0],
                       ),
                     ),
@@ -288,7 +286,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
                 decoration: BoxDecoration(
-                  color: kDarkBlue,
+                  color: AppColors.kDarkBlueDetail,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: Colors.white.withOpacity(0.05)),
                 ),
@@ -305,7 +303,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                             );
                           }
                         },
-                        child: _buildStatItem(Icons.category, "CATEGORY", _article.category.toUpperCase(), kLimeColor),
+                        child: _buildStatItem(Icons.category, "CATEGORY", _article.category.toUpperCase(), AppColors.kAccentLime),
                       ),
                     ),
                     _buildDivider(),
@@ -327,7 +325,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      Container(width: 4, height: 16, color: kLimeColor),
+                      Container(width: 4, height: 16, color: AppColors.kAccentLime),
                       const SizedBox(width: 10),
                       const Text("STORY COVERAGE",
                         style: TextStyle(color: Colors.white54, letterSpacing: 2, fontWeight: FontWeight.bold, fontSize: 11)),
@@ -408,7 +406,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
 
     try {
       // Ambil semua data sports
-      final response = await request.get('http://127.0.0.1:8000/sports/json/');
+      final response = await request.get('https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//sports/json/');
       
       SportEntry? targetSport;
       for (var item in response) {
@@ -418,7 +416,7 @@ class _ArticleDetailPageState extends State<ArticleDetailPage> {
         }
       }
 
-      if (mounted) Navigator.pop(context); // Hilangkan loading spinner
+      if (mounted) Navigator.pop(context);
 
       if (targetSport != null && mounted) {
         Navigator.push(

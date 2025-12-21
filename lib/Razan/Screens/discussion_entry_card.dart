@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wikilympics/Razan/models/discussion_entry.dart';
 import 'package:wikilympics/Razan/Screens/edit_discussion.dart';
+import 'package:wikilympics/app_colors.dart';
 
 class DiscussionEntryCard extends StatefulWidget {
   final DiscussionEntry discussion;
@@ -77,7 +78,7 @@ class _DiscussionEntryCardState extends State<DiscussionEntryCard> {
                 final isSuperuser = prefs.getBool('is_superuser') ?? false;
                 
                 final response = await request.post(
-                  'http://127.0.0.1:8000/forum_section/discussion/${widget.discussion.pk}/delete/',
+                  'https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//forum_section/discussion/${widget.discussion.pk}/delete/',
                   {
                     '_method': 'DELETE',
                     'user_id': currentUserId.toString(),
@@ -179,7 +180,7 @@ class _DiscussionEntryCardState extends State<DiscussionEntryCard> {
             Text(
               widget.discussion.fields.discuss,
               style: const TextStyle(fontSize: 15,
-              color: Color(0xFF03045e),)
+              color: AppColors.kSecondaryNavy)
               ,
               
             ),

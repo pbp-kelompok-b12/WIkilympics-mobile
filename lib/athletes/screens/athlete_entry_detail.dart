@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wikilympics/app_colors.dart';
 
 import 'package:wikilympics/athletes/models/athlete_entry.dart';
 import 'package:wikilympics/athletes/screens/athlete_entry_form.dart';
@@ -17,10 +18,6 @@ class AthleteDetailPage extends StatefulWidget {
 }
 
 class _AthleteDetailPageState extends State<AthleteDetailPage> {
-  // === COLOR PALETTE (SESUAI SPORTS) ===
-  static const Color kNavyColor = Color(0xFF0F1929);
-  static const Color kLimeColor = Color(0xFFD2F665);
-  static const Color kDarkBlue = Color(0xFF162235);
   static const Color kRedAlert = Color(0xFFFF4C4C);
 
   // === STATE VARIABLES ===
@@ -41,7 +38,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
     if (request.loggedIn) {
       try {
         final response = await request.get(
-          "http://127.0.0.1:8000/auth/status/",
+          "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//auth/status/",
         );
         if (mounted) {
           setState(() {
@@ -58,7 +55,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
     final request = context.read<CookieRequest>();
     try {
       final response = await request.get(
-        'http://127.0.0.1:8000/athletes/flutter/',
+        'https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//athletes/flutter/',
       );
 
       if (response is List) {
@@ -81,7 +78,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
                 "Data successfully updated!",
                 style: GoogleFonts.poppins(),
               ),
-              backgroundColor: kLimeColor,
+              backgroundColor: AppColors.kAccentLime,
               duration: const Duration(milliseconds: 1500),
             ),
           );
@@ -105,7 +102,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
     bool? confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: kDarkBlue,
+        backgroundColor: AppColors.kDarkBlueDetail,
         title: Text(
           "Delete Athlete",
           style: GoogleFonts.poppins(
@@ -155,7 +152,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
     if (confirm == true) {
       try {
         final response = await request.postJson(
-          'http://127.0.0.1:8000/athletes/flutter/${_athlete.pk}/delete/',
+          'https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//athletes/flutter/${_athlete.pk}/delete/',
           null,
         );
 
@@ -167,7 +164,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
                   "Athlete deleted successfully!",
                   style: GoogleFonts.poppins(),
                 ),
-                backgroundColor: kLimeColor,
+                backgroundColor: AppColors.kAccentLime,
                 duration: const Duration(seconds: 2),
               ),
             );
@@ -206,7 +203,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
     final f = _athlete.fields;
 
     return Scaffold(
-      backgroundColor: kNavyColor,
+      backgroundColor: AppColors.kPrimaryNavy,
 
       floatingActionButton: _isAdmin
           ? FloatingActionButton.extended(
@@ -220,8 +217,8 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
                 );
                 _refreshAthleteData();
               },
-              backgroundColor: kLimeColor,
-              foregroundColor: kNavyColor,
+              backgroundColor: AppColors.kAccentLime,
+              foregroundColor: AppColors.kPrimaryNavy,
               icon: const Icon(Icons.edit, size: 22),
               label: Text(
                 "EDIT DATA",
@@ -245,7 +242,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
             expandedHeight: 400,
             pinned: true,
             stretch: true,
-            backgroundColor: kNavyColor,
+            backgroundColor: AppColors.kPrimaryNavy,
             leading: Padding(
               padding: const EdgeInsets.only(left: 12),
               child: CircleAvatar(
@@ -290,16 +287,16 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
                           loadingBuilder: (context, child, loadingProgress) {
                             if (loadingProgress == null) return child;
                             return Container(
-                              color: kDarkBlue,
+                              color: AppColors.kDarkBlueDetail,
                               child: const Center(
                                 child: CircularProgressIndicator(
-                                  color: kLimeColor,
+                                  color: AppColors.kAccentLime,
                                 ),
                               ),
                             );
                           },
                           errorBuilder: (ctx, err, stack) => Container(
-                            color: kDarkBlue,
+                            color: AppColors.kDarkBlueDetail,
                             child: const Center(
                               child: Icon(
                                 Icons.person,
@@ -310,7 +307,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
                           ),
                         )
                       : Container(
-                          color: kDarkBlue,
+                          color: AppColors.kDarkBlueDetail,
                           child: const Center(
                             child: Icon(
                               Icons.person,
@@ -329,7 +326,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
                         colors: [
                           Colors.black45,
                           Colors.transparent,
-                          kNavyColor,
+                          AppColors.kPrimaryNavy,
                         ],
                         stops: [0.0, 0.5, 1.0],
                       ),
@@ -376,7 +373,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
                   horizontal: 15,
                 ),
                 decoration: BoxDecoration(
-                  color: kDarkBlue,
+                  color: AppColors.kDarkBlueDetail,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: Colors.white.withOpacity(0.05)),
                   boxShadow: [
@@ -401,10 +398,10 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
                               children: [
                                 CircleAvatar(
                                   radius: 10,
-                                  backgroundColor: kNavyColor,
+                                  backgroundColor: AppColors.kPrimaryNavy,
                                   child: const Icon(
                                     Icons.flag,
-                                    color: kLimeColor,
+                                    color: AppColors.kAccentLime,
                                     size: 14,
                                   ),
                                 ),
@@ -427,7 +424,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
                               children: [
                                 const Icon(
                                   Icons.person,
-                                  color: kLimeColor,
+                                  color: AppColors.kAccentLime,
                                   size: 14,
                                 ),
                                 const SizedBox(width: 5),
@@ -522,7 +519,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
   Widget _buildSectionHeader(String title) {
     return Row(
       children: [
-        Container(width: 4, height: 16, color: kLimeColor),
+        Container(width: 4, height: 16, color: AppColors.kAccentLime),
         const SizedBox(width: 10),
         Text(
           title,
@@ -541,7 +538,7 @@ class _AthleteDetailPageState extends State<AthleteDetailPage> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(icon, color: kLimeColor, size: 18),
+        Icon(icon, color: AppColors.kAccentLime, size: 18),
         const SizedBox(height: 6),
         Text(
           value.toUpperCase(),

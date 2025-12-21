@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart'; // Import Google Fonts
+import 'package:google_fonts/google_fonts.dart';
+import 'package:wikilympics/app_colors.dart'; // Import Google Fonts
 
 class AddEventScreen extends StatefulWidget {
   const AddEventScreen({super.key});
@@ -28,7 +29,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
 
     if (_formKey.currentState!.validate() && _selectedDate != null) {
       final response = await request.post(
-        'http://127.0.0.1:8000/upcoming_event/create-event-flutter/',
+        'https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//upcoming_event/create-event-flutter/',
         {
           'name': _eventNameController.text,
           'organizer': _organizerController.text,
@@ -80,7 +81,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
         style: GoogleFonts.poppins(
           fontWeight: FontWeight.w600,
           fontSize: 14,
-          color: const Color(0xFF03045E),
+          color: AppColors.kSecondaryNavy,
         ),
       ),
     );
@@ -103,11 +104,11 @@ class _AddEventScreenState extends State<AddEventScreen> {
         fillColor: Colors.grey[50],
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF03045E), width: 1.5),
+          borderSide: const BorderSide(color: AppColors.kSecondaryNavy, width: 1.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF03045E), width: 2.0),
+          borderSide: const BorderSide(color: AppColors.kSecondaryNavy, width: 2.0),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -131,7 +132,7 @@ class _AddEventScreenState extends State<AddEventScreen> {
         title: Text(
           'Add Upcoming Event',
           style: GoogleFonts.poppins(
-            color: const Color(0xFF03045E),
+            color: AppColors.kSecondaryNavy,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -170,14 +171,14 @@ class _AddEventScreenState extends State<AddEventScreen> {
                       fillColor: Colors.grey[50],
                       hintText: _selectedDate == null ? 'dd/mm/yyyy' : DateFormat('dd/MM/yyyy').format(_selectedDate!),
                       hintStyle: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
-                      suffixIcon: const Icon(Icons.calendar_today, size: 20, color: Color(0xFF03045E)),
+                      suffixIcon: const Icon(Icons.calendar_today, size: 20, color: AppColors.kSecondaryNavy),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFF03045E), width: 1.5),
+                        borderSide: const BorderSide(color: AppColors.kSecondaryNavy, width: 1.5),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFF03045E), width: 2.0),
+                        borderSide: const BorderSide(color: AppColors.kSecondaryNavy, width: 2.0),
                       ),
                     ),
                     validator: (value) => _selectedDate == null ? 'Date is required' : null,

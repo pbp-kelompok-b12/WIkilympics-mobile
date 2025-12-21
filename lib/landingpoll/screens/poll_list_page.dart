@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:wikilympics/app_colors.dart';
 import 'package:wikilympics/landingpoll/models/poll_model.dart';
 import 'package:wikilympics/landingpoll/screens/poll_form_page.dart';
 import 'package:wikilympics/landingpoll/widgets/poll_service.dart';
@@ -17,8 +18,6 @@ class _PollListPageState extends State<PollListPage> {
   bool _isAdmin = false;
   late Future<List<PollQuestion>> _pollFuture;
 
-  final Color kPrimaryNavy = const Color(0xFF03045E);
-  final Color kAccentLime = const Color(0xFFC8DB2C);
   final Color kBgGrey = const Color(0xFFF8F9FA);
   final Color kBarGrey = const Color(0xFFE9ECEF);
 
@@ -37,7 +36,7 @@ class _PollListPageState extends State<PollListPage> {
     final request = context.read<CookieRequest>();
     if (request.loggedIn) {
       try {
-        final response = await request.get("http://127.0.0.1:8000/auth/status/");
+        final response = await request.get("https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//auth/status/");
         setState(() {
           _isAdmin = response['is_superuser'] ?? false;
         });
@@ -73,7 +72,7 @@ class _PollListPageState extends State<PollListPage> {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: kPrimaryNavy),
+          icon: Icon(Icons.arrow_back_ios_new, color: AppColors.kSecondaryNavy),
           onPressed: () => Navigator.pop(context),
         ),
         title: Image.asset(
@@ -89,7 +88,7 @@ class _PollListPageState extends State<PollListPage> {
 
       floatingActionButton: _isAdmin
           ? FloatingActionButton.extended(
-        backgroundColor: kAccentLime,
+        backgroundColor: AppColors.kAccentLime,
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
         onPressed: () async {
@@ -99,11 +98,11 @@ class _PollListPageState extends State<PollListPage> {
           );
           _refreshList();
         },
-        icon: Icon(Icons.add, color: kPrimaryNavy),
+        icon: Icon(Icons.add, color: AppColors.kSecondaryNavy),
         label: Text(
             "New Poll",
             style: GoogleFonts.poppins(
-                color: kPrimaryNavy,
+                color: AppColors.kSecondaryNavy,
                 fontWeight: FontWeight.bold
             )
         ),
@@ -123,7 +122,7 @@ class _PollListPageState extends State<PollListPage> {
                   style: GoogleFonts.poppins(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
-                    color: kPrimaryNavy,
+                    color: AppColors.kSecondaryNavy,
                     letterSpacing: -0.5,
                   ),
                 ),
@@ -196,7 +195,7 @@ class _PollListPageState extends State<PollListPage> {
                                     style: GoogleFonts.poppins(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w700,
-                                      color: kPrimaryNavy,
+                                      color: AppColors.kSecondaryNavy,
                                       height: 1.3,
                                     ),
                                   ),
@@ -250,7 +249,7 @@ class _PollListPageState extends State<PollListPage> {
                                             try {
                                               // Mengirim request POST ke endpoint delete
                                               final response = await request.post(
-                                                'http://127.0.0.1:8000/landingpoll/delete/${poll.id}/',
+                                                'https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//landingpoll/delete/${poll.id}/',
                                                 {},
                                               );
 
@@ -322,7 +321,7 @@ class _PollListPageState extends State<PollListPage> {
                                             style: GoogleFonts.poppins(
                                               fontSize: 13,
                                               fontWeight: FontWeight.w600,
-                                              color: kPrimaryNavy,
+                                              color: AppColors.kSecondaryNavy,
                                             ),
                                           ),
                                         ],
@@ -335,7 +334,7 @@ class _PollListPageState extends State<PollListPage> {
                                           value: percent,
                                           backgroundColor: kBarGrey,
                                           valueColor: AlwaysStoppedAnimation<Color>(
-                                              percent > 0.5 ? kAccentLime : const Color(0xFF4C6EF5)
+                                              percent > 0.5 ? AppColors.kAccentLime : const Color(0xFF4C6EF5)
                                           ),
                                           minHeight: 10,
                                         ),

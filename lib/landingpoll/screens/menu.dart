@@ -4,13 +4,13 @@ import 'dart:math';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:wikilympics/app_colors.dart';
 
 import 'package:wikilympics/sports/models/sport_entry.dart';
 import 'package:wikilympics/sports/screens/sport_entry_list.dart';
 import 'package:wikilympics/sports/screens/sport_entry_detail.dart';
 
 import 'package:wikilympics/athletes/models/athlete_entry.dart';
-// Perhatikan huruf 's' di athletes_entry_list.dart sesuai gambar kamu
 import 'package:wikilympics/athletes/screens/athletes_entry_list.dart';
 import 'package:wikilympics/athletes/screens/athlete_entry_detail.dart';
 
@@ -168,7 +168,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final request = context.read<CookieRequest>();
     if (request.loggedIn) {
       try {
-        final response = await request.get("http://127.0.0.1:8000/auth/status/");
+        final response = await request.get("https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//auth/status/");
         setState(() {
           _isAdmin = response['is_superuser'] ?? false;
         });
@@ -277,7 +277,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 _menuItem(
                   icon: Icons.person_search_outlined,
                   label: "Athletes",
-                  onTap: () => _selectMenuPage(AthleteEntryListPage()), // Hapus 'const'
+                  onTap: () => _selectMenuPage(AthleteEntryListPage()),
                 ),
 
                 if (_isAdmin) ...[
@@ -367,7 +367,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          // HEADER
+        
           Container(
             width: double.infinity,
             color: Colors.white,
@@ -538,7 +538,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
 
-          // ATHLETES HIGHLIGHT
+         
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
@@ -566,7 +566,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
                     final topAthletes = snapshot.data!.take(3).toList();
                     return Column(
-                      // Penting: map<Widget> untuk mencegah error List<dynamic>
                       children: topAthletes.asMap().entries.map<Widget>((entry) {
                         int index = entry.key;
                         AthleteEntry athlete = entry.value;
@@ -609,7 +608,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     borderRadius: BorderRadius.circular(20),
                     onTap: () {
                       setState(() {
-                        // Pastikan nama class ini sesuai dengan file atlet temanmu
                         _selectedPage = AthleteEntryListPage();
                         _selectedIndex = 2;
                       });
@@ -638,7 +636,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
 
-          // UPCOMING EVENTS ... (Sisa kode tetap sama)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
@@ -1031,7 +1028,7 @@ String fixImageUrl(String rawUrl) {
   }
 
   if (rawUrl.startsWith("/")) {
-    String base = kIsWeb ? "http://127.0.0.1:8000" : "http://10.0.2.2:8000";
+    String base = kIsWeb ? "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id/" : "http://10.0.2.2:8000";
     return "$base$rawUrl";
   }
 
@@ -1039,7 +1036,7 @@ String fixImageUrl(String rawUrl) {
 }
 
 Future<List<SportEntry>> fetchSports(CookieRequest request) async {
-  final String baseUrl = kIsWeb ? "http://127.0.0.1:8000" : "http://10.0.2.2:8000";
+  final String baseUrl = kIsWeb ? "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id/" : "http://10.0.2.2:8000";
 
   final response = await request.get('$baseUrl/sports/json/');
 
@@ -1053,7 +1050,7 @@ Future<List<SportEntry>> fetchSports(CookieRequest request) async {
 }
 
 Future<List<AthleteEntry>> fetchAthletes(CookieRequest request) async {
-  final String baseUrl = kIsWeb ? "http://127.0.0.1:8000" : "http://10.0.2.2:8000";
+  final String baseUrl = kIsWeb ? "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id/" : "http://10.0.2.2:8000";
   final response = await request.get('$baseUrl/athletes/flutter/');
 
   List<AthleteEntry> listAthletes = [];
@@ -1066,7 +1063,7 @@ Future<List<AthleteEntry>> fetchAthletes(CookieRequest request) async {
 }
 
 Future<List<ArticleEntry>> fetchArticles(CookieRequest request) async {
-  final response = await request.get('http://127.0.0.1:8000/article/json/');
+  final response = await request.get('https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//article/json/');
   List<ArticleEntry> listArticles = [];
   for (var d in response) {
     if (d != null) {
@@ -1077,7 +1074,7 @@ Future<List<ArticleEntry>> fetchArticles(CookieRequest request) async {
 }
 
 Future<List<EventEntry>> fetchEvents(CookieRequest request) async {
-  final response = await request.get('http://127.0.0.1:8000/upcoming_event/json/');
+  final response = await request.get('https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//upcoming_event/json/');
   List<EventEntry> listEvents = [];
   for (var d in response) {
     if (d != null) {
@@ -1088,7 +1085,7 @@ Future<List<EventEntry>> fetchEvents(CookieRequest request) async {
 }
 
 Future<List<ForumEntry>> fetchForums(CookieRequest request) async {
-  final String baseUrl = kIsWeb ? "http://127.0.0.1:8000" : "http://10.0.2.2:8000";
+  final String baseUrl = kIsWeb ? "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id/" : "http://10.0.2.2:8000";
   final response = await request.get('$baseUrl/forum_section/forums/json-for/');
 
   List<ForumEntry> listForums = [];

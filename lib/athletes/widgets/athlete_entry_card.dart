@@ -1,6 +1,7 @@
 // widgets/athlete_entry_card.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wikilympics/app_colors.dart';
 import 'package:wikilympics/athletes/models/athlete_entry.dart';
 
 class AthleteEntryCard extends StatelessWidget {
@@ -15,9 +16,6 @@ class AthleteEntryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color darkCardColor = Color(0xFF0B162C);
-    const Color accentColor = Color(0xFFD2F665);
-
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -80,9 +78,9 @@ class AthleteEntryCard extends StatelessWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: darkCardColor.withOpacity(0.8),
+                          color: AppColors.kPrimaryNavy.withOpacity(0.8),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: accentColor, width: 1),
+                          border: Border.all(color: AppColors.kAccentLime, width: 1),
                         ),
                         child: Text(
                           athlete.fields.country.toUpperCase(),
@@ -117,7 +115,7 @@ class AthleteEntryCard extends StatelessWidget {
                           Text(
                             athlete.fields.sport,
                             style: GoogleFonts.poppins(
-                              color: accentColor,
+                              color: AppColors.kAccentLime,
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                             ),
@@ -136,7 +134,7 @@ class AthleteEntryCard extends StatelessWidget {
                   vertical: 16,
                 ),
                 decoration: const BoxDecoration(
-                  color: darkCardColor,
+                  color: AppColors.kPrimaryNavy,
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(24),
                     bottomRight: Radius.circular(24),
@@ -147,13 +145,13 @@ class AthleteEntryCard extends StatelessWidget {
                     // Icon
                     Container(
                       decoration: BoxDecoration(
-                        color: accentColor.withOpacity(0.2),
+                        color: AppColors.kAccentLime.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       padding: const EdgeInsets.all(10),
                       child: const Icon(
                         Icons.person,
-                        color: accentColor,
+                        color: AppColors.kAccentLime,
                         size: 24,
                       ),
                     ),
@@ -193,7 +191,7 @@ class AthleteEntryCard extends StatelessWidget {
                     // Arrow Icon
                     const Icon(
                       Icons.arrow_forward_ios,
-                      color: accentColor,
+                      color: AppColors.kAccentLime,
                       size: 20,
                     ),
                   ],

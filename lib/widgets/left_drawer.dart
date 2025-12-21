@@ -140,7 +140,7 @@ class LeftDrawer extends StatelessWidget {
                 return;
               }
               final response = await request.logout(
-                  "http://127.0.0.1:8000/auth/logout/");
+                  "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//auth/logout/");
                   // "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id/auth/logout/");
               String message = response["message"];
               if (context.mounted) {

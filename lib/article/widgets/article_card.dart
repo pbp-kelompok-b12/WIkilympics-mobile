@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:wikilympics/app_colors.dart';
 import 'package:wikilympics/article/models/article_entry.dart';
 import 'package:wikilympics/screens/login.dart';
 
@@ -85,16 +86,16 @@ class _ArticleCardState extends State<ArticleCard> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F1929), // Navy Gelap
+        color: AppColors.kPrimaryNavy, // Navy Gelap
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFD2F665), width: 1), // Lime Border
+        border: Border.all(color: AppColors.kAccentLime, width: 1), // Lime Border
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
             getSportIcon(category),
-            color: const Color(0xFFD2F665),
+            color: AppColors.kAccentLime,
             size: 14,
           ),
           const SizedBox(width: 6),
@@ -147,8 +148,8 @@ class _ArticleCardState extends State<ArticleCard> {
 
     try {
       String url = action == 'like' 
-          ? "http://127.0.0.1:8000/article/like/${widget.article.id}/"
-          : "http://127.0.0.1:8000/article/dislike/${widget.article.id}/";
+          ? "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//article/like/${widget.article.id}/"
+          : "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//article/dislike/${widget.article.id}/";
 
       final response = await request.post(url, {});
 
@@ -236,11 +237,11 @@ class _ArticleCardState extends State<ArticleCard> {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
-                color: const Color(0xFF0F1929),
+                color: AppColors.kPrimaryNavy,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.south_west, color: Color(0xFFD2F665), size: 24),
+                    const Icon(Icons.south_west, color: AppColors.kAccentLime, size: 24),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -286,7 +287,7 @@ class _ArticleCardState extends State<ArticleCard> {
       onTap: onTap,
       child: Icon(
         active ? icon : (isDislike ? Icons.thumb_down_outlined : Icons.thumb_up_outlined),
-        color: active ? (isDislike ? Colors.redAccent : const Color(0xFFD2F665)) : Colors.grey,
+        color: active ? (isDislike ? Colors.redAccent : AppColors.kAccentLime) : Colors.grey,
         size: 20,
       ),
     );

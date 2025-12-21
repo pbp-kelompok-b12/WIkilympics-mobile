@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wikilympics/app_colors.dart';
 import 'package:wikilympics/sports/models/sport_entry.dart';
 
 class SportEntryCard extends StatelessWidget {
@@ -35,9 +36,7 @@ class SportEntryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color darkCardColor = Color(0xFF0B162C);
-    const Color accentArrowColor = Color(0xFFCEF250);
-
+    
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -82,7 +81,7 @@ class SportEntryCard extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 decoration: const BoxDecoration(
-                  color: darkCardColor,
+                  color: AppColors.kPrimaryNavy,
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -91,7 +90,7 @@ class SportEntryCard extends StatelessWidget {
                       angle: 0.785,
                       child: const Icon(
                         Icons.arrow_downward,
-                        color: accentArrowColor,
+                        color: AppColors.kAccentLime,
                         size: 24,
                       ),
                     ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wikilympics/app_colors.dart';
 
 class PopularSportCard extends StatefulWidget {
   final int rank;
@@ -42,7 +43,7 @@ class _PopularSportCardState extends State<PopularSportCard> with SingleTickerPr
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
+          colors: [AppColors.kPrimaryNavy, AppColors.kDarkBlueDetail],
         ),
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
@@ -64,7 +65,7 @@ class _PopularSportCardState extends State<PopularSportCard> with SingleTickerPr
                 style: GoogleFonts.poppins(
                   fontSize: 48,
                   fontWeight: FontWeight.w800,
-                  color: const Color(0xFFC8DB2C).withOpacity(0.9),
+                  color: AppColors.kAccentLime.withOpacity(0.9),
                   height: 1,
                 ),
               ),
@@ -160,7 +161,7 @@ class _PopularSportCardState extends State<PopularSportCard> with SingleTickerPr
           const SizedBox(height: 12),
           Text(
             "Overview",
-            style: GoogleFonts.poppins(color: const Color(0xFFC8DB2C), fontWeight: FontWeight.bold, fontSize: 13),
+            style: GoogleFonts.poppins(color: AppColors.kAccentLime, fontWeight: FontWeight.bold, fontSize: 13),
           ),
           const SizedBox(height: 6),
           Text(
@@ -176,8 +177,8 @@ class _PopularSportCardState extends State<PopularSportCard> with SingleTickerPr
               icon: const Icon(Icons.arrow_forward_rounded, size: 16),
               label: const Text("VIEW FULL SPORT PROFILE"),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFC8DB2C),
-                foregroundColor: const Color(0xFF0F172A),
+                backgroundColor: AppColors.kAccentLime,
+                foregroundColor: AppColors.kPrimaryNavy,
                 elevation: 0,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 padding: const EdgeInsets.symmetric(vertical: 12),
@@ -202,9 +203,9 @@ class _PopularSportCardState extends State<PopularSportCard> with SingleTickerPr
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFFC8DB2C).withOpacity(0.1),
+        color: AppColors.kAccentLime.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFC8DB2C).withOpacity(0.3)),
+        border: Border.all(color: AppColors.kAccentLime.withOpacity(0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -214,7 +215,7 @@ class _PopularSportCardState extends State<PopularSportCard> with SingleTickerPr
             child: Image.network(flagUrl, width: 16, height: 11, fit: BoxFit.cover),
           ),
           const SizedBox(width: 6),
-          Text(name.toUpperCase(), style: GoogleFonts.poppins(color: const Color(0xFFC8DB2C), fontSize: 10, fontWeight: FontWeight.bold)),
+          Text(name.toUpperCase(), style: GoogleFonts.poppins(color: AppColors.kAccentLime, fontSize: 10, fontWeight: FontWeight.bold)),
         ],
       ),
     );

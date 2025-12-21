@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:wikilympics/app_colors.dart';
 import 'package:wikilympics/athletes/models/athlete_entry.dart';
 
 class AthleteEntryFormPage extends StatefulWidget {
@@ -25,11 +26,6 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
   String _biography = "";
   String _athletePhoto = "";
 
-  // Color Palette
-  final Color kPrimaryBlue = const Color(0xFF1E3CC8);
-  final Color kAccentYellow = const Color(0xFFFFD700);
-  final Color kBgWhite = const Color(0xFFF9F9F9);
-
   // screens/athlete_entry_form.dart - bagian initState
   @override
   void initState() {
@@ -47,17 +43,17 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
     return InputDecoration(
       hintText: hint,
       hintStyle: GoogleFonts.poppins(color: Colors.grey[500], fontSize: 14),
-      prefixIcon: Icon(icon, color: kPrimaryBlue),
+      prefixIcon: Icon(icon, color: AppColors.kSecondaryNavy),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       fillColor: Colors.white,
       filled: true,
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: kPrimaryBlue, width: 1.0),
+        borderSide: BorderSide(color: AppColors.kSecondaryNavy, width: 1.0),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: kPrimaryBlue, width: 2.0),
+        borderSide: BorderSide(color: AppColors.kSecondaryNavy, width: 2.0),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
@@ -85,18 +81,18 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
     final isEdit = widget.athleteEntry != null;
 
     return Scaffold(
-      backgroundColor: kBgWhite,
+      backgroundColor: AppColors.kBgGrey,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        backgroundColor: kBgWhite,
+        backgroundColor: AppColors.kBgGrey,
         elevation: 0,
         title: Text(
           isEdit ? "Edit Athlete" : "Add New Athlete",
           style: GoogleFonts.poppins(
-            color: kPrimaryBlue,
+            color: AppColors.kSecondaryNavy,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -131,7 +127,7 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
                       style: GoogleFonts.poppins(
                         fontSize: 26,
                         fontWeight: FontWeight.w700,
-                        color: kPrimaryBlue,
+                        color: AppColors.kSecondaryNavy,
                       ),
                     ),
                   ),
@@ -144,7 +140,7 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
                       "Athlete Name",
                       Icons.person,
                     ),
-                    style: GoogleFonts.poppins(color: kPrimaryBlue),
+                    style: GoogleFonts.poppins(color: AppColors.kSecondaryNavy),
                     onChanged: (value) => _athleteName = value,
                     validator: (value) => (value == null || value.isEmpty)
                         ? "Name cannot be empty!"
@@ -162,7 +158,7 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
                             "Country",
                             Icons.flag,
                           ),
-                          style: GoogleFonts.poppins(color: kPrimaryBlue),
+                          style: GoogleFonts.poppins(color: AppColors.kSecondaryNavy),
                           onChanged: (value) => _country = value,
                           validator: (value) => (value == null || value.isEmpty)
                               ? "Country cannot be empty!"
@@ -177,7 +173,7 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
                             "Sport",
                             Icons.sports,
                           ),
-                          style: GoogleFonts.poppins(color: kPrimaryBlue),
+                          style: GoogleFonts.poppins(color: AppColors.kSecondaryNavy),
                           onChanged: (value) => _sport = value,
                           validator: (value) => (value == null || value.isEmpty)
                               ? "Sport cannot be empty!"
@@ -195,7 +191,7 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
                       "Photo URL (optional)",
                       Icons.image,
                     ),
-                    style: GoogleFonts.poppins(color: kPrimaryBlue),
+                    style: GoogleFonts.poppins(color: AppColors.kSecondaryNavy),
                     onChanged: (value) => _athletePhoto = value,
                     validator: _validateUrl,
                   ),
@@ -217,7 +213,7 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
                         alignment: Alignment.topCenter,
                         child: Transform.translate(
                           offset: const Offset(0, 0),
-                          child: Icon(Icons.description, color: kPrimaryBlue),
+                          child: Icon(Icons.description, color: AppColors.kSecondaryNavy),
                         ),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
@@ -228,14 +224,14 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
                       filled: true,
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: kPrimaryBlue, width: 1.0),
+                        borderSide: BorderSide(color: AppColors.kSecondaryNavy, width: 1.0),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: kPrimaryBlue, width: 2.0),
+                        borderSide: BorderSide(color: AppColors.kSecondaryNavy, width: 2.0),
                       ),
                     ),
-                    style: GoogleFonts.poppins(color: kPrimaryBlue),
+                    style: GoogleFonts.poppins(color: AppColors.kSecondaryNavy),
                     onChanged: (value) => _biography = value,
                     validator: (value) => (value == null || value.isEmpty)
                         ? "Biography cannot be empty!"
@@ -251,8 +247,8 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
                       height: 45,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: kAccentYellow,
-                          foregroundColor: kPrimaryBlue,
+                          backgroundColor: AppColors.kAccentLime,
+                          foregroundColor: AppColors.kSecondaryNavy,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -290,11 +286,11 @@ class _AthleteEntryFormPageState extends State<AthleteEntryFormPage> {
                                           ? "Athlete updated!"
                                           : "Athlete added!",
                                     ),
-                                    backgroundColor: kAccentYellow,
+                                    backgroundColor: AppColors.kAccentLime,
                                     behavior: SnackBarBehavior.floating,
                                     action: SnackBarAction(
                                       label: 'OK',
-                                      textColor: kPrimaryBlue,
+                                      textColor: AppColors.kSecondaryNavy,
                                       onPressed: () {},
                                     ),
                                   ),

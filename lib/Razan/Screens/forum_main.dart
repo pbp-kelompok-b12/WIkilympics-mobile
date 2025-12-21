@@ -5,6 +5,7 @@ import 'package:wikilympics/Razan/models/forum_entry.dart';
 import 'package:wikilympics/Razan/Screens/forum_entry_card.dart';
 import 'package:wikilympics/Razan/Screens/forum_detail.dart';
 import 'package:wikilympics/Razan/Screens/add_forum.dart';
+import 'package:wikilympics/app_colors.dart';
 import 'package:wikilympics/widgets/left_drawer.dart';
 
 class ForumListPage extends StatefulWidget {
@@ -25,7 +26,7 @@ class _ForumListPageState extends State<ForumListPage> {
   }
 
   Future<List<ForumEntry>> fetchForums(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/forum_section/forums/json-for/');
+    final response = await request.get('https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//forum_section/forums/json-for/');
     
     List<ForumEntry> listForums = [];
     for (var d in response) {
@@ -78,7 +79,7 @@ class _ForumListPageState extends State<ForumListPage> {
               children: [
                 const Text(
                   'Forums',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF03045e),),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.kSecondaryNavy,),
                 ),
                 const SizedBox(height: 12),
                 TextField(
@@ -143,7 +144,7 @@ class _ForumListPageState extends State<ForumListPage> {
       ),
 
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFFE6EC4C),
+        backgroundColor: AppColors.kAccentLime,
         onPressed: () async {
           final result = await Navigator.push(
             context,

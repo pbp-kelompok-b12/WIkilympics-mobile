@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wikilympics/app_colors.dart';
 import 'package:wikilympics/widgets/left_drawer.dart';
 import 'package:wikilympics/Razan/models/forum_entry.dart';
 
@@ -92,8 +93,8 @@ class _AddForumPageState extends State<AddForumPage> {
       }
 
       final endpoint = widget.forum != null
-          ? 'http://127.0.0.1:8000/forum_section/forum/${widget.forum!.pk}/edit/'
-          : 'http://127.0.0.1:8000/forum_section/forum/add/';
+          ? 'https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//forum_section/forum/${widget.forum!.pk}/edit/'
+          : 'https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//forum_section/forum/add/';
       
       final response = await request.post(
         endpoint,
@@ -176,6 +177,11 @@ class _AddForumPageState extends State<AddForumPage> {
         title: Text(widget.forum != null ? "Edit Forum" : "Create Forum"),
         backgroundColor: const Color(0xFF3f5f90),
         titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       drawer: const LeftDrawer(),
       body: Container(
@@ -238,7 +244,7 @@ class _AddForumPageState extends State<AddForumPage> {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE6EC4C),
+                    backgroundColor: AppColors.kAccentLime,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   onPressed: _isLoading ? null : () => _submitForum(request),

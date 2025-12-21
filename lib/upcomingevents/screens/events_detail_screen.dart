@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wikilympics/app_colors.dart';
 import 'package:wikilympics/upcomingevents/models/events_entry.dart';
 import 'package:wikilympics/upcomingevents/screens/edit_event_screen.dart';
 
@@ -15,10 +16,6 @@ class EventDetailScreen extends StatefulWidget {
 }
 
 class _EventDetailScreenState extends State<EventDetailScreen> {
-  // === COLOR PALETTE ===
-  static const Color kNavyColor = Color(0xFF0F1929);
-  static const Color kLimeColor = Color(0xFFD2F665);
-  static const Color kDarkBlue = Color(0xFF162235);
   static const Color kRedAlert = Color(0xFFFF4C4C);
 
   late EventEntry _event;
@@ -42,7 +39,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: kNavyColor,
+      backgroundColor: AppColors.kPrimaryNavy,
 
       // Tombol Edit
       floatingActionButton: _isAdmin
@@ -60,10 +57,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             });
           }
         },
-        backgroundColor: kLimeColor,
-        icon: const Icon(Icons.edit, color: kNavyColor),
+        backgroundColor: AppColors.kAccentLime,
+        icon: const Icon(Icons.edit, color: AppColors.kPrimaryNavy),
         label: Text("EDIT EVENT",
-            style: GoogleFonts.poppins(color: kNavyColor, fontWeight: FontWeight.bold)),
+            style: GoogleFonts.poppins(color: AppColors.kPrimaryNavy, fontWeight: FontWeight.bold)),
       )
           : null,
 
@@ -75,7 +72,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             expandedHeight: 400,
             pinned: true,
             stretch: true,
-            backgroundColor: kNavyColor,
+            backgroundColor: AppColors.kPrimaryNavy,
             leading: Padding(
               padding: const EdgeInsets.only(left: 12),
               child: CircleAvatar(
@@ -94,14 +91,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   Image.network(
                     _event.imageUrl,
                     fit: BoxFit.cover,
-                    errorBuilder: (ctx, err, stack) => Container(color: kDarkBlue),
+                    errorBuilder: (ctx, err, stack) => Container(color: AppColors.kDarkBlueDetail),
                   ),
                   const DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [Colors.black45, Colors.transparent, kNavyColor],
+                        colors: [Colors.black45, Colors.transparent, AppColors.kPrimaryNavy],
                         stops: [0.0, 0.5, 1.0],
                       ),
                     ),
@@ -134,7 +131,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
                 decoration: BoxDecoration(
-                    color: kDarkBlue,
+                    color: AppColors.kDarkBlueDetail,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: Colors.white.withOpacity(0.05)),
                     boxShadow: [
@@ -205,23 +202,23 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                          colors: [kDarkBlue, kNavyColor],
+                          colors: [AppColors.kDarkBlueDetail, AppColors.kPrimaryNavy],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight
                       ),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: kLimeColor.withOpacity(0.3)),
+                      border: Border.all(color: AppColors.kAccentLime.withOpacity(0.3)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.location_on, color: kLimeColor, size: 20),
+                            const Icon(Icons.location_on, color: AppColors.kAccentLime, size: 20),
                             const SizedBox(width: 12),
                             Text(
                               "ADDRESS",
-                              style: GoogleFonts.poppins(color: kLimeColor, fontWeight: FontWeight.w900, fontSize: 12, letterSpacing: 1),
+                              style: GoogleFonts.poppins(color: AppColors.kAccentLime, fontWeight: FontWeight.w900, fontSize: 12, letterSpacing: 1),
                             ),
                           ],
                         ),
@@ -249,7 +246,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   Widget _buildSectionHeader(String title) {
     return Row(
       children: [
-        Container(width: 4, height: 16, color: kLimeColor),
+        Container(width: 4, height: 16, color: AppColors.kAccentLime),
         const SizedBox(width: 10),
         Text(title, style: GoogleFonts.poppins(color: Colors.white54, letterSpacing: 2, fontWeight: FontWeight.bold, fontSize: 11)),
       ],
@@ -260,7 +257,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(icon, color: kLimeColor, size: 18),
+        Icon(icon, color: AppColors.kAccentLime, size: 18),
         const SizedBox(height: 6),
         Text(value.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis,
             style: GoogleFonts.poppins(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),

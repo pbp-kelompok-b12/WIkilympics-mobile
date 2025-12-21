@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wikilympics/app_colors.dart';
 
 import 'package:wikilympics/article/models/article_entry.dart';
 import 'package:wikilympics/article/screens/article_form.dart';
@@ -18,10 +19,6 @@ class ArticleListPage extends StatefulWidget {
 }
 
 class _ArticleListPageState extends State<ArticleListPage> {
-  final Color kPrimaryNavy = const Color(0xFF03045E);
-  final Color kBgGrey = const Color(0xFFF9F9F9);
-  final Color kAccentLime = const Color(0xFFD9E74C);
-
   bool _isAdmin = false;
 
   // Filter
@@ -83,7 +80,7 @@ class _ArticleListPageState extends State<ArticleListPage> {
   Future<void> _checkAdminStatus() async {
     final request = context.read<CookieRequest>();
     if (request.loggedIn) {
-      final response = await request.get("http://127.0.0.1:8000/auth/status/");
+      final response = await request.get("https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//auth/status/");
       if (mounted) {
         setState(() {
           _isAdmin = response['is_superuser'] ?? false;
@@ -93,7 +90,7 @@ class _ArticleListPageState extends State<ArticleListPage> {
   }
 
   Future<List<ArticleEntry>> fetchArticles(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/article/json/');
+    final response = await request.get('https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//article/json/');
     List<ArticleEntry> listArticles = [];
     for (var d in response) {
       if (d != null) {
@@ -147,7 +144,7 @@ class _ArticleListPageState extends State<ArticleListPage> {
                     decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(10)),
                   ),
                   Text("Filter by Category", 
-                    style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold, color: kPrimaryNavy)),
+                    style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.kSecondaryNavy)),
                   const Divider(),
                   
                   // Daftar Kategori
@@ -160,10 +157,10 @@ class _ArticleListPageState extends State<ArticleListPage> {
                         final isSelected = tempSelected.contains(cat);
                         
                         return CheckboxListTile(
-                          secondary: Icon(getSportIcon(cat), color: kPrimaryNavy),
+                          secondary: Icon(getSportIcon(cat), color: AppColors.kSecondaryNavy),
                           title: Text(cat, style: GoogleFonts.poppins(fontSize: 14)),
                           value: isSelected,
-                          activeColor: kPrimaryNavy,
+                          activeColor: AppColors.kSecondaryNavy,
                           onChanged: (bool? value) {
                             setModalState(() {
                               if (value == true) {
@@ -193,7 +190,7 @@ class _ArticleListPageState extends State<ArticleListPage> {
                         Expanded(
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: kPrimaryNavy,
+                              backgroundColor: AppColors.kSecondaryNavy,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                             onPressed: () {
@@ -221,11 +218,11 @@ class _ArticleListPageState extends State<ArticleListPage> {
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
-      backgroundColor: kBgGrey,
+      backgroundColor: AppColors.kBgGrey,
       appBar: AppBar(
         title: Image.asset('assets/wikilympics_banner.png', height: 60, fit: BoxFit.contain),
-        backgroundColor: kBgGrey,
-        iconTheme: IconThemeData(color: kPrimaryNavy),
+        backgroundColor: AppColors.kBgGrey,
+        iconTheme: IconThemeData(color: AppColors.kSecondaryNavy),
         elevation: 0,
       ),
       drawer: const LeftDrawer(),
@@ -237,9 +234,9 @@ class _ArticleListPageState extends State<ArticleListPage> {
                 fetchArticles(request);
               });
             },
-            label: Text("ADD ARTICLE", style: TextStyle(color: kPrimaryNavy, fontWeight: FontWeight.bold)),
-            icon: Icon(Icons.add, color: kPrimaryNavy),
-            backgroundColor: kAccentLime,
+            label: Text("ADD ARTICLE", style: TextStyle(color: AppColors.kSecondaryNavy, fontWeight: FontWeight.bold)),
+            icon: Icon(Icons.add, color: AppColors.kSecondaryNavy),
+            backgroundColor: AppColors.kAccentLime,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           )
         : null,
@@ -266,7 +263,7 @@ class _ArticleListPageState extends State<ArticleListPage> {
                         child: TextField(
                           onChanged: (val) => setState(() => _searchQuery = val.toLowerCase()),
                           decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.search, color: kPrimaryNavy, size: 20),
+                            prefixIcon: Icon(Icons.search, color: AppColors.kSecondaryNavy, size: 20),
                             hintText: "Search articles...",
                             hintStyle: GoogleFonts.poppins(color: Colors.grey, fontSize: 13),
                             border: InputBorder.none,
@@ -281,7 +278,7 @@ class _ArticleListPageState extends State<ArticleListPage> {
                       child: Container(
                         height: 40,
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        decoration: BoxDecoration(color: kPrimaryNavy, borderRadius: BorderRadius.circular(15)),
+                        decoration: BoxDecoration(color: AppColors.kSecondaryNavy, borderRadius: BorderRadius.circular(15)),
                         child: const Icon(Icons.tune, color: Colors.white, size: 18),
                       ),
                     ),
@@ -296,7 +293,7 @@ class _ArticleListPageState extends State<ArticleListPage> {
                         ..._selectedCategories.map((e) => _buildChip(e)),
                         GestureDetector(
                           onTap: () => setState(() => _selectedCategories.clear()),
-                          child: Text(" Clear All", style: TextStyle(color: kPrimaryNavy, fontSize: 12, fontWeight: FontWeight.bold)),
+                          child: Text(" Clear All", style: TextStyle(color: AppColors.kSecondaryNavy, fontSize: 12, fontWeight: FontWeight.bold)),
                         )
                       ],
                     ),
@@ -316,7 +313,6 @@ class _ArticleListPageState extends State<ArticleListPage> {
                 final filteredAll = _applyFilters(snapshot.data!);
                 
                 final trendingList = filteredAll.where((a) => a.likes >= 7).toList();
-                final regularList = filteredAll.where((a) => a.likes < 7).toList();
 
                 if (filteredAll.isEmpty) {
                   return Center(
@@ -357,7 +353,7 @@ class _ArticleListPageState extends State<ArticleListPage> {
                     ],
 
                     // Article list
-                    _buildSectionTitle("Olympic Articles", Icons.article_outlined, kPrimaryNavy),
+                    _buildSectionTitle("Olympic Articles", Icons.article_outlined, AppColors.kSecondaryNavy),
                     ListView.builder(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       shrinkWrap: true,
@@ -385,7 +381,7 @@ class _ArticleListPageState extends State<ArticleListPage> {
         children: [
           Icon(icon, color: iconColor, size: 24),
           const SizedBox(width: 8),
-          Text(title, style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w800, color: kPrimaryNavy)),
+          Text(title, style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.kSecondaryNavy)),
         ],
       ),
     );
@@ -408,16 +404,16 @@ class _ArticleListPageState extends State<ArticleListPage> {
       margin: const EdgeInsets.only(right: 8),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: kPrimaryNavy.withOpacity(0.1), 
+        color: AppColors.kSecondaryNavy.withOpacity(0.1), 
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: kPrimaryNavy.withOpacity(0.2)),
+        border: Border.all(color: AppColors.kSecondaryNavy.withOpacity(0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(getSportIcon(label), size: 14, color: kPrimaryNavy),
+          Icon(getSportIcon(label), size: 14, color: AppColors.kSecondaryNavy),
           const SizedBox(width: 6),
-          Text(label, style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.bold, color: kPrimaryNavy)),
+          Text(label, style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.kSecondaryNavy)),
         ],
       ),
     );

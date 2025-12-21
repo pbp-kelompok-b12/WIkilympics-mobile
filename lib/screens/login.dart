@@ -109,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
                         String password = _passwordController.text;
 
                         final response = await request.login(
-                          "http://127.0.0.1:8000/auth/login/",
+                          "https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//auth/login/",
                           {
                             "username": username,
                             "password": password,
@@ -121,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
                             final prefs = await SharedPreferences.getInstance();
                             await prefs.setString('username', username);
                             try {
-                                final userInfoResponse = await request.get('http://127.0.0.1:8000/forum_section/get-user-info/');
+                                final userInfoResponse = await request.get('https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//forum_section/get-user-info/');
                                 if (userInfoResponse is Map) {
                                     final userId = userInfoResponse['user_id'] ?? 0;
                                     final isSuperuser = userInfoResponse['is_superuser'] ?? false;
@@ -233,7 +233,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // ===== INPUT FIELD (SAMA PERSIS REGISTER) =====
   Widget _buildInputField({
     required TextEditingController controller,
     required String hint,

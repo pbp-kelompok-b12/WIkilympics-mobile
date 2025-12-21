@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wikilympics/app_colors.dart';
 
 import 'package:wikilympics/sports/models/sport_entry.dart';
 import 'package:wikilympics/widgets/left_drawer.dart';
@@ -18,10 +19,6 @@ class SportEntryListPage extends StatefulWidget {
 }
 
 class _SportEntryListPageState extends State<SportEntryListPage> {
-  final Color kPrimaryNavy = const Color(0xFF03045E);
-  final Color kBgGrey = const Color(0xFFF9F9F9);
-  final Color kAccentLime = const Color(0xFFD9E74C);
-
   bool _isAdmin = false;
 
   String _searchQuery = "";
@@ -52,7 +49,7 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
     if (request.loggedIn) {
       try {
         final response =
-            await request.get("http://127.0.0.1:8000/auth/status/");
+            await request.get("https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//auth/status/");
         setState(() {
           _isAdmin = response['is_superuser'] ?? false;
         });
@@ -61,7 +58,7 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
   }
 
   Future<List<SportEntry>> fetchSports(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/sports/json/');
+    final response = await request.get('https://razan-muhammad-wikilympics.pbp.cs.ui.ac.id//sports/json/');
     List<SportEntry> listSports = [];
     for (var d in response) {
       if (d != null) {
@@ -130,7 +127,7 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
-      backgroundColor: kBgGrey,
+      backgroundColor: AppColors.kBgGrey,
       appBar: AppBar(
         title: Image.asset(
           'assets/wikilympics_banner.png',
@@ -138,10 +135,10 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
           fit: BoxFit.contain,
           errorBuilder: (ctx, _, __) => Text("WikiLympics",
               style: GoogleFonts.poppins(
-                  color: kPrimaryNavy, fontWeight: FontWeight.bold)),
+                  color: AppColors.kSecondaryNavy, fontWeight: FontWeight.bold)),
         ),
-        backgroundColor: kBgGrey,
-        iconTheme: IconThemeData(color: kPrimaryNavy),
+        backgroundColor: AppColors.kBgGrey,
+        iconTheme: IconThemeData(color: AppColors.kSecondaryNavy),
         elevation: 0,
       ),
       drawer: const LeftDrawer(),
@@ -157,9 +154,9 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
               },
               label: Text("ADD SPORT",
                   style: GoogleFonts.poppins(
-                      color: kPrimaryNavy, fontWeight: FontWeight.bold)),
-              icon: Icon(Icons.add, color: kPrimaryNavy),
-              backgroundColor: kAccentLime,
+                      color: AppColors.kSecondaryNavy, fontWeight: FontWeight.bold)),
+              icon: Icon(Icons.add, color: AppColors.kSecondaryNavy),
+              backgroundColor: AppColors.kAccentLime,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16)),
             )
@@ -171,7 +168,7 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(30, 10, 30, 7),
             decoration: BoxDecoration(
-              color: kBgGrey,
+              color: AppColors.kBgGrey,
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(24),
                 bottomRight: Radius.circular(24),
@@ -201,7 +198,7 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
                           onChanged: (val) =>
                               setState(() => _searchQuery = val.toLowerCase()),
                           decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.search, color: kPrimaryNavy),
+                            prefixIcon: Icon(Icons.search, color: AppColors.kSecondaryNavy),
                             hintText: "Search sports...",
                             hintStyle: GoogleFonts.poppins(
                                 color: Colors.black87, fontSize: 14),
@@ -219,11 +216,11 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
                         height: 40,
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         decoration: BoxDecoration(
-                          color: kPrimaryNavy,
+                          color: AppColors.kSecondaryNavy,
                           borderRadius: BorderRadius.circular(15),
                           boxShadow: [
                             BoxShadow(
-                                color: kPrimaryNavy.withOpacity(0.2),
+                                color: AppColors.kSecondaryNavy.withOpacity(0.2),
                                 blurRadius: 4,
                                 offset: const Offset(0, 2))
                           ],
@@ -243,7 +240,7 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
                     style: GoogleFonts.poppins(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      color: kPrimaryNavy,
+                      color: AppColors.kSecondaryNavy,
                       letterSpacing: -0.5,
                     ),
                   ),
@@ -269,7 +266,7 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
                               padding: const EdgeInsets.only(left: 8.0),
                               child: Text("Clear All",
                                   style: GoogleFonts.poppins(
-                                      color: kPrimaryNavy,
+                                      color: AppColors.kSecondaryNavy,
                                       fontSize: 12,
                                       fontWeight: FontWeight.w500)),
                             ),
@@ -295,7 +292,7 @@ class _SportEntryListPageState extends State<SportEntryListPage> {
                         Text(
                           'No sports yet.',
                           style: GoogleFonts.poppins(
-                              fontSize: 20, color: kPrimaryNavy),
+                              fontSize: 20, color: AppColors.kSecondaryNavy),
                         ),
                       ],
                     ),
